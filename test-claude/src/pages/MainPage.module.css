@@ -1,0 +1,31 @@
+.page {
+  position: fixed;
+  inset: 0;
+  background: #0d0d0d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.content {
+  text-align: center;
+}
+
+.title {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 800;
+  font-size: clamp(5rem, 14vw, 12rem);
+  letter-spacing: 0.08em;
+  margin: 0;
+  color: #ffffff;
+}
+
+.sub {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 300;
+  font-size: 1.1rem;
+  letter-spacing: 0.35em;
+  color: rgba(255, 255, 255, 0.35);
+  margin-top: 1.2rem;
+}

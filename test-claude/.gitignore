@@ -1,0 +1,21 @@
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+_workspace/
+.claude/
+.claude-logs/
+.claude-cache/
+
+# Editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS
+.DS_Store
+Thumbs.db
