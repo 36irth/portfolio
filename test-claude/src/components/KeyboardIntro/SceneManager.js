@@ -183,9 +183,9 @@ export class SceneManager {
       const totalWidth = (KEYCAP_CONFIGS.length - 1) * SCENE.spacing;
       KEYCAP_CONFIGS.forEach((cfg, i) => {
         const keycap = createKeycap(cfg, i);
-        const x      = -totalWidth / 2 + i * SCENE.spacing;
-        keycap.position.set(x, 0, 0);
-        keycap.userData.restY = 0;
+        const x      = -totalWidth / 2 + i * SCENE.spacing + SCENE.desktopOffsetX;
+        keycap.position.set(x, SCENE.desktopOffsetY, 0);
+        keycap.userData.restY = SCENE.desktopOffsetY;
         this.keycaps.push(keycap);
         this.scene.add(keycap);
       });

@@ -18,6 +18,8 @@ export const SCENE = {
   bevelSegments: 5,
   spacing: 1.44,
   mobileSpacing: 1.44,
+  desktopOffsetX: 0,
+  desktopOffsetY: -0.85,
   pressDepth: 0.17,
   cameraFov: 38,
   cameraY: 7.4,
