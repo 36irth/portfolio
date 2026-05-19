@@ -17,6 +17,7 @@ export class SceneManager {
     this._rafId = null;
     this._resizeHandler = null;
     this._touchHandler = null;
+    this._clickHandler = null;
 
     this._pressCallback = null;
     this._wrongKeyCallback = null;
@@ -42,19 +43,31 @@ export class SceneManager {
     }
   }
 
+  _getRenderPixelRatio(width, height) {
+    const dpr = window.devicePixelRatio || 1;
+    const maxPixels = 1200000;
+    const areaRatio = Math.sqrt(maxPixels / Math.max(width * height, 1));
+    return Math.max(0.75, Math.min(dpr, areaRatio, 1.35));
+  }
+
   _setupRenderer() {
     const width  = window.innerWidth;
     const height = window.innerHeight;
 
     let renderer;
     try {
-      renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, alpha: false });
+      renderer = new THREE.WebGLRenderer({
+        canvas: this.canvas,
+        antialias: width * height < 1400000,
+        alpha: false,
+        powerPreference: 'high-performance',
+      });
     } catch (err) {
       throw err;
     }
 
     renderer.setSize(width, height, false);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(this._getRenderPixelRatio(width, height));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -118,7 +131,7 @@ export class SceneManager {
     const key = new THREE.DirectionalLight(0xFFFAF0, 3.2);
     key.position.set(-5, 9, 6);
     key.castShadow = true;
-    key.shadow.mapSize.set(2048, 2048);
+    key.shadow.mapSize.set(512, 512);
     key.shadow.camera.near = 1;
     key.shadow.camera.far  = 40;
     key.shadow.camera.left   = -12;
@@ -181,10 +194,13 @@ export class SceneManager {
     } else {
       // 데스크톱: 한 줄
       const totalWidth = (KEYCAP_CONFIGS.length - 1) * SCENE.spacing;
+      const centerIndex = (KEYCAP_CONFIGS.length - 1) / 2;
       KEYCAP_CONFIGS.forEach((cfg, i) => {
         const keycap = createKeycap(cfg, i);
         const x      = -totalWidth / 2 + i * SCENE.spacing + SCENE.desktopOffsetX;
-        keycap.position.set(x, SCENE.desktopOffsetY, 0);
+        const z      = (i - centerIndex) * SCENE.desktopDepthStep + SCENE.desktopOffsetZ;
+        keycap.position.set(x, SCENE.desktopOffsetY, z);
+        keycap.rotation.y = SCENE.desktopKeyRotationY;
         keycap.userData.restY = SCENE.desktopOffsetY;
         this.keycaps.push(keycap);
         this.scene.add(keycap);
@@ -210,6 +226,10 @@ export class SceneManager {
 
   // ── 터치 탭으로 3D 키캡 직접 입력 ──────────────────────────
   _setupTouchRaycast() {
+    this._clickHandler = (e) => {
+      const keycap = this._getKeycapAtPoint(e.clientX, e.clientY);
+      if (keycap) this.handleKey(keycap.userData.letter.toLowerCase());
+    };
     this._touchHandler = (e) => {
       e.preventDefault();
       const touch = e.changedTouches[0];
@@ -217,6 +237,7 @@ export class SceneManager {
       const keycap = this._getKeycapAtPoint(touch.clientX, touch.clientY);
       if (keycap) this.handleKey(keycap.userData.letter.toLowerCase());
     };
+    this.canvas.addEventListener('click', this._clickHandler);
     this.canvas.addEventListener('touchend', this._touchHandler, { passive: false });
   }
 
@@ -302,6 +323,7 @@ export class SceneManager {
       this.camera.aspect = aspect;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(width, height, false);
+      this.renderer.setPixelRatio(this._getRenderPixelRatio(width, height));
     };
     window.addEventListener('resize', this._resizeHandler);
   }
@@ -318,6 +340,10 @@ export class SceneManager {
     if (this._touchHandler) {
       this.canvas.removeEventListener('touchend', this._touchHandler);
       this._touchHandler = null;
+    }
+    if (this._clickHandler) {
+      this.canvas.removeEventListener('click', this._clickHandler);
+      this._clickHandler = null;
     }
 
     gsap.killTweensOf(this.keycaps.map((k) => k.position));

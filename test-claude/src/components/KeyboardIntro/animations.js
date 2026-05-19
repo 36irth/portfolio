@@ -72,15 +72,23 @@ export function stopFloat(keycap) {
 
 export function animatePress(keycap) {
   stopFloat(keycap);
-  const { bodyMat, glowMat, glowSpriteMat, restY, index } = keycap.userData;
+  const { bodyMat, glowMat, glowSpriteMat, restY, index, pressParts } = keycap.userData;
   gsap.killTweensOf(glowMat);
   gsap.killTweensOf(bodyMat);
   if (glowSpriteMat) gsap.killTweensOf(glowSpriteMat);
+  if (pressParts) pressParts.forEach(({ obj }) => gsap.killTweensOf(obj.position));
 
   const tl = gsap.timeline({ onComplete: () => startFloat(keycap, index) });
+  const groupDepth = pressParts ? SCENE.pressDepth * 0.35 : SCENE.pressDepth;
+  const capDepth = SCENE.pressDepth * 0.95;
 
   // 누름
-  tl.to(keycap.position, { y: restY - SCENE.pressDepth, duration: 0.07, ease: 'power3.in' }, 0);
+  tl.to(keycap.position, { y: restY - groupDepth, duration: 0.07, ease: 'power3.in' }, 0);
+  if (pressParts) {
+    pressParts.forEach(({ obj, restY: partRestY }) => {
+      tl.to(obj.position, { y: partRestY - capDepth, duration: 0.07, ease: 'power3.in' }, 0);
+    });
+  }
   tl.to(glowMat,         { opacity: 0.65,               duration: 0.07 }, 0);
   tl.to(bodyMat,         { emissiveIntensity: 0.35,      duration: 0.07 }, 0);
   if (glowSpriteMat) {
@@ -95,6 +103,11 @@ export function animatePress(keycap) {
   tl.to(keycap.position, { y: restY + 0.06, duration: 0.20, ease: 'power2.out' });
   tl.to(glowMat,         { opacity: 0,      duration: 0.38, ease: 'power2.out' }, 0.07);
   tl.to(bodyMat,         { emissiveIntensity: 0.08, duration: 0.42, ease: 'power2.out' }, 0.07);
+  if (pressParts) {
+    pressParts.forEach(({ obj, restY: partRestY }) => {
+      tl.to(obj.position, { y: partRestY, duration: 0.2, ease: 'power2.out' }, 0.07);
+    });
+  }
   tl.to(keycap.position, { y: restY,        duration: 0.14, ease: 'power2.inOut' });
 
   return tl;
