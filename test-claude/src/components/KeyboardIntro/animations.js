@@ -28,7 +28,7 @@ export function startNextHighlight(keycap, light) {
       keycap.position.z,
     );
     gsap.to(light, {
-      intensity: 4.0,
+      intensity: 2.8,
       duration: 0.95,
       repeat: -1,
       yoyo: true,
@@ -170,6 +170,13 @@ export function animateCompletion(keycaps, onDone, light) {
 
   // 웨이브 완료 후 키캡 페이드 아웃
   const phase2 = (keycaps.length - 1) * waveStep + 0.67 + 0.9;
+  let doneCalled = false;
+  const finish = () => {
+    if (doneCalled) return;
+    doneCalled = true;
+    if (typeof onDone === 'function') onDone();
+  };
+
   keycaps.forEach((keycap, i) => {
     const { bodyMat, labelMat } = keycap.userData;
     const d = phase2 + i * 0.05;
@@ -177,7 +184,9 @@ export function animateCompletion(keycaps, onDone, light) {
     gsap.to(keycap.position, { y: 12,      duration: 0.65, delay: d,        ease: 'power4.in' });
     gsap.to(bodyMat,         { opacity: 0,  duration: 0.38, delay: d + 0.27, ease: 'power2.in' });
     gsap.to(labelMat,        { opacity: 0,  duration: 0.3,  delay: d + 0.25,
-      onComplete: isLast ? () => { if (typeof onDone === 'function') onDone(); } : undefined,
+      onComplete: isLast ? finish : undefined,
     });
   });
+
+  gsap.delayedCall(phase2 + keycaps.length * 0.05 + 0.9, finish);
 }

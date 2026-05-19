@@ -3,19 +3,44 @@
   inset: 0;
   background: #0d0d0d;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: clamp(1.25rem, 4vh, 2.75rem);
   color: #ffffff;
+  overflow: hidden;
+  padding: clamp(1.5rem, 5vw, 4rem);
+  box-sizing: border-box;
+}
+
+.keyStage {
+  width: min(58vw, 520px);
+  height: min(44vh, 390px);
+  min-width: 280px;
+  min-height: 260px;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(18px) scale(0.94);
+  animation: keyStageIn 0.72s 0.72s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.keyStage :global(.exploded-key-canvas) {
+  width: 100%;
+  height: 100%;
+  display: block;
+  outline: none;
 }
 
 .content {
   text-align: center;
+  pointer-events: none;
+  animation: contentIn 0.7s ease both;
 }
 
 .title {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   font-weight: 800;
-  font-size: clamp(5rem, 14vw, 12rem);
+  font-size: clamp(3.8rem, 10vw, 9rem);
   letter-spacing: 0.08em;
   margin: 0;
   color: #ffffff;
@@ -28,4 +53,34 @@
   letter-spacing: 0.35em;
   color: rgba(255, 255, 255, 0.35);
   margin-top: 1.2rem;
+}
+
+@media (max-width: 600px) {
+  .page {
+    gap: 1rem;
+  }
+
+  .keyStage {
+    width: min(92vw, 390px);
+    height: 44vh;
+    min-height: 250px;
+  }
+}
+
+@keyframes contentIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes keyStageIn {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

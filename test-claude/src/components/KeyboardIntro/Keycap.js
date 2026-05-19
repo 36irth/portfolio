@@ -253,7 +253,7 @@ function addSwitchInside(group, { keycapW, keycapH, keycapD }) {
 export function createKeycap({ letter, color, textColor, glow, emissive }, index) {
   const { keycapW, keycapH, keycapD, radius, bevelSegments } = SCENE;
   const group = new THREE.Group();
-  const hasVisibleSwitch = letter.toUpperCase() === 'Y';
+  const hasVisibleSwitch = true;
   const capLift = hasVisibleSwitch ? keycapH * 0.68 : 0;
   const glassTexture = getGlassTexture();
 

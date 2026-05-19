@@ -71,7 +71,7 @@ export class SceneManager {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer.toneMappingExposure = 0.92;
     renderer.setClearColor(new THREE.Color(SCENE.bg), 1);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
@@ -124,11 +124,11 @@ export class SceneManager {
 
   _setupLighting() {
     // 전체 베이스 밝기
-    const ambient = new THREE.AmbientLight(0xffffff, 0.45);
+    const ambient = new THREE.AmbientLight(0xffffff, 0.34);
     this.scene.add(ambient);
 
     // 메인 키 라이트 — 위 좌측에서 따뜻한 빛
-    const key = new THREE.DirectionalLight(0xFFFAF0, 3.2);
+    const key = new THREE.DirectionalLight(0xFFFAF0, 2.45);
     key.position.set(-5, 9, 6);
     key.castShadow = true;
     key.shadow.mapSize.set(512, 512);
@@ -142,17 +142,17 @@ export class SceneManager {
     this.scene.add(key);
 
     // 필 라이트 — 앰버 워밍
-    const fill = new THREE.DirectionalLight(0xFFD8A0, 1.1);
+    const fill = new THREE.DirectionalLight(0xFFD8A0, 0.78);
     fill.position.set(6, 2, 3);
     this.scene.add(fill);
 
     // 림 라이트 — 뒤쪽 푸른 반사 (엣지 분리감)
-    const rim = new THREE.DirectionalLight(0xC8D8FF, 0.55);
+    const rim = new THREE.DirectionalLight(0xC8D8FF, 0.42);
     rim.position.set(-3, -1, -6);
     this.scene.add(rim);
 
     // 상단 포인트 라이트
-    const point = new THREE.PointLight(0xFFEED8, 0.9, 25);
+    const point = new THREE.PointLight(0xFFEED8, 0.58, 25);
     point.position.set(0, 7, 1);
     this.scene.add(point);
 
@@ -169,14 +169,15 @@ export class SceneManager {
     const mobile = window.innerWidth < 600;
 
     if (mobile) {
-      // 모바일: yul(3개) 윗줄 + ssem(4개) 아랫줄
+      // 모바일: chaei 2개 윗줄 + 3개 아랫줄
       const rowY   = [1.2, -1.0];
-      const splits = [3, 4];
+      const splits = [2, 3];
       let globalIdx = 0;
       splits.forEach((count, row) => {
         const rowWidth = (count - 1) * SCENE.mobileSpacing;
         for (let i = 0; i < count; i++) {
           const cfg    = KEYCAP_CONFIGS[globalIdx];
+          if (!cfg) return;
           const keycap = createKeycap(cfg, globalIdx);
           const x      = -rowWidth / 2 + i * SCENE.mobileSpacing;
           const y      = rowY[row];

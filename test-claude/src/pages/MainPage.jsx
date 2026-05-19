@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import ExplodedKeyScene from './ExplodedKeyScene';
 import styles from './MainPage.module.css';
 
 export function MainPage() {
@@ -20,6 +21,9 @@ export function MainPage() {
       <div className={styles.content}>
         <h1 className={styles.title}>yulssem</h1>
         <p className={styles.sub}>welcome.</p>
+      </div>
+      <div className={styles.keyStage}>
+        <ExplodedKeyScene />
       </div>
     </div>
   );

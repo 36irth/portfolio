@@ -62,7 +62,25 @@ export function KeyboardIntro({ onComplete }) {
         const keycap = scene.keycaps[index];
         if (keycap) animateWrongKey(keycap);
       },
-      onCompletion: () => animateCompletion(scene.keycaps, handleComplete, scene.switchLight),
+      onCompletion: () => {
+        let didFinish = false;
+        const finish = () => {
+          if (didFinish) return;
+          didFinish = true;
+          handleComplete();
+        };
+        const fallback = window.setTimeout(finish, 3600);
+
+        try {
+          animateCompletion(scene.keycaps, () => {
+            window.clearTimeout(fallback);
+            finish();
+          }, scene.switchLight);
+        } catch (err) {
+          window.clearTimeout(fallback);
+          finish();
+        }
+      },
     });
 
     if (scene.keycaps[0]) startNextHighlight(scene.keycaps[0], scene.switchLight);
@@ -104,7 +122,7 @@ export function KeyboardIntro({ onComplete }) {
     return (
       <div className={styles.wrapper}>
         <div className={styles.fallback}>
-          <div className={styles.fallbackTitle}>yulssem</div>
+          <div className={styles.fallbackTitle}>chaei</div>
           <p className={styles.fallbackText}>
             This browser could not start the 3D intro.
           </p>

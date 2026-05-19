@@ -1,13 +1,11 @@
-export const SEQUENCE = ['y', 'u', 'l', 's', 's', 'e', 'm'];
+export const SEQUENCE = ['c', 'h', 'a', 'e', 'i'];
 
 export const KEYCAP_CONFIGS = [
-  { letter: 'Y', color: '#EDE8DF', textColor: '#1C1C1C', glow: '#FF8040', emissive: '#8B3518' },
-  { letter: 'U', color: '#EDE8DF', textColor: '#1C1C1C', glow: '#FF8040', emissive: '#8B3518' },
-  { letter: 'L', color: '#EDE8DF', textColor: '#1C1C1C', glow: '#FF8040', emissive: '#8B3518' },
-  { letter: 'S', color: '#EDE8DF', textColor: '#1C1C1C', glow: '#FF8040', emissive: '#8B3518' },
-  { letter: 'S', color: '#EDE8DF', textColor: '#1C1C1C', glow: '#FF8040', emissive: '#8B3518' },
+  { letter: 'C', color: '#EDE8DF', textColor: '#1C1C1C', glow: '#FF8040', emissive: '#8B3518' },
+  { letter: 'H', color: '#EDE8DF', textColor: '#1C1C1C', glow: '#FF8040', emissive: '#8B3518' },
+  { letter: 'A', color: '#EDE8DF', textColor: '#1C1C1C', glow: '#FF8040', emissive: '#8B3518' },
   { letter: 'E', color: '#EDE8DF', textColor: '#1C1C1C', glow: '#FF8040', emissive: '#8B3518' },
-  { letter: 'M', color: '#EDE8DF', textColor: '#1C1C1C', glow: '#FF8040', emissive: '#8B3518' },
+  { letter: 'I', color: '#EDE8DF', textColor: '#1C1C1C', glow: '#FF8040', emissive: '#8B3518' },
 ];
 
 export const SCENE = {
