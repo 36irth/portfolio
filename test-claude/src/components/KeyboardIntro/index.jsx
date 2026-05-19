@@ -4,7 +4,7 @@ import {
   animateEntrance,
   animatePress,
   animateWrongKey,
-  animateCompletion,
+  animateCompletionExit,
   startNextHighlight,
   clearNextHighlight,
 } from './animations';
@@ -72,7 +72,7 @@ export function KeyboardIntro({ onComplete }) {
         const fallback = window.setTimeout(finish, 3600);
 
         try {
-          animateCompletion(scene.keycaps, () => {
+          animateCompletionExit(scene.keycaps, () => {
             window.clearTimeout(fallback);
             finish();
           }, scene.switchLight);

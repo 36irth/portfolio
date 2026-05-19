@@ -13,7 +13,7 @@ export const SCENE = {
   keycapH: 0.52,
   keycapD: 1.1,
   radius: 0.17,
-  bevelSegments: 5,
+  bevelSegments: 3,
   spacing: 1.44,
   mobileSpacing: 1.44,
   desktopOffsetX: -0.35,

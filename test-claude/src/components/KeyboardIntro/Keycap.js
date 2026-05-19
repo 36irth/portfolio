@@ -89,7 +89,7 @@ function getGlassTexture() {
   _glassTextureCache = new THREE.CanvasTexture(canvas);
   _glassTextureCache.wrapS = THREE.RepeatWrapping;
   _glassTextureCache.wrapT = THREE.RepeatWrapping;
-  _glassTextureCache.repeat.set(2.6, 2.6);
+  _glassTextureCache.repeat.set(1.4, 1.4);
   _glassTextureCache.colorSpace = THREE.NoColorSpace;
   _glassTextureCache.needsUpdate = true;
   return _glassTextureCache;
@@ -104,15 +104,15 @@ function addSwitchInside(group, { keycapW, keycapH, keycapD }) {
     color: new THREE.Color('#F7FCFF'),
     emissive: new THREE.Color('#F5FBFF'),
     emissiveIntensity: 0.012,
-    roughness: 0.02,
+    roughness: 0.035,
     roughnessMap: glassTexture,
     bumpMap: glassTexture,
-    bumpScale: 0.012,
+    bumpScale: 0.006,
     metalness: 0,
     clearcoat: 1,
-    clearcoatRoughness: 0.01,
-    transmission: 0.72,
-    thickness: 0.62,
+    clearcoatRoughness: 0.025,
+    transmission: 0,
+    thickness: 0.1,
     ior: 1.48,
     specularIntensity: 1,
     specularColor: new THREE.Color('#FFFFFF'),
@@ -139,20 +139,18 @@ function addSwitchInside(group, { keycapW, keycapH, keycapD }) {
   });
 
   const lowerCase = new THREE.Mesh(
-    new RoundedBoxGeometry(keycapW * 1.08, keycapH * 0.58, keycapD * 0.98, 3, 0.075),
+    new RoundedBoxGeometry(keycapW * 1.08, keycapH * 0.58, keycapD * 0.98, 2, 0.075),
     housingMat,
   );
   lowerCase.position.y = -keycapH * 0.32;
-  lowerCase.castShadow = true;
   lowerCase.receiveShadow = true;
   switchGroup.add(lowerCase);
 
   const topPlate = new THREE.Mesh(
-    new RoundedBoxGeometry(keycapW * 0.88, keycapH * 0.13, keycapD * 0.78, 2, 0.045),
+    new RoundedBoxGeometry(keycapW * 0.88, keycapH * 0.13, keycapD * 0.78, 1, 0.045),
     housingMat.clone(),
   );
   topPlate.position.y = keycapH * 0.03;
-  topPlate.castShadow = true;
   topPlate.receiveShadow = true;
   switchGroup.add(topPlate);
 
@@ -160,11 +158,10 @@ function addSwitchInside(group, { keycapW, keycapH, keycapD }) {
   bevelPrismMat.opacity = 0.28;
   [-0.42, 0.42].forEach((x) => {
     const sideBlock = new THREE.Mesh(
-      new RoundedBoxGeometry(keycapW * 0.08, keycapH * 0.42, keycapD * 0.76, 2, 0.025),
+      new RoundedBoxGeometry(keycapW * 0.08, keycapH * 0.42, keycapD * 0.76, 1, 0.025),
       bevelPrismMat,
     );
     sideBlock.position.set(keycapW * x, -keycapH * 0.28, 0);
-    sideBlock.castShadow = true;
     sideBlock.receiveShadow = true;
     switchGroup.add(sideBlock);
   });
@@ -180,8 +177,8 @@ function addSwitchInside(group, { keycapW, keycapH, keycapD }) {
     metalness: 0.15,
     clearcoat: 1,
     clearcoatRoughness: 0.02,
-    transmission: 0.42,
-    thickness: 0.28,
+    transmission: 0,
+    thickness: 0.08,
     ior: 1.46,
     specularIntensity: 0.9,
     transparent: true,
@@ -195,13 +192,12 @@ function addSwitchInside(group, { keycapW, keycapH, keycapD }) {
       innerRailMat,
     );
     rail.position.set(keycapW * x, -keycapH * 0.12, 0);
-    rail.castShadow = true;
     rail.receiveShadow = true;
     switchGroup.add(rail);
   });
 
   const stem = new THREE.Mesh(
-    new THREE.CylinderGeometry(keycapW * 0.12, keycapW * 0.14, keycapH * 0.34, 16),
+    new THREE.CylinderGeometry(keycapW * 0.12, keycapW * 0.14, keycapH * 0.34, 12),
     stemMat,
   );
   stem.position.y = keycapH * 0.25;
@@ -262,21 +258,18 @@ export function createKeycap({ letter, color, textColor, glow, emissive }, index
     color: new THREE.Color(color),
     emissive: new THREE.Color(emissive),
     emissiveIntensity: 0,
-    roughness: 0.035,
-    roughnessMap: glassTexture,
-    bumpMap: glassTexture,
-    bumpScale: 0.018,
+    roughness: 0.04,
     metalness: 0,
     clearcoat: 1,
-    clearcoatRoughness: 0.012,
-    transmission: 0.5,
-    thickness: 0.74,
+    clearcoatRoughness: 0.016,
+    transmission: 0,
+    thickness: 0.1,
     ior: 1.49,
     specularIntensity: 1,
     specularColor: new THREE.Color('#FFFFFF'),
     transparent: true,
-    opacity: 0.78,
-    depthWrite: false,
+    opacity: 0.88,
+    depthWrite: true,
   });
   const body = new THREE.Mesh(geo, mat);
   body.position.y = capLift;

@@ -54,6 +54,7 @@ export function clearNextHighlight(keycap, light) {
 }
 
 export function startFloat(keycap, index) {
+  if (keycap.userData.isCompleting) return;
   const { restY } = keycap.userData;
   keycap.position.y = restY;
   gsap.to(keycap.position, {
@@ -71,6 +72,7 @@ export function stopFloat(keycap) {
 }
 
 export function animatePress(keycap) {
+  if (keycap.userData.isCompleting) return null;
   stopFloat(keycap);
   const { bodyMat, glowMat, glowSpriteMat, restY, index, pressParts } = keycap.userData;
   gsap.killTweensOf(glowMat);
@@ -78,7 +80,11 @@ export function animatePress(keycap) {
   if (glowSpriteMat) gsap.killTweensOf(glowSpriteMat);
   if (pressParts) pressParts.forEach(({ obj }) => gsap.killTweensOf(obj.position));
 
-  const tl = gsap.timeline({ onComplete: () => startFloat(keycap, index) });
+  const tl = gsap.timeline({
+    onComplete: () => {
+      if (!keycap.userData.isCompleting) startFloat(keycap, index);
+    },
+  });
   const groupDepth = pressParts ? SCENE.pressDepth * 0.35 : SCENE.pressDepth;
   const capDepth = SCENE.pressDepth * 0.95;
 
@@ -135,8 +141,74 @@ export function animateEntrance(keycaps) {
     gsap.to(keycap.position, { y: restY, duration: 0.85, delay: d,        ease: 'power4.out' });
     gsap.to(bodyMat,         { opacity: 1, duration: 0.4,  delay: d });
     gsap.to(labelMat,        { opacity: 1, duration: 0.5,  delay: d + 0.2 });
-    gsap.delayedCall(d + 1.1, () => startFloat(keycap, i));
+    const floatCall = gsap.delayedCall(d + 1.1, () => startFloat(keycap, i));
+    keycap.userData.floatCall = floatCall;
   });
+}
+
+export function animateCompletionExit(keycaps, onDone, light) {
+  let doneCalled = false;
+  const finish = () => {
+    if (doneCalled) return;
+    doneCalled = true;
+    if (typeof onDone === 'function') onDone();
+  };
+
+  keycaps.forEach((keycap) => {
+    keycap.userData.isCompleting = true;
+    keycap.userData.floatCall?.kill?.();
+    keycap.userData.floatCall = null;
+    stopFloat(keycap);
+    gsap.killTweensOf(keycap.position);
+    const { bodyMat, glowMat, labelMat, glowSpriteMat } = keycap.userData;
+    if (bodyMat) gsap.killTweensOf(bodyMat);
+    if (glowMat) gsap.killTweensOf(glowMat);
+    if (labelMat) gsap.killTweensOf(labelMat);
+    if (glowSpriteMat) {
+      gsap.killTweensOf(glowSpriteMat);
+      gsap.to(glowSpriteMat, { opacity: 0, duration: 0.22, ease: 'power2.out' });
+    }
+  });
+
+  if (light) {
+    gsap.killTweensOf(light);
+    gsap.to(light, { intensity: 0, duration: 0.25, ease: 'power2.out' });
+  }
+
+  const waveStep = 0.08;
+  const waveDuration = 0.72;
+  const exitDelay = (keycaps.length - 1) * waveStep + waveDuration + 0.18;
+  const tl = gsap.timeline({ onComplete: finish });
+
+  keycaps.forEach((keycap, i) => {
+    const { bodyMat, glowMat, restY } = keycap.userData;
+    const at = i * waveStep;
+    tl.to(keycap.position, { y: restY + 0.72, duration: 0.22, ease: 'power2.out' }, at);
+    tl.to(keycap.position, { y: restY, duration: 0.5, ease: 'elastic.out(1,0.52)' }, at + 0.22);
+    if (glowMat) {
+      tl.to(glowMat, { opacity: 0.65, duration: 0.16, ease: 'power2.out' }, at);
+      tl.to(glowMat, { opacity: 0, duration: 0.5, ease: 'power2.out' }, at + 0.18);
+    }
+    if (bodyMat) {
+      tl.to(bodyMat, { emissiveIntensity: 0.5, duration: 0.16, ease: 'power2.out' }, at);
+      tl.to(bodyMat, { emissiveIntensity: 0.08, duration: 0.5, ease: 'power2.out' }, at + 0.18);
+    }
+  });
+
+  keycaps.forEach((keycap, i) => {
+    const { bodyMat, labelMat } = keycap.userData;
+    const at = exitDelay + i * 0.045;
+    tl.to(keycap.position, { y: keycap.userData.restY + 9.5, duration: 0.62, ease: 'power4.in' }, at);
+    if (bodyMat) {
+      tl.to(bodyMat, { opacity: 0, duration: 0.34, ease: 'power2.in' }, at + 0.22);
+    }
+    if (labelMat) {
+      tl.to(labelMat, { opacity: 0, duration: 0.28, ease: 'power2.in' }, at + 0.2);
+    }
+  });
+
+  gsap.delayedCall(exitDelay + keycaps.length * 0.045 + 1.0, finish);
+  return tl;
 }
 
 export function animateCompletion(keycaps, onDone, light) {
@@ -176,6 +248,9 @@ export function animateCompletion(keycaps, onDone, light) {
     doneCalled = true;
     if (typeof onDone === 'function') onDone();
   };
+
+  gsap.delayedCall((keycaps.length - 1) * waveStep + 0.9, finish);
+  return;
 
   keycaps.forEach((keycap, i) => {
     const { bodyMat, labelMat } = keycap.userData;

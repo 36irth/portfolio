@@ -4,26 +4,8 @@ import gsap from 'gsap';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { KEYCAP_CONFIGS, SCENE } from '../components/KeyboardIntro/constants';
 
-function makeLetterTexture(letter, textColor) {
-  const size = 512;
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, size, size);
-  ctx.fillStyle = textColor;
-  ctx.font = `700 ${Math.round(size * 0.44)}px "Inter", system-ui, sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(letter, size / 2, size / 2 + size * 0.02);
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.needsUpdate = true;
-  return tex;
-}
-
 function makeGlassTexture() {
-  const size = 192;
+  const size = 96;
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
@@ -47,14 +29,14 @@ function makeGlassTexture() {
   const tex = new THREE.CanvasTexture(canvas);
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(2.4, 2.4);
+  tex.repeat.set(1.4, 1.4);
   tex.colorSpace = THREE.NoColorSpace;
   return tex;
 }
 
 function makeSpring(radius, height, turns) {
   const points = [];
-  const steps = 150;
+  const steps = 72;
   for (let i = 0; i <= steps; i++) {
     const t = i / steps;
     const angle = t * Math.PI * 2 * turns;
@@ -64,22 +46,20 @@ function makeSpring(radius, height, turns) {
       Math.sin(angle) * radius,
     ));
   }
-  return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), 150, 0.014, 8, false);
+  return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), 72, 0.014, 6, false);
 }
 
 function setExploded(parts, exploded) {
   const targets = exploded
     ? {
-      cap: { y: 2.05, rz: -0.08 },
-      label: { y: 2.314, rz: -0.08 },
-      stem: { y: 0.42, rz: 0 },
-      spring: { y: -0.06, rz: 0 },
-      switch: { y: -1.05, rz: 0.06 },
-      base: { y: -1.55, rz: 0 },
+      cap: { y: 1.65, rz: -0.08 },
+      stem: { y: 0.22, rz: 0 },
+      spring: { y: -0.16, rz: 0 },
+      switch: { y: -0.92, rz: 0.06 },
+      base: { y: -1.24, rz: 0 },
     }
     : {
-      cap: { y: 0.72, rz: 0 },
-      label: { y: 0.984, rz: 0 },
+      cap: { y: SCENE.keycapH * 0.68, rz: 0 },
       stem: { y: 0.18, rz: 0 },
       spring: { y: -0.08, rz: 0 },
       switch: { y: -0.35, rz: 0 },
@@ -87,16 +67,19 @@ function setExploded(parts, exploded) {
     };
 
   Object.entries(parts).forEach(([name, obj], index) => {
+    if (!obj?.position) return;
     gsap.to(obj.position, {
       y: targets[name].y,
       duration: 0.86,
       delay: index * 0.018,
       ease: exploded ? 'expo.out' : 'power3.inOut',
+      onUpdate: parts.render,
     });
     gsap.to(obj.rotation, {
       z: targets[name].rz,
       duration: 0.86,
       ease: exploded ? 'expo.out' : 'power3.inOut',
+      onUpdate: parts.render,
     });
   });
 }
@@ -123,18 +106,15 @@ export function ExplodedKeyScene() {
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.82;
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.enabled = false;
 
-    const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
-    camera.position.set(0, 3.2, 6.2);
+    const camera = new THREE.PerspectiveCamera(SCENE.cameraFov, 1, 0.1, 200);
+    camera.position.set(0, SCENE.cameraY, SCENE.cameraZ);
     camera.lookAt(0, 0, 0);
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.28));
     const keyLight = new THREE.DirectionalLight(0xFFFAF0, 2.1);
     keyLight.position.set(-4, 6, 5);
-    keyLight.castShadow = true;
-    keyLight.shadow.mapSize.set(512, 512);
     scene.add(keyLight);
 
     const rim = new THREE.DirectionalLight(0xC8D8FF, 0.72);
@@ -142,46 +122,42 @@ export function ExplodedKeyScene() {
     scene.add(rim);
 
     const group = new THREE.Group();
-    group.rotation.x = -0.42;
-    group.rotation.y = -0.34;
-    group.position.y = -0.18;
-    group.scale.setScalar(0.72);
+    group.rotation.y = SCENE.desktopKeyRotationY;
+    group.position.y = 0;
+    group.scale.setScalar(1);
     scene.add(group);
 
     const capMat = new THREE.MeshPhysicalMaterial({
       color: new THREE.Color(keyConfig.color),
       emissive: new THREE.Color(keyConfig.emissive),
       emissiveIntensity: 0.02,
-      roughness: 0.035,
-      roughnessMap: glassTexture,
-      bumpMap: glassTexture,
-      bumpScale: 0.018,
+      roughness: 0.04,
       metalness: 0,
       clearcoat: 1,
-      clearcoatRoughness: 0.012,
-      transmission: 0.5,
-      thickness: 0.74,
+      clearcoatRoughness: 0.016,
+      transmission: 0,
+      thickness: 0.1,
       ior: 1.49,
       specularIntensity: 1,
       specularColor: new THREE.Color('#FFFFFF'),
       transparent: true,
-      opacity: 0.78,
-      depthWrite: false,
+      opacity: 0.88,
+      depthWrite: true,
     });
 
     const switchMat = new THREE.MeshPhysicalMaterial({
       color: new THREE.Color('#F7FCFF'),
       emissive: new THREE.Color('#F5FBFF'),
       emissiveIntensity: 0.012,
-      roughness: 0.02,
+      roughness: 0.035,
       roughnessMap: glassTexture,
       bumpMap: glassTexture,
-      bumpScale: 0.01,
+      bumpScale: 0.006,
       metalness: 0,
       clearcoat: 1,
-      clearcoatRoughness: 0.01,
-      transmission: 0.72,
-      thickness: 0.6,
+      clearcoatRoughness: 0.025,
+      transmission: 0,
+      thickness: 0.1,
       ior: 1.48,
       specularIntensity: 1,
       transparent: true,
@@ -207,77 +183,71 @@ export function ExplodedKeyScene() {
     });
 
     const cap = new THREE.Mesh(
-      new RoundedBoxGeometry(SCENE.keycapW, SCENE.keycapH, SCENE.keycapD, SCENE.bevelSegments, SCENE.radius),
+      new RoundedBoxGeometry(SCENE.keycapW, SCENE.keycapH, SCENE.keycapD, 3, SCENE.radius),
       capMat,
     );
-    cap.position.y = 0.72;
-    cap.castShadow = true;
-    cap.receiveShadow = true;
+    cap.position.y = SCENE.keycapH * 0.68;
     group.add(cap);
 
-    const label = new THREE.Mesh(
-      new THREE.PlaneGeometry(SCENE.keycapW * 0.6, SCENE.keycapD * 0.6),
-      new THREE.MeshBasicMaterial({
-        map: makeLetterTexture('Y', keyConfig.textColor),
-        transparent: true,
-        depthWrite: false,
-      }),
-    );
-    label.rotation.x = -Math.PI / 2;
-    label.position.y = 0.984;
-    group.add(label);
-
     const stem = new THREE.Mesh(
-      new THREE.CylinderGeometry(SCENE.keycapW * 0.12, SCENE.keycapW * 0.14, SCENE.keycapH * 0.34, 18),
+      new THREE.CylinderGeometry(SCENE.keycapW * 0.12, SCENE.keycapW * 0.14, SCENE.keycapH * 0.34, 12),
       stemMat,
     );
     stem.position.y = 0.18;
-    stem.castShadow = true;
     group.add(stem);
 
     const spring = new THREE.Mesh(makeSpring(0.16, 0.58, 5.2), springMat);
     spring.position.y = -0.08;
-    spring.castShadow = true;
     group.add(spring);
 
     const switchBody = new THREE.Mesh(
-      new RoundedBoxGeometry(SCENE.keycapW * 1.04, SCENE.keycapH * 0.58, SCENE.keycapD * 0.96, 4, 0.075),
+      new RoundedBoxGeometry(SCENE.keycapW * 1.04, SCENE.keycapH * 0.58, SCENE.keycapD * 0.96, 2, 0.075),
       switchMat,
     );
     switchBody.position.y = -0.35;
-    switchBody.castShadow = true;
-    switchBody.receiveShadow = true;
     group.add(switchBody);
 
     const base = new THREE.Mesh(
-      new RoundedBoxGeometry(SCENE.keycapW * 1.16, SCENE.keycapH * 0.18, SCENE.keycapD * 1.06, 3, 0.055),
+      new RoundedBoxGeometry(SCENE.keycapW * 1.16, SCENE.keycapH * 0.18, SCENE.keycapD * 1.06, 2, 0.055),
       switchMat.clone(),
     );
     base.position.y = -0.68;
-    base.castShadow = true;
-    base.receiveShadow = true;
     group.add(base);
 
-    const parts = { cap, label, stem, spring, switch: switchBody, base };
+    let renderQueued = false;
+    const render = () => {
+      renderQueued = false;
+      renderer.render(scene, camera);
+    };
+    const requestRender = () => {
+      if (renderQueued) return;
+      renderQueued = true;
+      requestAnimationFrame(render);
+    };
+
+    const parts = { cap, stem, spring, switch: switchBody, base, render: requestRender };
     gsap.from(group.rotation, {
       y: group.rotation.y - 0.28,
-      duration: 0.9,
-      delay: 0.65,
+      duration: 1.05,
+      delay: 0.18,
       ease: 'power3.out',
+      onUpdate: requestRender,
     });
     gsap.from(group.position, {
-      y: -0.62,
-      duration: 0.9,
-      delay: 0.65,
-      ease: 'power3.out',
+      y: 4.8,
+      duration: 1.05,
+      delay: 0.18,
+      ease: 'power4.out',
+      onUpdate: requestRender,
     });
     gsap.from(group.scale, {
-      x: 0.45,
-      y: 0.45,
-      z: 0.45,
-      duration: 0.9,
-      delay: 0.65,
+      x: 0.92,
+      y: 0.92,
+      z: 0.92,
+      duration: 1.05,
+      delay: 0.18,
       ease: 'back.out(1.4)',
+      onUpdate: requestRender,
     });
 
     const setSize = () => {
@@ -285,9 +255,10 @@ export function ExplodedKeyScene() {
       const width = Math.max(rect.width, 1);
       const height = Math.max(rect.height, 1);
       renderer.setSize(width, height, false);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
+      requestRender();
     };
 
     const toggle = () => {
@@ -303,20 +274,13 @@ export function ExplodedKeyScene() {
     window.addEventListener('resize', setSize);
     setSize();
 
-    let rafId;
-    const tick = () => {
-      rafId = requestAnimationFrame(tick);
-      group.rotation.y += 0.0018;
-      renderer.render(scene, camera);
-    };
-    tick();
+    requestRender();
 
     return () => {
-      cancelAnimationFrame(rafId);
       window.removeEventListener('resize', setSize);
       canvas.removeEventListener('pointerdown', pointerDown);
       gsap.killTweensOf([group.position, group.rotation, group.scale]);
-      Object.values(parts).forEach((part) => {
+      [cap, stem, spring, switchBody, base].forEach((part) => {
         gsap.killTweensOf(part.position);
         gsap.killTweensOf(part.rotation);
       });

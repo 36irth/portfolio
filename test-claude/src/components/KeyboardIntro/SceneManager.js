@@ -45,9 +45,9 @@ export class SceneManager {
 
   _getRenderPixelRatio(width, height) {
     const dpr = window.devicePixelRatio || 1;
-    const maxPixels = 1200000;
+    const maxPixels = 1150000;
     const areaRatio = Math.sqrt(maxPixels / Math.max(width * height, 1));
-    return Math.max(0.75, Math.min(dpr, areaRatio, 1.35));
+    return Math.max(0.8, Math.min(dpr, areaRatio, 1.25));
   }
 
   _setupRenderer() {
@@ -58,7 +58,7 @@ export class SceneManager {
     try {
       renderer = new THREE.WebGLRenderer({
         canvas: this.canvas,
-        antialias: width * height < 1400000,
+        antialias: true,
         alpha: false,
         powerPreference: 'high-performance',
       });
@@ -68,7 +68,7 @@ export class SceneManager {
 
     renderer.setSize(width, height, false);
     renderer.setPixelRatio(this._getRenderPixelRatio(width, height));
-    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.enabled = false;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.92;
@@ -130,7 +130,7 @@ export class SceneManager {
     // 메인 키 라이트 — 위 좌측에서 따뜻한 빛
     const key = new THREE.DirectionalLight(0xFFFAF0, 2.45);
     key.position.set(-5, 9, 6);
-    key.castShadow = true;
+    key.castShadow = false;
     key.shadow.mapSize.set(512, 512);
     key.shadow.camera.near = 1;
     key.shadow.camera.far  = 40;
