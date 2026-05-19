@@ -226,6 +226,9 @@ export function ExplodedKeyScene() {
     };
 
     const parts = { cap, stem, spring, switch: switchBody, base, render: requestRender };
+    const hitTargets = [cap, stem, spring, switchBody, base];
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
     gsap.from(group.rotation, {
       y: group.rotation.y - 0.28,
       duration: 1.05,
@@ -265,12 +268,27 @@ export function ExplodedKeyScene() {
       explodedRef.current = !explodedRef.current;
       setExploded(parts, explodedRef.current);
     };
-    const pointerDown = () => {
+    const isPointerOnKey = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+      return raycaster.intersectObjects(hitTargets, false).length > 0;
+    };
+    const pointerDown = (e) => {
+      if (!isPointerOnKey(e)) return;
       toggle();
     };
+    const pointerMove = (e) => {
+      canvas.style.cursor = isPointerOnKey(e) ? 'pointer' : 'default';
+    };
+    const pointerLeave = () => {
+      canvas.style.cursor = 'default';
+    };
 
-    canvas.style.cursor = 'pointer';
     canvas.addEventListener('pointerdown', pointerDown);
+    canvas.addEventListener('pointermove', pointerMove);
+    canvas.addEventListener('pointerleave', pointerLeave);
     window.addEventListener('resize', setSize);
     setSize();
 
@@ -279,6 +297,8 @@ export function ExplodedKeyScene() {
     return () => {
       window.removeEventListener('resize', setSize);
       canvas.removeEventListener('pointerdown', pointerDown);
+      canvas.removeEventListener('pointermove', pointerMove);
+      canvas.removeEventListener('pointerleave', pointerLeave);
       gsap.killTweensOf([group.position, group.rotation, group.scale]);
       [cap, stem, spring, switchBody, base].forEach((part) => {
         gsap.killTweensOf(part.position);
