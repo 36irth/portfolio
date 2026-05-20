@@ -131,7 +131,7 @@ export function animateWrongKey(keycap) {
 export function animateEntrance(keycaps) {
   keycaps.forEach((keycap, i) => {
     const { bodyMat, labelMat, restY } = keycap.userData;
-    keycap.position.y = restY + 8;   // 각자 restY 기준으로 위에서 떨어짐
+    keycap.position.y = restY + 8;
     bodyMat.opacity = 0;
     bodyMat.transparent = true;
     labelMat.opacity = 0;
@@ -139,7 +139,15 @@ export function animateEntrance(keycaps) {
 
     const d = 0.4 + i * 0.09;
     gsap.to(keycap.position, { y: restY, duration: 0.85, delay: d,        ease: 'power4.out' });
-    gsap.to(bodyMat,         { opacity: 1, duration: 0.4,  delay: d });
+    gsap.to(bodyMat, {
+      opacity: 1,
+      duration: 0.4,
+      delay: d,
+      onComplete: () => {
+        bodyMat.transparent = false;
+        bodyMat.needsUpdate = true;
+      },
+    });
     gsap.to(labelMat,        { opacity: 1, duration: 0.5,  delay: d + 0.2 });
     const floatCall = gsap.delayedCall(d + 1.1, () => startFloat(keycap, i));
     keycap.userData.floatCall = floatCall;
@@ -200,6 +208,8 @@ export function animateCompletionExit(keycaps, onDone, light) {
     const at = exitDelay + i * 0.045;
     tl.to(keycap.position, { y: keycap.userData.restY + 9.5, duration: 0.62, ease: 'power4.in' }, at);
     if (bodyMat) {
+      bodyMat.transparent = true;
+      bodyMat.needsUpdate = true;
       tl.to(bodyMat, { opacity: 0, duration: 0.34, ease: 'power2.in' }, at + 0.22);
     }
     if (labelMat) {

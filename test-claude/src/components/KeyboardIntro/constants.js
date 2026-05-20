@@ -19,7 +19,7 @@ export const SCENE = {
   desktopOffsetX: -0.35,
   desktopOffsetY: -0.85,
   desktopOffsetZ: 0,
-  desktopDepthStep: 0.34,
+  desktopDepthStep: 0.24,
   desktopKeyRotationY: -0.24,
   pressDepth: 0.17,
   cameraFov: 38,

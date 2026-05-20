@@ -3,7 +3,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { SCENE } from './constants';
 
 function makeLetterTexture(letter, textColor) {
-  const size = 512;
+  const size = 256;
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
@@ -65,7 +65,7 @@ function getHousingTexture() {
 let _glassTextureCache = null;
 function getGlassTexture() {
   if (_glassTextureCache) return _glassTextureCache;
-  const size = 256;
+  const size = 128;
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
@@ -95,10 +95,46 @@ function getGlassTexture() {
   return _glassTextureCache;
 }
 
+let _springGeometryCache = null;
+function getSpringGeometry(radius, height, turns) {
+  if (_springGeometryCache) return _springGeometryCache;
+  const points = [];
+  const steps = 64;
+
+  for (let i = 0; i <= steps; i += 1) {
+    const t = i / steps;
+    const angle = t * Math.PI * 2 * turns;
+    points.push(new THREE.Vector3(
+      Math.cos(angle) * radius,
+      (t - 0.5) * height,
+      Math.sin(angle) * radius,
+    ));
+  }
+
+  _springGeometryCache = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), steps, 0.01, 6, false);
+  return _springGeometryCache;
+}
+
+function addBox(parent, geometry, material, position) {
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(position.x || 0, position.y || 0, position.z || 0);
+  parent.add(mesh);
+  return mesh;
+}
+
 function addSwitchInside(group, { keycapW, keycapH, keycapD }) {
   const switchGroup = new THREE.Group();
-  switchGroup.position.y = -keycapH * 0.06;
   const glassTexture = getGlassTexture();
+  const sx = keycapW / 1.42;
+  const sy = sx;
+  const sz = keycapD / 1.42;
+  const scale = Math.min(sx, sz);
+  const scaledBox = (w, h, d, radius, segments = 2) => (
+    new RoundedBoxGeometry(w * sx, h * sy, d * sz, segments, radius * scale)
+  );
+  const scaledSpring = (radius, height, turns) => (
+    getSpringGeometry(radius * scale, height * sy, turns)
+  );
 
   const housingMat = new THREE.MeshPhysicalMaterial({
     color: new THREE.Color('#F7FCFF'),
@@ -117,130 +153,177 @@ function addSwitchInside(group, { keycapW, keycapH, keycapD }) {
     specularIntensity: 1,
     specularColor: new THREE.Color('#FFFFFF'),
     transparent: true,
-    opacity: 0.34,
+    opacity: 0.44,
     depthWrite: false,
   });
 
   const stemMat = new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color('#F4F1E9'),
-    emissive: new THREE.Color('#CBBFA4'),
+    color: new THREE.Color('#efe8da'),
+    emissive: new THREE.Color('#9f8965'),
     emissiveIntensity: 0.025,
-    roughness: 0.16,
+    roughness: 0.18,
     metalness: 0,
-    clearcoat: 0.8,
-    clearcoatRoughness: 0.06,
+    clearcoat: 0.9,
+    clearcoatRoughness: 0.08,
   });
 
-  const pinMat = new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color('#D8C9AC'),
+  const stemEdgeMat = stemMat.clone();
+  stemEdgeMat.color = new THREE.Color('#d7ccbb');
+
+  const springMat = new THREE.MeshPhysicalMaterial({
+    color: new THREE.Color('#f0d99f'),
     roughness: 0.18,
-    metalness: 0.55,
+    metalness: 0.72,
+    clearcoat: 0.45,
+  });
+
+  const contactMat = new THREE.MeshPhysicalMaterial({
+    color: new THREE.Color('#c99745'),
+    roughness: 0.2,
+    metalness: 0.82,
     clearcoat: 0.35,
   });
 
-  const lowerCase = new THREE.Mesh(
-    new RoundedBoxGeometry(keycapW * 1.08, keycapH * 0.58, keycapD * 0.98, 2, 0.075),
+  const glassDenseMat = housingMat.clone();
+  glassDenseMat.opacity = 0.58;
+  glassDenseMat.color = new THREE.Color('#cfd9db');
+
+  addBox(
+    switchGroup,
+    scaledBox(1.42, 0.18, 1.42, 0.075, 3),
+    glassDenseMat,
+    { y: -0.74 * sy - 0.02 * sy },
+  );
+  addBox(
+    switchGroup,
+    scaledBox(0.74, 0.08, 0.74, 0.035, 2),
     housingMat,
+    { y: -0.74 * sy + 0.11 * sy },
   );
-  lowerCase.position.y = -keycapH * 0.32;
-  lowerCase.receiveShadow = true;
-  switchGroup.add(lowerCase);
 
-  const topPlate = new THREE.Mesh(
-    new RoundedBoxGeometry(keycapW * 0.88, keycapH * 0.13, keycapD * 0.78, 1, 0.045),
-    housingMat.clone(),
+  const housingY = -0.62 * sy;
+  addBox(
+    switchGroup,
+    scaledBox(1.28, 0.12, 1.28, 0.065, 3),
+    housingMat,
+    { y: housingY - 0.28 * sy },
   );
-  topPlate.position.y = keycapH * 0.03;
-  topPlate.receiveShadow = true;
-  switchGroup.add(topPlate);
 
-  const bevelPrismMat = housingMat.clone();
-  bevelPrismMat.opacity = 0.28;
-  [-0.42, 0.42].forEach((x) => {
-    const sideBlock = new THREE.Mesh(
-      new RoundedBoxGeometry(keycapW * 0.08, keycapH * 0.42, keycapD * 0.76, 1, 0.025),
-      bevelPrismMat,
+  [
+    { w: 1.28, h: 0.11, d: 0.18, x: 0, y: 0.04, z: -0.55 },
+    { w: 1.28, h: 0.11, d: 0.18, x: 0, y: 0.04, z: 0.55 },
+    { w: 0.18, h: 0.11, d: 1.28, x: -0.55, y: 0.04, z: 0 },
+    { w: 0.18, h: 0.11, d: 1.28, x: 0.55, y: 0.04, z: 0 },
+    { w: 1.12, h: 0.48, d: 0.15, x: 0, y: 0.18, z: -0.58 },
+    { w: 1.12, h: 0.48, d: 0.15, x: 0, y: 0.18, z: 0.58 },
+    { w: 0.15, h: 0.48, d: 1.12, x: -0.58, y: 0.18, z: 0 },
+    { w: 0.15, h: 0.48, d: 1.12, x: 0.58, y: 0.18, z: 0 },
+  ].forEach(({ w, h, d, x, y, z }) => {
+    addBox(
+      switchGroup,
+      scaledBox(w, h, d, 0.035, 2),
+      housingMat,
+      { x: x * sx, y: housingY + y * sy, z: z * sz },
     );
-    sideBlock.position.set(keycapW * x, -keycapH * 0.28, 0);
-    sideBlock.receiveShadow = true;
-    switchGroup.add(sideBlock);
   });
 
-  const innerRailMat = new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color('#F3C186'),
-    emissive: new THREE.Color('#8A3F12'),
-    emissiveIntensity: 0.012,
-    roughness: 0.08,
-    roughnessMap: glassTexture,
-    bumpMap: glassTexture,
-    bumpScale: 0.008,
-    metalness: 0.15,
-    clearcoat: 1,
-    clearcoatRoughness: 0.02,
-    transmission: 0,
-    thickness: 0.08,
-    ior: 1.46,
-    specularIntensity: 0.9,
-    transparent: true,
-    opacity: 0.56,
-    depthWrite: false,
-  });
-
-  [-0.27, 0.27].forEach((x) => {
-    const rail = new THREE.Mesh(
-      new RoundedBoxGeometry(keycapW * 0.07, keycapH * 0.2, keycapD * 0.5, 1, 0.018),
-      innerRailMat,
+  [
+    { w: 0.15, h: 0.42, d: 0.18, x: -0.76, y: -0.02, z: 0 },
+    { w: 0.15, h: 0.42, d: 0.18, x: 0.76, y: -0.02, z: 0 },
+    { w: 0.26, h: 0.18, d: 0.16, x: 0, y: -0.08, z: -0.76 },
+    { w: 0.26, h: 0.18, d: 0.16, x: 0, y: -0.08, z: 0.76 },
+  ].forEach(({ w, h, d, x, y, z }) => {
+    addBox(
+      switchGroup,
+      scaledBox(w, h, d, 0.03, 2),
+      glassDenseMat,
+      { x: x * sx, y: housingY + y * sy, z: z * sz },
     );
-    rail.position.set(keycapW * x, -keycapH * 0.12, 0);
-    rail.receiveShadow = true;
-    switchGroup.add(rail);
   });
 
-  const stem = new THREE.Mesh(
-    new THREE.CylinderGeometry(keycapW * 0.12, keycapW * 0.14, keycapH * 0.34, 12),
-    stemMat,
+  const spring = new THREE.Mesh(
+    scaledSpring(0.21, 0.72, 6.4),
+    springMat,
   );
-  stem.position.y = keycapH * 0.25;
-  stem.castShadow = true;
-  stem.receiveShadow = true;
-  switchGroup.add(stem);
+  spring.position.y = -0.28 * sy;
+  switchGroup.add(spring);
 
-  const crossX = new THREE.Mesh(
-    new RoundedBoxGeometry(keycapW * 0.28, keycapH * 0.07, keycapD * 0.07, 2, 0.016),
+  const stemY = 0.04 * sy;
+  addBox(
+    switchGroup,
+    scaledBox(0.52, 0.12, 0.52, 0.025, 2),
     stemMat,
+    { y: stemY - 0.1 * sy },
   );
-  crossX.position.y = keycapH * 0.43;
-  crossX.castShadow = true;
-  switchGroup.add(crossX);
-
-  const crossZ = new THREE.Mesh(
-    new RoundedBoxGeometry(keycapW * 0.07, keycapH * 0.07, keycapD * 0.28, 2, 0.016),
+  addBox(
+    switchGroup,
+    scaledBox(0.13, 0.58, 0.34, 0.025, 2),
     stemMat,
+    { y: stemY + 0.16 * sy },
   );
-  crossZ.position.y = keycapH * 0.43;
-  crossZ.castShadow = true;
-  switchGroup.add(crossZ);
+  addBox(
+    switchGroup,
+    scaledBox(0.34, 0.58, 0.13, 0.025, 2),
+    stemMat,
+    { y: stemY + 0.16 * sy },
+  );
+  addBox(
+    switchGroup,
+    scaledBox(0.16, 0.44, 0.16, 0.025, 2),
+    stemEdgeMat,
+    { y: stemY + 0.06 * sy },
+  );
 
-  const pcbMat = new THREE.MeshBasicMaterial({
-    color: new THREE.Color('#FF9B3D'),
-    transparent: true,
-    opacity: 0.58,
-    depthWrite: false,
-  });
-  const pcb = new THREE.Mesh(new THREE.BoxGeometry(keycapW * 0.54, keycapH * 0.025, keycapD * 0.055), pcbMat);
-  pcb.position.set(0, -keycapH * 0.55, keycapD * 0.26);
-  switchGroup.add(pcb);
-
-  [-0.18, 0.18].forEach((x) => {
-    const pin = new THREE.Mesh(
-      new THREE.BoxGeometry(keycapW * 0.045, keycapH * 0.2, keycapD * 0.22),
-      pinMat,
+  [
+    [-0.25, -0.37, -0.25],
+    [0.25, -0.37, -0.25],
+    [-0.25, -0.37, 0.25],
+    [0.25, -0.37, 0.25],
+  ].forEach(([x, y, z]) => {
+    addBox(
+      switchGroup,
+      scaledBox(0.1, 0.42, 0.1, 0.022, 2),
+      stemMat,
+      { x: x * sx, y: stemY + y * sy, z: z * sz },
     );
-    pin.position.set(keycapW * x, -keycapH * 0.48, keycapD * 0.15);
-    pin.castShadow = true;
-    pin.receiveShadow = true;
-    switchGroup.add(pin);
   });
+
+  addBox(
+    switchGroup,
+    scaledBox(0.34, 0.06, 0.11, 0.018, 1),
+    contactMat,
+    { x: -0.19 * sx, y: housingY - 0.2 * sy, z: 0.24 * sz },
+  );
+  addBox(
+    switchGroup,
+    scaledBox(0.34, 0.06, 0.11, 0.018, 1),
+    contactMat,
+    { x: 0.19 * sx, y: housingY - 0.19 * sy, z: 0.15 * sz },
+  );
+  addBox(
+    switchGroup,
+    scaledBox(0.16, 0.34, 0.08, 0.018, 1),
+    contactMat,
+    { x: -0.26 * sx, y: housingY - 0.04 * sy, z: -0.15 * sz },
+  );
+  addBox(
+    switchGroup,
+    scaledBox(0.16, 0.34, 0.08, 0.018, 1),
+    contactMat,
+    { x: 0.26 * sx, y: housingY - 0.04 * sy, z: -0.18 * sz },
+  );
+  addBox(
+    switchGroup,
+    scaledBox(0.18, 0.42, 0.12, 0.025, 2),
+    contactMat,
+    { x: -0.24 * sx, y: -0.74 * sy - 0.28 * sy, z: 0.18 * sz },
+  );
+  addBox(
+    switchGroup,
+    scaledBox(0.18, 0.42, 0.12, 0.025, 2),
+    contactMat,
+    { x: 0.24 * sx, y: -0.74 * sy - 0.28 * sy, z: 0.05 * sz },
+  );
 
   group.add(switchGroup);
   return switchGroup;
@@ -250,31 +333,31 @@ export function createKeycap({ letter, color, textColor, glow, emissive }, index
   const { keycapW, keycapH, keycapD, radius, bevelSegments } = SCENE;
   const group = new THREE.Group();
   const hasVisibleSwitch = true;
-  const capLift = hasVisibleSwitch ? keycapH * 0.68 : 0;
-  const glassTexture = getGlassTexture();
+  const scale = keycapW / 1.42;
+  const capH = 0.56 * scale;
+  const capRadius = 0.2 * scale;
+  const capLift = hasVisibleSwitch ? 0.62 * scale : 0;
 
-  const geo = new RoundedBoxGeometry(keycapW, keycapH, keycapD, bevelSegments, radius);
+  const geo = new RoundedBoxGeometry(keycapW, capH, keycapD, 6, capRadius);
   const mat = new THREE.MeshPhysicalMaterial({
     color: new THREE.Color(color),
-    emissive: new THREE.Color(emissive),
+    emissive: new THREE.Color('#fff7e8'),
     emissiveIntensity: 0,
-    roughness: 0.04,
+    roughness: 0.22,
     metalness: 0,
     clearcoat: 1,
-    clearcoatRoughness: 0.016,
+    clearcoatRoughness: 0.09,
     transmission: 0,
     thickness: 0.1,
     ior: 1.49,
     specularIntensity: 1,
     specularColor: new THREE.Color('#FFFFFF'),
-    transparent: true,
-    opacity: 0.88,
+    transparent: false,
+    opacity: 1,
     depthWrite: true,
   });
   const body = new THREE.Mesh(geo, mat);
   body.position.y = capLift;
-  body.castShadow = true;
-  body.receiveShadow = true;
   group.add(body);
 
   if (hasVisibleSwitch) {
@@ -291,10 +374,10 @@ export function createKeycap({ letter, color, textColor, glow, emissive }, index
   });
   const label = new THREE.Mesh(labelGeo, labelMat);
   label.rotation.x = -Math.PI / 2;
-  label.position.y = keycapH / 2 + capLift + 0.002;
+  label.position.y = capLift + capH / 2 + 0.004;
   group.add(label);
 
-  const glowGeo = new RoundedBoxGeometry(keycapW + 0.1, keycapH + 0.06, keycapD + 0.1, bevelSegments, radius + 0.05);
+  const glowGeo = new RoundedBoxGeometry(keycapW + 0.1, capH + 0.06, keycapD + 0.1, bevelSegments, radius + 0.05);
   const glowMat = new THREE.MeshBasicMaterial({
     color: new THREE.Color(glow),
     transparent: true,

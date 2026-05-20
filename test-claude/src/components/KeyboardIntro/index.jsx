@@ -11,6 +11,7 @@ import {
 import { SEQUENCE, KEYCAP_CONFIGS } from './constants';
 import { detectWebGL } from '../../utils/webgl';
 import styles from './KeyboardIntro.module.css';
+import TypeText from './TypeText';
 
 let _instanceCount = 0;
 
@@ -139,15 +140,23 @@ export function KeyboardIntro({ onComplete }) {
       <canvas ref={canvasRef} className={styles.canvas} />
 
       <div className={styles.introCopy}>
-        <h1 className={styles.introTitle}>
-          <span className={styles.introStrong}>CHAEI</span>
-          <span className={styles.introLight}> wants to</span>
-          <br />
-          <span className={styles.introRegular}>share a </span>
-          <span className={styles.introStrong}>portfolio</span>
-          <br />
-          <span className={styles.introLight}>with you.</span>
-        </h1>
+        <TypeText
+          className={styles.introTitle}
+          typingSpeed={70}
+          initialDelay={400}
+          cursorCharacter="|"
+          cursorBlinkDuration={0.5}
+          showCursor
+          segments={[
+            { text: 'CHAEI', className: styles.introStrong },
+            { text: ' wants to', className: styles.introLight },
+            { isBreak: true },
+            { text: 'share a ', className: styles.introRegular },
+            { text: 'portfolio', className: styles.introStrong },
+            { isBreak: true },
+            { text: 'with you.', className: styles.introLight },
+          ]}
+        />
 
         <p className={styles.introHint}>
           <span className={styles.introRegular}>Press any key</span>
