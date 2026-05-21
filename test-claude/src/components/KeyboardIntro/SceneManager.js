@@ -45,9 +45,9 @@ export class SceneManager {
 
   _getRenderPixelRatio(width, height) {
     const dpr = window.devicePixelRatio || 1;
-    const maxPixels = 1150000;
+    const maxPixels = 760000;
     const areaRatio = Math.sqrt(maxPixels / Math.max(width * height, 1));
-    return Math.max(0.8, Math.min(dpr, areaRatio, 1.25));
+    return Math.max(0.68, Math.min(dpr, areaRatio, 0.9));
   }
 
   _setupRenderer() {
@@ -82,16 +82,8 @@ export class SceneManager {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(SCENE.bg);
 
-    const groundGeo = new THREE.PlaneGeometry(60, 60);
-    const groundMat = new THREE.ShadowMaterial({ opacity: 0.15 });
-    const ground = new THREE.Mesh(groundGeo, groundMat);
-    ground.rotation.x = -Math.PI / 2;
-    ground.position.y = -1.1;
-    ground.receiveShadow = true;
-    scene.add(ground);
-
     this.scene = scene;
-    this.ground = ground;
+    this.ground = null;
   }
 
   _setupCamera() {
@@ -200,9 +192,11 @@ export class SceneManager {
         const keycap = createKeycap(cfg, i);
         const x      = -totalWidth / 2 + i * SCENE.spacing + SCENE.desktopOffsetX;
         const z      = (i - centerIndex) * SCENE.desktopDepthStep + SCENE.desktopOffsetZ;
-        keycap.position.set(x, SCENE.desktopOffsetY, z);
+        const y      = SCENE.desktopOffsetY;
+        keycap.position.set(x, y, z);
+        keycap.rotation.x = 0;
         keycap.rotation.y = SCENE.desktopKeyRotationY;
-        keycap.userData.restY = SCENE.desktopOffsetY;
+        keycap.userData.restY = y;
         this.keycaps.push(keycap);
         this.scene.add(keycap);
       });

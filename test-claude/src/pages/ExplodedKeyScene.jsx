@@ -2,23 +2,40 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { KEYCAP_CONFIGS } from '../components/KeyboardIntro/constants';
+import { KEYCAP_CONFIGS, SCENE } from '../components/KeyboardIntro/constants';
+import {
+  KEYCAP_SHELL,
+  createTaperedKeycapGeometry,
+  getKeycapShellMetrics,
+} from '../components/KeyboardIntro/Keycap';
 
-const EXPLODED_TARGETS = {
-  cap: { y: 1.84, rz: -0.045 },
+const KEY_UNIT_SCALE = SCENE.keycapW / 1.42;
+const { capH: CAP_HEIGHT, capRadius: CAP_RADIUS } = getKeycapShellMetrics(SCENE.keycapW);
+
+const scaleUnit = (value) => value * KEY_UNIT_SCALE;
+
+const scaleTargets = (targets) => Object.fromEntries(
+  Object.entries(targets).map(([name, target]) => [
+    name,
+    { ...target, y: scaleUnit(target.y) },
+  ]),
+);
+
+const EXPLODED_TARGETS = scaleTargets({
+  cap: { y: 1.96, rz: -0.045 },
   stem: { y: 0.5, rz: 0.015 },
   spring: { y: -0.18, rz: 0 },
   housing: { y: -0.94, rz: 0.035 },
   base: { y: -1.18, rz: 0 },
-};
+});
 
-const ASSEMBLED_TARGETS = {
-  cap: { y: 0.48, rz: 0 },
+const ASSEMBLED_TARGETS = scaleTargets({
+  cap: { y: KEYCAP_SHELL.liftRatio, rz: 0 },
   stem: { y: 0.04, rz: 0 },
   spring: { y: -0.28, rz: 0 },
   housing: { y: -0.62, rz: 0 },
   base: { y: -0.74, rz: 0 },
-};
+});
 
 function makeNoiseTexture(size = 128) {
   const canvas = document.createElement('canvas');
@@ -58,10 +75,50 @@ function makeLegendTexture(letter, textColor) {
 
   ctx.clearRect(0, 0, size, size);
   ctx.fillStyle = textColor;
-  ctx.font = '700 118px Arial, Helvetica, sans-serif';
+  ctx.font = `700 ${Math.round(size * 0.44)}px "Inter", "SF Pro Display", system-ui, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(letter, size / 2, size / 2 + 4);
+  ctx.fillText(letter, size / 2, size / 2 + size * 0.02);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+function makeGlowTexture(size = 256) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const center = size / 2;
+  const grad = ctx.createRadialGradient(center, center, 0, center, center, center);
+  grad.addColorStop(0.0, 'rgba(255, 216, 160, 0.68)');
+  grad.addColorStop(0.2, 'rgba(255, 174, 92, 0.46)');
+  grad.addColorStop(0.45, 'rgba(232, 138, 58, 0.18)');
+  grad.addColorStop(0.7, 'rgba(200, 102, 24, 0.03)');
+  grad.addColorStop(1.0, 'rgba(0, 0, 0, 0.0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+function makeHousingTexture(size = 64) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const center = size / 2;
+  const grad = ctx.createRadialGradient(center, center, 0, center, center, center);
+  grad.addColorStop(0.0, 'rgba(255, 193, 110, 0.62)');
+  grad.addColorStop(0.3, 'rgba(248, 152, 74, 0.38)');
+  grad.addColorStop(0.6, 'rgba(224, 118, 44, 0.12)');
+  grad.addColorStop(0.85, 'rgba(190, 82, 24, 0.025)');
+  grad.addColorStop(1.0, 'rgba(0, 0, 0, 0.0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
@@ -82,11 +139,25 @@ function makeSpringGeometry(radius, height, turns) {
     ));
   }
 
-  return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), steps, 0.013, 8, false);
+  return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), steps, 0.01, 8, false);
 }
 
 function makeRoundedBox(w, h, d, radius, segments = 3) {
-  return new RoundedBoxGeometry(w, h, d, segments, radius);
+  return new RoundedBoxGeometry(
+    scaleUnit(w),
+    scaleUnit(h),
+    scaleUnit(d),
+    segments,
+    scaleUnit(radius),
+  );
+}
+
+function scalePosition(position) {
+  return {
+    x: scaleUnit(position.x || 0),
+    y: scaleUnit(position.y || 0),
+    z: scaleUnit(position.z || 0),
+  };
 }
 
 function addBox(parent, geometry, material, position, scale) {
@@ -99,25 +170,26 @@ function addBox(parent, geometry, material, position, scale) {
 
 function createKeycap(materials, keyConfig) {
   const group = new THREE.Group();
+  const capScale = SCENE.keycapW / KEYCAP_SHELL.sourceWidth;
 
   addBox(
     group,
-    makeRoundedBox(1.42, 0.56, 1.42, 0.2, 6),
+    createTaperedKeycapGeometry(SCENE.keycapW, CAP_HEIGHT, SCENE.keycapD, CAP_RADIUS, 6),
     materials.cap,
-    { y: -0.03 },
+    { y: 0 },
   );
 
   const innerLip = addBox(
     group,
-    makeRoundedBox(0.82, 0.12, 0.82, 0.035, 2),
+    createTaperedKeycapGeometry(0.82 * capScale, 0.12 * capScale, 0.82 * capScale, 0.035 * capScale, 2),
     materials.capShadow,
-    { y: -0.38 },
+    scalePosition({ y: -0.37 }),
   );
   innerLip.castShadow = false;
 
   const legendMap = makeLegendTexture(keyConfig.letter, keyConfig.textColor);
   const legend = new THREE.Mesh(
-    new THREE.PlaneGeometry(0.42, 0.42),
+    new THREE.PlaneGeometry(SCENE.keycapW * 0.6, SCENE.keycapD * 0.6),
     new THREE.MeshBasicMaterial({
       map: legendMap,
       transparent: true,
@@ -125,8 +197,8 @@ function createKeycap(materials, keyConfig) {
     }),
   );
   legend.rotation.x = -Math.PI / 2;
-  legend.position.y = 0.255;
-  legend.position.z = -0.03;
+  legend.position.y = CAP_HEIGHT / 2 + 0.004;
+  legend.position.z = 0;
   group.add(legend);
 
   group.userData.texture = legendMap;
@@ -135,10 +207,10 @@ function createKeycap(materials, keyConfig) {
 
 function createStem(materials) {
   const group = new THREE.Group();
-  addBox(group, makeRoundedBox(0.52, 0.12, 0.52, 0.025, 2), materials.stem, { y: -0.1 });
-  addBox(group, makeRoundedBox(0.13, 0.58, 0.34, 0.025, 2), materials.stem, { y: 0.16 });
-  addBox(group, makeRoundedBox(0.34, 0.58, 0.13, 0.025, 2), materials.stem, { y: 0.16 });
-  addBox(group, makeRoundedBox(0.16, 0.44, 0.16, 0.025, 2), materials.stemEdge, { y: 0.06 });
+  addBox(group, makeRoundedBox(0.52, 0.12, 0.52, 0.025, 2), materials.stem, scalePosition({ y: -0.1 }));
+  addBox(group, makeRoundedBox(0.13, 0.58, 0.34, 0.025, 2), materials.stem, scalePosition({ y: 0.16 }));
+  addBox(group, makeRoundedBox(0.34, 0.58, 0.13, 0.025, 2), materials.stem, scalePosition({ y: 0.16 }));
+  addBox(group, makeRoundedBox(0.16, 0.44, 0.16, 0.025, 2), materials.stemEdge, scalePosition({ y: 0.06 }));
 
   [
     [-0.25, -0.37, -0.25],
@@ -146,11 +218,11 @@ function createStem(materials) {
     [-0.25, -0.37, 0.25],
     [0.25, -0.37, 0.25],
   ].forEach(([x, y, z]) => {
-    addBox(group, makeRoundedBox(0.1, 0.42, 0.1, 0.022, 2), materials.stem, { x, y, z });
+    addBox(group, makeRoundedBox(0.1, 0.42, 0.1, 0.022, 2), materials.stem, scalePosition({ x, y, z }));
   });
 
-  addBox(group, makeRoundedBox(0.1, 0.5, 0.08, 0.018, 2), materials.stemEdge, { x: -0.16, y: -0.1, z: 0 });
-  addBox(group, makeRoundedBox(0.1, 0.5, 0.08, 0.018, 2), materials.stemEdge, { x: 0.16, y: -0.1, z: 0 });
+  addBox(group, makeRoundedBox(0.1, 0.5, 0.08, 0.018, 2), materials.stemEdge, scalePosition({ x: -0.16, y: -0.1, z: 0 }));
+  addBox(group, makeRoundedBox(0.1, 0.5, 0.08, 0.018, 2), materials.stemEdge, scalePosition({ x: 0.16, y: -0.1, z: 0 }));
   return group;
 }
 
@@ -159,36 +231,36 @@ function createHousing(materials) {
   const wallH = 0.48;
   const y = 0.04;
 
-  addBox(housing, makeRoundedBox(1.28, 0.12, 1.28, 0.065, 3), materials.glass, { y: -0.28 });
-  addBox(housing, makeRoundedBox(1.28, 0.11, 0.18, 0.035, 2), materials.glass, { y, z: -0.55 });
-  addBox(housing, makeRoundedBox(1.28, 0.11, 0.18, 0.035, 2), materials.glass, { y, z: 0.55 });
-  addBox(housing, makeRoundedBox(0.18, 0.11, 1.28, 0.035, 2), materials.glass, { x: -0.55, y });
-  addBox(housing, makeRoundedBox(0.18, 0.11, 1.28, 0.035, 2), materials.glass, { x: 0.55, y });
+  addBox(housing, makeRoundedBox(1.28, 0.12, 1.28, 0.065, 3), materials.glass, scalePosition({ y: -0.28 }));
+  addBox(housing, makeRoundedBox(1.28, 0.11, 0.18, 0.035, 2), materials.glass, scalePosition({ y, z: -0.55 }));
+  addBox(housing, makeRoundedBox(1.28, 0.11, 0.18, 0.035, 2), materials.glass, scalePosition({ y, z: 0.55 }));
+  addBox(housing, makeRoundedBox(0.18, 0.11, 1.28, 0.035, 2), materials.glass, scalePosition({ x: -0.55, y }));
+  addBox(housing, makeRoundedBox(0.18, 0.11, 1.28, 0.035, 2), materials.glass, scalePosition({ x: 0.55, y }));
 
-  addBox(housing, makeRoundedBox(1.12, wallH, 0.15, 0.04, 2), materials.glass, { y: 0.18, z: -0.58 });
-  addBox(housing, makeRoundedBox(1.12, wallH, 0.15, 0.04, 2), materials.glass, { y: 0.18, z: 0.58 });
-  addBox(housing, makeRoundedBox(0.15, wallH, 1.12, 0.04, 2), materials.glass, { x: -0.58, y: 0.18 });
-  addBox(housing, makeRoundedBox(0.15, wallH, 1.12, 0.04, 2), materials.glass, { x: 0.58, y: 0.18 });
+  addBox(housing, makeRoundedBox(1.12, wallH, 0.15, 0.04, 2), materials.glass, scalePosition({ y: 0.18, z: -0.58 }));
+  addBox(housing, makeRoundedBox(1.12, wallH, 0.15, 0.04, 2), materials.glass, scalePosition({ y: 0.18, z: 0.58 }));
+  addBox(housing, makeRoundedBox(0.15, wallH, 1.12, 0.04, 2), materials.glass, scalePosition({ x: -0.58, y: 0.18 }));
+  addBox(housing, makeRoundedBox(0.15, wallH, 1.12, 0.04, 2), materials.glass, scalePosition({ x: 0.58, y: 0.18 }));
 
-  addBox(housing, makeRoundedBox(0.34, 0.06, 0.11, 0.018, 1), materials.contact, { x: -0.19, y: -0.2, z: 0.24 });
-  addBox(housing, makeRoundedBox(0.34, 0.06, 0.11, 0.018, 1), materials.contact, { x: 0.19, y: -0.19, z: 0.15 });
-  addBox(housing, makeRoundedBox(0.16, 0.34, 0.08, 0.018, 1), materials.contact, { x: -0.26, y: -0.04, z: -0.15 });
-  addBox(housing, makeRoundedBox(0.16, 0.34, 0.08, 0.018, 1), materials.contact, { x: 0.26, y: -0.04, z: -0.18 });
+  addBox(housing, makeRoundedBox(0.34, 0.06, 0.11, 0.018, 1), materials.contact, scalePosition({ x: -0.19, y: -0.2, z: 0.24 }));
+  addBox(housing, makeRoundedBox(0.34, 0.06, 0.11, 0.018, 1), materials.contact, scalePosition({ x: 0.19, y: -0.19, z: 0.15 }));
+  addBox(housing, makeRoundedBox(0.16, 0.34, 0.08, 0.018, 1), materials.contact, scalePosition({ x: -0.26, y: -0.04, z: -0.15 }));
+  addBox(housing, makeRoundedBox(0.16, 0.34, 0.08, 0.018, 1), materials.contact, scalePosition({ x: 0.26, y: -0.04, z: -0.18 }));
 
-  addBox(housing, makeRoundedBox(0.15, 0.42, 0.18, 0.03, 2), materials.glassDense, { x: -0.76, y: -0.02 });
-  addBox(housing, makeRoundedBox(0.15, 0.42, 0.18, 0.03, 2), materials.glassDense, { x: 0.76, y: -0.02 });
-  addBox(housing, makeRoundedBox(0.26, 0.18, 0.16, 0.03, 2), materials.glassDense, { z: -0.76, y: -0.08 });
-  addBox(housing, makeRoundedBox(0.26, 0.18, 0.16, 0.03, 2), materials.glassDense, { z: 0.76, y: -0.08 });
+  addBox(housing, makeRoundedBox(0.15, 0.42, 0.18, 0.03, 2), materials.glassDense, scalePosition({ x: -0.76, y: -0.02 }));
+  addBox(housing, makeRoundedBox(0.15, 0.42, 0.18, 0.03, 2), materials.glassDense, scalePosition({ x: 0.76, y: -0.02 }));
+  addBox(housing, makeRoundedBox(0.26, 0.18, 0.16, 0.03, 2), materials.glassDense, scalePosition({ z: -0.76, y: -0.08 }));
+  addBox(housing, makeRoundedBox(0.26, 0.18, 0.16, 0.03, 2), materials.glassDense, scalePosition({ z: 0.76, y: -0.08 }));
 
   return housing;
 }
 
 function createBase(materials) {
   const base = new THREE.Group();
-  addBox(base, makeRoundedBox(1.42, 0.18, 1.42, 0.075, 3), materials.glassDense, { y: -0.02 });
-  addBox(base, makeRoundedBox(0.74, 0.08, 0.74, 0.035, 2), materials.glass, { y: 0.11 });
-  addBox(base, makeRoundedBox(0.18, 0.42, 0.12, 0.025, 2), materials.contact, { x: -0.24, y: -0.28, z: 0.18 });
-  addBox(base, makeRoundedBox(0.18, 0.42, 0.12, 0.025, 2), materials.contact, { x: 0.24, y: -0.28, z: 0.05 });
+  addBox(base, makeRoundedBox(1.42, 0.18, 1.42, 0.075, 3), materials.glassDense, scalePosition({ y: -0.02 }));
+  addBox(base, makeRoundedBox(0.74, 0.08, 0.74, 0.035, 2), materials.glass, scalePosition({ y: 0.11 }));
+  addBox(base, makeRoundedBox(0.18, 0.42, 0.12, 0.025, 2), materials.contact, scalePosition({ x: -0.24, y: -0.28, z: 0.18 }));
+  addBox(base, makeRoundedBox(0.18, 0.42, 0.12, 0.025, 2), materials.contact, scalePosition({ x: 0.24, y: -0.28, z: 0.05 }));
   return base;
 }
 
@@ -215,7 +287,7 @@ function moveParts(parts, exploded) {
 
 export function ExplodedKeyScene() {
   const canvasRef = useRef(null);
-  const explodedRef = useRef(true);
+  const explodedRef = useRef(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -225,6 +297,8 @@ export function ExplodedKeyScene() {
     const noiseTexture = makeNoiseTexture();
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x090806, 0.055);
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -237,8 +311,8 @@ export function ExplodedKeyScene() {
     renderer.toneMappingExposure = 0.92;
     renderer.shadowMap.enabled = false;
 
-    const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 120);
-    camera.position.set(0.18, 6.35, 4.75);
+    const camera = new THREE.PerspectiveCamera(SCENE.cameraFov, 1, 0.1, 120);
+    camera.position.set(0.18, SCENE.cameraY, SCENE.cameraZ);
     camera.lookAt(0, -0.16, 0);
 
     scene.add(new THREE.HemisphereLight(0xfff4dc, 0x1c1d24, 0.48));
@@ -255,10 +329,14 @@ export function ExplodedKeyScene() {
     scene.add(warmPin);
 
     const group = new THREE.Group();
-    group.rotation.set(-0.18, -0.42, 0.02);
-    group.position.set(0.03, -0.05, 0);
-    group.scale.setScalar(0.84);
+    group.rotation.set(-0.16, SCENE.desktopKeyRotationY, 0.02);
+    group.position.set(0.03, -0.18, 0);
+    group.scale.setScalar(1);
     scene.add(group);
+
+    const switchLight = new THREE.PointLight(0xffb47a, 0, 9);
+    switchLight.position.set(0, scaleUnit(-0.55), 0);
+    group.add(switchLight);
 
     const capMat = new THREE.MeshPhysicalMaterial({
       color: new THREE.Color(keyConfig.color),
@@ -340,12 +418,38 @@ export function ExplodedKeyScene() {
     const cap = createKeycap(materials, keyConfig);
     const stem = createStem(materials);
     const spring = new THREE.Group();
-    const springMesh = new THREE.Mesh(makeSpringGeometry(0.21, 0.72, 6.4), springMat);
+    const springMesh = new THREE.Mesh(makeSpringGeometry(scaleUnit(0.21), scaleUnit(0.72), 6.4), springMat);
     spring.add(springMesh);
     const housing = createHousing(materials);
     const base = createBase(materials);
+    const glowTexture = makeGlowTexture();
+    const housingTexture = makeHousingTexture();
+    const glowDiscMat = new THREE.MeshBasicMaterial({
+      map: housingTexture,
+      transparent: true,
+      opacity: 0.22,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    });
+    const glowDisc = new THREE.Mesh(new THREE.CircleGeometry(1.4, 64), glowDiscMat);
+    glowDisc.rotation.x = -Math.PI / 2;
+    glowDisc.position.set(0, scaleUnit(-0.55), 0);
+    group.add(glowDisc);
+    const glowSpriteMat = new THREE.SpriteMaterial({
+      map: glowTexture,
+      transparent: true,
+      opacity: 0.38,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      depthTest: false,
+    });
+    const glowSprite = new THREE.Sprite(glowSpriteMat);
+    glowSprite.scale.set(5, 5, 1);
+    glowSprite.position.set(0, scaleUnit(-0.55), 0);
+    group.add(glowSprite);
 
-    Object.entries(EXPLODED_TARGETS).forEach(([name, target]) => {
+    Object.entries(ASSEMBLED_TARGETS).forEach(([name, target]) => {
       const part = { cap, stem, spring, housing, base }[name];
       part.position.y = target.y;
       part.rotation.z = target.rz;
@@ -364,23 +468,83 @@ export function ExplodedKeyScene() {
     };
 
     const parts = { cap, stem, spring, housing, base, render: requestRender };
+    const pulseGlow = gsap.to(glowSpriteMat, {
+      opacity: 0.6,
+      duration: 0.9,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+      onUpdate: requestRender,
+    });
+    const pulseDisc = gsap.to(glowDiscMat, {
+      opacity: 0.34,
+      duration: 0.9,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+      onUpdate: requestRender,
+    });
+    const pulseLight = gsap.to(switchLight, {
+      intensity: 1.65,
+      duration: 0.95,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+      onUpdate: requestRender,
+    });
+
+    const hitKey = (clientX, clientY) => {
+      const rect = canvas.getBoundingClientRect();
+      pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+
+      const meshes = [];
+      group.traverse((obj) => {
+        if (obj.isMesh && obj !== glowDisc) meshes.push(obj);
+      });
+
+      return raycaster.intersectObjects(meshes, false).length > 0;
+    };
+
+    const getResponsiveFov = (width, height) => {
+      const mobile = width < 600;
+      const aspect = width / height;
+
+      if (mobile) {
+        const halfW = (3 * SCENE.mobileSpacing / 2) * 1.22;
+        const dist = Math.sqrt(5.5 ** 2 + 6.0 ** 2);
+        const hHalf = Math.atan(halfW / dist);
+        return Math.max(60, Math.min(82,
+          2 * Math.atan(Math.tan(hHalf) / aspect) * (180 / Math.PI),
+        ));
+      }
+
+      const baseHFOVTan = Math.tan((SCENE.cameraFov / 2) * (Math.PI / 180)) * 1.78;
+      return Math.max(36, Math.min(78,
+        2 * Math.atan(baseHFOVTan / aspect) * (180 / Math.PI),
+      ));
+    };
+
     const setSize = () => {
       const rect = canvas.getBoundingClientRect();
       const width = Math.max(rect.width, 1);
       const height = Math.max(rect.height, 1);
+      const mobile = width < 760;
       renderer.setSize(width, height, false);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.18));
       camera.aspect = width / height;
+      camera.fov = getResponsiveFov(width, height);
       camera.updateProjectionMatrix();
 
-      if (width < 760) {
-        group.scale.setScalar(0.66);
-        group.position.y = -0.08;
-        camera.position.set(0.12, 6.6, 5.35);
+      if (mobile) {
+        group.scale.setScalar(0.92);
+        group.position.y = -0.14;
+        camera.position.set(0.12, 5.5, 6.0);
       } else {
-        group.scale.setScalar(0.84);
-        group.position.y = -0.1;
-        camera.position.set(0.18, 6.35, 4.75);
+        group.scale.setScalar(1);
+        group.position.y = -0.18;
+        camera.position.set(0.18, SCENE.cameraY, SCENE.cameraZ);
       }
       camera.lookAt(0, -0.16, 0);
       requestRender();
@@ -391,8 +555,14 @@ export function ExplodedKeyScene() {
       moveParts(parts, explodedRef.current);
     };
 
-    const pointerDown = () => toggle();
-    canvas.style.cursor = 'pointer';
+    const pointerMove = (e) => {
+      canvas.style.cursor = hitKey(e.clientX, e.clientY) ? 'pointer' : 'default';
+    };
+    const pointerDown = (e) => {
+      if (!hitKey(e.clientX, e.clientY)) return;
+      toggle();
+    };
+    canvas.style.cursor = 'default';
 
     gsap.from(group.rotation, {
       x: group.rotation.x - 0.12,
@@ -408,6 +578,7 @@ export function ExplodedKeyScene() {
       onUpdate: requestRender,
     });
 
+    canvas.addEventListener('pointermove', pointerMove);
     canvas.addEventListener('pointerdown', pointerDown);
     window.addEventListener('resize', setSize);
     setSize();
@@ -415,15 +586,22 @@ export function ExplodedKeyScene() {
 
     return () => {
       window.removeEventListener('resize', setSize);
+      canvas.removeEventListener('pointermove', pointerMove);
       canvas.removeEventListener('pointerdown', pointerDown);
+      pulseGlow.kill();
+      pulseDisc.kill();
+      pulseLight.kill();
       gsap.killTweensOf([group.position, group.rotation]);
+      gsap.killTweensOf(glowDiscMat);
+      gsap.killTweensOf(glowSpriteMat);
+      gsap.killTweensOf(switchLight);
       Object.values(parts).forEach((part) => {
         if (!part?.position) return;
         gsap.killTweensOf(part.position);
         gsap.killTweensOf(part.rotation);
       });
       group.traverse((obj) => {
-        if (!obj.isMesh && !obj.isLine) return;
+        if (!obj.isMesh && !obj.isLine && !obj.isSprite) return;
         obj.geometry?.dispose?.();
         const mat = obj.material;
         if (Array.isArray(mat)) {
@@ -441,6 +619,8 @@ export function ExplodedKeyScene() {
         }
       });
       cap.userData.texture?.dispose?.();
+      glowTexture.dispose();
+      housingTexture.dispose();
       noiseTexture.dispose();
       renderer.dispose();
     };

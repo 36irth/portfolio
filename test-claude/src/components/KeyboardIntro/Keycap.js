@@ -3,7 +3,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { SCENE } from './constants';
 
 function makeLetterTexture(letter, textColor) {
-  const size = 256;
+  const size = 192;
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
@@ -23,7 +23,7 @@ function makeLetterTexture(letter, textColor) {
 let _glowTexCache = null;
 function getGlowTexture() {
   if (_glowTexCache) return _glowTexCache;
-  const size = 256;
+  const size = 192;
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
@@ -44,7 +44,7 @@ function getGlowTexture() {
 let _housingTexCache = null;
 function getHousingTexture() {
   if (_housingTexCache) return _housingTexCache;
-  const size = 64;
+  const size = 48;
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
@@ -65,7 +65,7 @@ function getHousingTexture() {
 let _glassTextureCache = null;
 function getGlassTexture() {
   if (_glassTextureCache) return _glassTextureCache;
-  const size = 128;
+  const size = 96;
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
@@ -99,7 +99,7 @@ let _springGeometryCache = null;
 function getSpringGeometry(radius, height, turns) {
   if (_springGeometryCache) return _springGeometryCache;
   const points = [];
-  const steps = 64;
+  const steps = 48;
 
   for (let i = 0; i <= steps; i += 1) {
     const t = i / steps;
@@ -111,8 +111,47 @@ function getSpringGeometry(radius, height, turns) {
     ));
   }
 
-  _springGeometryCache = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), steps, 0.01, 6, false);
+  _springGeometryCache = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), steps, 0.01, 5, false);
   return _springGeometryCache;
+}
+
+export const KEYCAP_SHELL = {
+  sourceWidth: 1.42,
+  heightRatio: 0.62,
+  radiusRatio: 0.2,
+  liftRatio: 0.76,
+  topScaleX: 0.94,
+  topScaleZ: 0.94,
+};
+
+export function getKeycapShellMetrics(keycapW) {
+  const scale = keycapW / KEYCAP_SHELL.sourceWidth;
+  return {
+    scale,
+    capH: KEYCAP_SHELL.heightRatio * scale,
+    capRadius: KEYCAP_SHELL.radiusRatio * scale,
+    capLift: KEYCAP_SHELL.liftRatio * scale,
+  };
+}
+
+export function createTaperedKeycapGeometry(width, height, depth, radius, segments = 6) {
+  const geometry = new RoundedBoxGeometry(width, height, depth, segments, radius);
+  const positions = geometry.attributes.position;
+  const halfHeight = height / 2;
+
+  for (let i = 0; i < positions.count; i += 1) {
+    const x = positions.getX(i);
+    const y = positions.getY(i);
+    const z = positions.getZ(i);
+    const t = THREE.MathUtils.clamp((y + halfHeight) / height, 0, 1);
+    const scaleX = THREE.MathUtils.lerp(1, KEYCAP_SHELL.topScaleX, t);
+    const scaleZ = THREE.MathUtils.lerp(1, KEYCAP_SHELL.topScaleZ, t);
+    positions.setXYZ(i, x * scaleX, y, z * scaleZ);
+  }
+
+  positions.needsUpdate = true;
+  geometry.computeVertexNormals();
+  return geometry;
 }
 
 function addBox(parent, geometry, material, position) {
@@ -333,12 +372,9 @@ export function createKeycap({ letter, color, textColor, glow, emissive }, index
   const { keycapW, keycapH, keycapD, radius, bevelSegments } = SCENE;
   const group = new THREE.Group();
   const hasVisibleSwitch = true;
-  const scale = keycapW / 1.42;
-  const capH = 0.56 * scale;
-  const capRadius = 0.2 * scale;
-  const capLift = hasVisibleSwitch ? 0.62 * scale : 0;
+  const { capH, capRadius, capLift } = getKeycapShellMetrics(keycapW);
 
-  const geo = new RoundedBoxGeometry(keycapW, capH, keycapD, 6, capRadius);
+  const geo = createTaperedKeycapGeometry(keycapW, capH, keycapD, capRadius, 6);
   const mat = new THREE.MeshPhysicalMaterial({
     color: new THREE.Color(color),
     emissive: new THREE.Color('#fff7e8'),
@@ -377,7 +413,13 @@ export function createKeycap({ letter, color, textColor, glow, emissive }, index
   label.position.y = capLift + capH / 2 + 0.004;
   group.add(label);
 
-  const glowGeo = new RoundedBoxGeometry(keycapW + 0.1, capH + 0.06, keycapD + 0.1, bevelSegments, radius + 0.05);
+  const glowGeo = createTaperedKeycapGeometry(
+    keycapW + 0.1,
+    capH + 0.06,
+    keycapD + 0.1,
+    radius + 0.05,
+    bevelSegments,
+  );
   const glowMat = new THREE.MeshBasicMaterial({
     color: new THREE.Color(glow),
     transparent: true,

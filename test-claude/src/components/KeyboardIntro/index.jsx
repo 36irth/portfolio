@@ -20,10 +20,14 @@ export function KeyboardIntro({ onComplete }) {
   const sceneRef = useRef(null);
   const completedRef = useRef(false);
   const ownedRef = useRef(false);
+  const skipSequenceRef = useRef(null);
+  const skipTimersRef = useRef([]);
+  const isSkippingRef = useRef(false);
 
   const [progress, setProgress] = useState(0);
   const [webglError, setWebglError] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
+  const [isSkipping, setIsSkipping] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -50,10 +54,36 @@ export function KeyboardIntro({ onComplete }) {
 
     sceneRef.current = scene;
 
+    const clearSkipTimers = () => {
+      skipTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+      skipTimersRef.current = [];
+    };
+
     const handleComplete = () => {
       if (completedRef.current) return;
+      clearSkipTimers();
       completedRef.current = true;
       onComplete?.();
+    };
+
+    const runCompletionExit = () => {
+      let didFinish = false;
+      const finish = () => {
+        if (didFinish) return;
+        didFinish = true;
+        handleComplete();
+      };
+      const fallback = window.setTimeout(finish, 3600);
+
+      try {
+        animateCompletionExit(scene.keycaps, () => {
+          window.clearTimeout(fallback);
+          finish();
+        }, scene.switchLight);
+      } catch (err) {
+        window.clearTimeout(fallback);
+        finish();
+      }
     };
 
     scene.setAnimationCallbacks({
@@ -63,30 +93,35 @@ export function KeyboardIntro({ onComplete }) {
         const keycap = scene.keycaps[index];
         if (keycap) animateWrongKey(keycap);
       },
-      onCompletion: () => {
-        let didFinish = false;
-        const finish = () => {
-          if (didFinish) return;
-          didFinish = true;
-          handleComplete();
-        };
-        const fallback = window.setTimeout(finish, 3600);
-
-        try {
-          animateCompletionExit(scene.keycaps, () => {
-            window.clearTimeout(fallback);
-            finish();
-          }, scene.switchLight);
-        } catch (err) {
-          window.clearTimeout(fallback);
-          finish();
-        }
-      },
+      onCompletion: runCompletionExit,
     });
 
     if (scene.keycaps[0]) startNextHighlight(scene.keycaps[0], scene.switchLight);
 
+    skipSequenceRef.current = () => {
+      if (completedRef.current || isSkippingRef.current) return;
+
+      const remaining = SEQUENCE.slice(scene.currentIndex);
+      if (!remaining.length) {
+        runCompletionExit();
+        return;
+      }
+
+      isSkippingRef.current = true;
+      setIsSkipping(true);
+      clearSkipTimers();
+      scene.canvas.style.pointerEvents = 'none';
+
+      remaining.forEach((key, idx) => {
+        const timer = window.setTimeout(() => {
+          scene.handleKey(key);
+        }, 120 + idx * 180);
+        skipTimersRef.current.push(timer);
+      });
+    };
+
     const handleKeyDown = (e) => {
+      if (isSkippingRef.current) return;
       if (e.repeat) return;
       if (e.key === 'Escape') {
         handleComplete();
@@ -97,6 +132,9 @@ export function KeyboardIntro({ onComplete }) {
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
+      skipSequenceRef.current = null;
+      clearSkipTimers();
+      isSkippingRef.current = false;
       ownedRef.current = false;
       _instanceCount -= 1;
       window.removeEventListener('keydown', handleKeyDown);
@@ -135,6 +173,10 @@ export function KeyboardIntro({ onComplete }) {
     );
   }
 
+  const handleSkip = () => {
+    skipSequenceRef.current?.();
+  };
+
   return (
     <div className={styles.wrapper}>
       <canvas ref={canvasRef} className={styles.canvas} />
@@ -142,7 +184,7 @@ export function KeyboardIntro({ onComplete }) {
       <div className={styles.introCopy}>
         <TypeText
           className={styles.introTitle}
-          typingSpeed={70}
+          typingSpeed={28}
           initialDelay={400}
           cursorCharacter="|"
           cursorBlinkDuration={0.5}
@@ -166,9 +208,11 @@ export function KeyboardIntro({ onComplete }) {
         </p>
       </div>
 
-      <button className={styles.skipButton} onClick={() => onComplete?.()}>
-        Skip
-      </button>
+      {!isSkipping && (
+        <button className={styles.skipButton} onClick={handleSkip}>
+          Skip
+        </button>
+      )}
 
       {showCompletion && (
         <div className={styles.completionOverlay}>
