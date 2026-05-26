@@ -333,6 +333,31 @@ export function ExplodedKeyScene({ onExplode, onAssemble }) {
     group.position.set(0.04, -0.58, 0);
     group.scale.setScalar(1.08);
     scene.add(group);
+    let baseGroupY = group.position.y;
+    let floatTween = null;
+
+    const stopFloat = () => {
+      floatTween?.kill();
+      floatTween = null;
+      gsap.to(group.position, {
+        y: baseGroupY,
+        duration: 0.45,
+        ease: 'sine.out',
+        onUpdate: requestRender,
+      });
+    };
+
+    const startFloat = () => {
+      floatTween?.kill();
+      floatTween = gsap.to(group.position, {
+        y: baseGroupY + 0.055,
+        duration: 2.35,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        onUpdate: requestRender,
+      });
+    };
 
     const switchLight = new THREE.PointLight(0xffb47a, 0, 9);
     switchLight.position.set(0, scaleUnit(-0.55), 0);
@@ -539,14 +564,17 @@ export function ExplodedKeyScene({ onExplode, onAssemble }) {
 
       if (mobile) {
         group.scale.setScalar(0.92);
-        group.position.y = -0.34;
+        baseGroupY = -0.34;
+        group.position.y = baseGroupY;
         group.position.x = 0;
         camera.position.set(0, 5.5, 6.0);
       } else {
         group.scale.setScalar(1.08);
-        group.position.set(0.04, -0.58, 0);
+        baseGroupY = -0.58;
+        group.position.set(0.04, baseGroupY, 0);
         camera.position.set(0, SCENE.cameraY, SCENE.cameraZ);
       }
+      if (explodedRef.current) startFloat();
       camera.lookAt(0, -0.16, 0);
       requestRender();
     };
@@ -555,8 +583,10 @@ export function ExplodedKeyScene({ onExplode, onAssemble }) {
       explodedRef.current = !explodedRef.current;
       moveParts(parts, explodedRef.current);
       if (explodedRef.current) {
+        window.setTimeout(startFloat, 760);
         onExplode?.();
       } else {
+        stopFloat();
         onAssemble?.();
       }
     };
@@ -600,6 +630,7 @@ export function ExplodedKeyScene({ onExplode, onAssemble }) {
       if (!explodedRef.current) {
         explodedRef.current = true;
         moveParts(parts, true);
+        window.setTimeout(startFloat, 760);
         onExplode?.();
       }
     }, 700);
@@ -613,6 +644,7 @@ export function ExplodedKeyScene({ onExplode, onAssemble }) {
       pulseGlow.kill();
       pulseDisc.kill();
       pulseLight.kill();
+      floatTween?.kill();
       gsap.killTweensOf([group.position, group.rotation]);
       gsap.killTweensOf(glowDiscMat);
       gsap.killTweensOf(glowSpriteMat);

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useRef, useState } from 'react';
 import ExplodedKeyScene from './ExplodedKeyScene';
 import styles from './MainPage.module.css';
 
@@ -119,6 +119,36 @@ function Panel({ section, phase, stagger, exitStagger }) {
   );
 }
 
+const ConnectorLines = memo(function ConnectorLines({ phase }) {
+  const visible = phase === 'showing';
+  const phaseClass = phase === 'hiding' ? styles.connectorsLeaving : styles.connectorsEntering;
+
+  return (
+    <svg
+      className={`${styles.connectorLayer} ${visible ? styles.connectorsVisible : ''} ${phaseClass}`}
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <path
+        className={`${styles.connectorLine} ${styles.connectorCap}`}
+        d="M 62.4 18.8 L 56.4 29.5"
+      />
+      <path
+        className={`${styles.connectorLine} ${styles.connectorStem}`}
+        d="M 43.0 54.2 L 48.0 49.6"
+      />
+      <path
+        className={`${styles.connectorLine} ${styles.connectorHousing}`}
+        d="M 61.0 65.0 L 56.4 76.6"
+      />
+      <circle className={`${styles.connectorDot} ${styles.dotCap}`} cx="56.4" cy="29.5" r="0.16" />
+      <circle className={`${styles.connectorDot} ${styles.dotStem}`} cx="48.0" cy="49.6" r="0.16" />
+      <circle className={`${styles.connectorDot} ${styles.dotHousing}`} cx="56.4" cy="76.6" r="0.16" />
+    </svg>
+  );
+});
+
 export function MainPage() {
   const [panelPhase, setPanelPhase] = useState('hidden');
   const hideTimerRef = useRef(null);
@@ -154,6 +184,7 @@ export function MainPage() {
       <Panel section={SECTIONS[0]} phase={panelPhase} stagger={0} exitStagger={0.3} />
       <Panel section={SECTIONS[1]} phase={panelPhase} stagger={0.15} exitStagger={0.15} />
       <Panel section={SECTIONS[2]} phase={panelPhase} stagger={0.3} exitStagger={0} />
+      <ConnectorLines phase={panelPhase} />
 
       <div className={styles.hint}>Use keyboard or click key</div>
     </main>
