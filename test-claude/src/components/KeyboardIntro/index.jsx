@@ -184,8 +184,8 @@ export function KeyboardIntro({ onComplete }) {
       <div className={styles.introCopy}>
         <TypeText
           className={styles.introTitle}
-          typingSpeed={28}
-          initialDelay={400}
+          typingSpeed={42}
+          initialDelay={700}
           cursorCharacter="|"
           cursorBlinkDuration={0.5}
           showCursor
@@ -208,7 +208,7 @@ export function KeyboardIntro({ onComplete }) {
         </p>
       </div>
 
-      {!isSkipping && (
+      {!isSkipping && !showCompletion && (
         <button className={styles.skipButton} onClick={handleSkip}>
           Skip
         </button>

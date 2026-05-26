@@ -22,11 +22,11 @@ const scaleTargets = (targets) => Object.fromEntries(
 );
 
 const EXPLODED_TARGETS = scaleTargets({
-  cap: { y: 1.96, rz: -0.045 },
-  stem: { y: 0.5, rz: 0.015 },
+  cap: { y: 2.28, rz: -0.045 },
+  stem: { y: 0.9, rz: 0.015 },
   spring: { y: -0.18, rz: 0 },
-  housing: { y: -0.94, rz: 0.035 },
-  base: { y: -1.18, rz: 0 },
+  housing: { y: -1.45, rz: 0.035 },
+  base: { y: -2.2, rz: 0 },
 });
 
 const ASSEMBLED_TARGETS = scaleTargets({
@@ -75,7 +75,7 @@ function makeLegendTexture(letter, textColor) {
 
   ctx.clearRect(0, 0, size, size);
   ctx.fillStyle = textColor;
-  ctx.font = `700 ${Math.round(size * 0.44)}px "Inter", "SF Pro Display", system-ui, sans-serif`;
+  ctx.font = `700 ${Math.round(size * 0.44)}px "Nohemi", "Inter", system-ui, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(letter, size / 2, size / 2 + size * 0.02);
@@ -285,7 +285,7 @@ function moveParts(parts, exploded) {
   });
 }
 
-export function ExplodedKeyScene() {
+export function ExplodedKeyScene({ onExplode, onAssemble }) {
   const canvasRef = useRef(null);
   const explodedRef = useRef(false);
 
@@ -312,7 +312,7 @@ export function ExplodedKeyScene() {
     renderer.shadowMap.enabled = false;
 
     const camera = new THREE.PerspectiveCamera(SCENE.cameraFov, 1, 0.1, 120);
-    camera.position.set(0.18, SCENE.cameraY, SCENE.cameraZ);
+    camera.position.set(0, SCENE.cameraY, SCENE.cameraZ);
     camera.lookAt(0, -0.16, 0);
 
     scene.add(new THREE.HemisphereLight(0xfff4dc, 0x1c1d24, 0.48));
@@ -330,8 +330,8 @@ export function ExplodedKeyScene() {
 
     const group = new THREE.Group();
     group.rotation.set(-0.16, SCENE.desktopKeyRotationY, 0.02);
-    group.position.set(0.03, -0.18, 0);
-    group.scale.setScalar(1);
+    group.position.set(0.04, -0.58, 0);
+    group.scale.setScalar(1.08);
     scene.add(group);
 
     const switchLight = new THREE.PointLight(0xffb47a, 0, 9);
@@ -539,12 +539,13 @@ export function ExplodedKeyScene() {
 
       if (mobile) {
         group.scale.setScalar(0.92);
-        group.position.y = -0.14;
-        camera.position.set(0.12, 5.5, 6.0);
+        group.position.y = -0.34;
+        group.position.x = 0;
+        camera.position.set(0, 5.5, 6.0);
       } else {
-        group.scale.setScalar(1);
-        group.position.y = -0.18;
-        camera.position.set(0.18, SCENE.cameraY, SCENE.cameraZ);
+        group.scale.setScalar(1.08);
+        group.position.set(0.04, -0.58, 0);
+        camera.position.set(0, SCENE.cameraY, SCENE.cameraZ);
       }
       camera.lookAt(0, -0.16, 0);
       requestRender();
@@ -553,6 +554,11 @@ export function ExplodedKeyScene() {
     const toggle = () => {
       explodedRef.current = !explodedRef.current;
       moveParts(parts, explodedRef.current);
+      if (explodedRef.current) {
+        onExplode?.();
+      } else {
+        onAssemble?.();
+      }
     };
 
     const pointerMove = (e) => {
@@ -560,6 +566,11 @@ export function ExplodedKeyScene() {
     };
     const pointerDown = (e) => {
       if (!hitKey(e.clientX, e.clientY)) return;
+      toggle();
+    };
+    const keyDown = (e) => {
+      if (![' ', 'Enter', 'c', 'C'].includes(e.key)) return;
+      e.preventDefault();
       toggle();
     };
     canvas.style.cursor = 'default';
@@ -580,12 +591,23 @@ export function ExplodedKeyScene() {
 
     canvas.addEventListener('pointermove', pointerMove);
     canvas.addEventListener('pointerdown', pointerDown);
+    window.addEventListener('keydown', keyDown);
     window.addEventListener('resize', setSize);
     setSize();
     requestRender();
 
+    const autoExplodeTimer = window.setTimeout(() => {
+      if (!explodedRef.current) {
+        explodedRef.current = true;
+        moveParts(parts, true);
+        onExplode?.();
+      }
+    }, 700);
+
     return () => {
+      window.clearTimeout(autoExplodeTimer);
       window.removeEventListener('resize', setSize);
+      window.removeEventListener('keydown', keyDown);
       canvas.removeEventListener('pointermove', pointerMove);
       canvas.removeEventListener('pointerdown', pointerDown);
       pulseGlow.kill();

@@ -10,7 +10,7 @@ function makeLetterTexture(letter, textColor) {
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, size, size);
   ctx.fillStyle = textColor;
-  ctx.font = `700 ${Math.round(size * 0.44)}px "Inter", "SF Pro Display", system-ui, sans-serif`;
+  ctx.font = `700 ${Math.round(size * 0.44)}px "Nohemi", "Inter", system-ui, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(letter.toUpperCase(), size / 2, size / 2 + size * 0.02);
