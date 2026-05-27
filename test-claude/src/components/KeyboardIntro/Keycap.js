@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { SCENE } from './constants';
 
-function makeLetterTexture(letter, textColor) {
+function makeLetterTexture(letter, textColor, labelFont = 'miller') {
   const size = 192;
   const canvas = document.createElement('canvas');
   canvas.width = size;
@@ -10,10 +10,16 @@ function makeLetterTexture(letter, textColor) {
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, size, size);
   ctx.fillStyle = textColor;
-  ctx.font = `700 ${Math.round(size * 0.44)}px "Nohemi", "Inter", system-ui, sans-serif`;
+  const fontSize = labelFont === 'nautica' ? size * 0.58 : size * 0.64;
+  const family = labelFont === 'nautica'
+    ? '"nautica", "Snell Roundhand", "Brush Script MT", cursive'
+    : '"miller-banner-compressed", "Times New Roman", serif';
+  const weight = labelFont === 'nautica' ? 400 : 300;
+  const yOffset = labelFont === 'nautica' ? size * 0.025 : size * 0.01;
+  ctx.font = `${weight} ${Math.round(fontSize)}px ${family}`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(letter.toUpperCase(), size / 2, size / 2 + size * 0.02);
+  ctx.fillText(letter.toUpperCase(), size / 2, size / 2 + yOffset);
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.needsUpdate = true;
@@ -368,7 +374,7 @@ function addSwitchInside(group, { keycapW, keycapH, keycapD }) {
   return switchGroup;
 }
 
-export function createKeycap({ letter, color, textColor, glow, emissive }, index) {
+export function createKeycap({ letter, color, textColor, glow, emissive, labelFont }, index) {
   const { keycapW, keycapH, keycapD, radius, bevelSegments } = SCENE;
   const group = new THREE.Group();
   const hasVisibleSwitch = true;
@@ -400,7 +406,7 @@ export function createKeycap({ letter, color, textColor, glow, emissive }, index
     addSwitchInside(group, { keycapW, keycapH, keycapD });
   }
 
-  const labelTex = makeLetterTexture(letter, textColor);
+  const labelTex = makeLetterTexture(letter, textColor, labelFont);
   const labelGeo = new THREE.PlaneGeometry(keycapW * 0.6, keycapD * 0.6);
   const labelMat = new THREE.MeshBasicMaterial({
     map: labelTex,
@@ -469,17 +475,17 @@ export function createKeycap({ letter, color, textColor, glow, emissive }, index
         { obj: glowMesh, restY: glowMesh.position.y },
       ]
       : null,
-    index, restY: 0, letter,
+    index, restY: 0, letter, labelFont,
   };
   return group;
 }
 
 export function setKeycapDone(keycap) {
-  const { bodyMat, labelMat, letter } = keycap.userData;
+  const { bodyMat, labelMat, letter, labelFont } = keycap.userData;
   bodyMat.color.set(SCENE.pressedColor);
   bodyMat.emissive.set(SCENE.pressedEmissive);
   bodyMat.emissiveIntensity = 0.08;
   if (labelMat.map) labelMat.map.dispose();
-  labelMat.map = makeLetterTexture(letter, '#FFFFFF');
+  labelMat.map = makeLetterTexture(letter, '#FFFFFF', labelFont);
   labelMat.needsUpdate = true;
 }

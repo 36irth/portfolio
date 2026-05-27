@@ -8,10 +8,10 @@ import {
   startNextHighlight,
   clearNextHighlight,
 } from './animations';
-import { SEQUENCE, KEYCAP_CONFIGS } from './constants';
+import { SEQUENCE } from './constants';
 import { detectWebGL } from '../../utils/webgl';
 import styles from './KeyboardIntro.module.css';
-import TypeText from './TypeText';
+import SplitText from './SplitText';
 
 let _instanceCount = 0;
 
@@ -28,6 +28,7 @@ export function KeyboardIntro({ onComplete }) {
   const [webglError, setWebglError] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const [isSkipping, setIsSkipping] = useState(false);
+  const [isTitleDone, setIsTitleDone] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -182,51 +183,38 @@ export function KeyboardIntro({ onComplete }) {
       <canvas ref={canvasRef} className={styles.canvas} />
 
       <div className={styles.introCopy}>
-        <TypeText
+        <SplitText
           className={styles.introTitle}
-          typingSpeed={42}
-          initialDelay={700}
-          cursorCharacter="|"
-          cursorBlinkDuration={0.5}
-          showCursor
+          stagger={0.045}
+          duration={0.95}
+          ease="power3.out"
+          animationDelay={0.55}
+          onComplete={() => setIsTitleDone(true)}
           segments={[
-            { text: 'CHAEI', className: styles.introStrong },
-            { text: ' wants to', className: styles.introLight },
+            { text: 'C', className: styles.introNauticaC },
+            { text: 'HAEI', className: styles.introMiller },
+            { text: ' wants to', className: styles.introMiller },
             { isBreak: true },
-            { text: 'share a ', className: styles.introRegular },
-            { text: 'portfolio', className: styles.introStrong },
-            { isBreak: true },
-            { text: 'with you.', className: styles.introLight },
+            { text: 'share a ', className: styles.introMiller },
+            { text: 'Portfolio', className: styles.introPortfolio },
+            { text: ' with you.', className: styles.introMiller },
           ]}
         />
 
-        <p className={styles.introHint}>
-          <span className={styles.introRegular}>Press any key</span>
-          <span className={styles.introLight}> or </span>
-          <span className={styles.introRegular}>click</span>
-          <span className={styles.introLight}> CHAEI</span>
+        <p className={`${styles.introHint} ${isTitleDone ? styles.introHintReady : ''}`}>
+          <span className={styles.shinyText}>Enter CHAEI or click the key</span>
         </p>
       </div>
 
       {!isSkipping && !showCompletion && (
         <button className={styles.skipButton} onClick={handleSkip}>
-          Skip
+          <span className={styles.skipLabel}>Skip</span>
+          <i className={`fa-solid fa-chevron-down ${styles.skipArrow}`} aria-hidden="true" />
         </button>
       )}
 
       {showCompletion && (
         <div className={styles.completionOverlay}>
-          <div className={styles.miniKeyRow}>
-            {KEYCAP_CONFIGS.map((cfg, i) => (
-              <span
-                key={i}
-                className={styles.miniKey}
-                style={{ animationDelay: `${i * 0.06}s` }}
-              >
-                {cfg.letter}
-              </span>
-            ))}
-          </div>
           <div className={styles.completionTitle}>Complete</div>
           <div className={styles.completionSub}>Moving to main page...</div>
           <div className={styles.progressBarWrap}>

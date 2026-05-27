@@ -59,11 +59,10 @@ function ExpandedContent({ section }) {
   if (section.id === '02') {
     return (
       <div className={styles.workExpanded}>
-        {section.items.map((item, index) => (
+        {section.items.map((item) => (
           <article key={item.key} className={styles.workCard}>
             <div className={styles.workThumb} />
             <div className={styles.workMeta}>
-              <span className={styles.workNum}>{String(index + 1).padStart(2, '0')}</span>
               <h3>{item.title.replace(/\d+$/, '')}</h3>
             </div>
           </article>
@@ -132,19 +131,27 @@ const ConnectorLines = memo(function ConnectorLines({ phase }) {
     >
       <path
         className={`${styles.connectorLine} ${styles.connectorCap}`}
-        d="M 62.4 18.8 L 56.4 29.5"
+        d="M 57.1 27 H 65.1 V 14.6"
       />
       <path
         className={`${styles.connectorLine} ${styles.connectorStem}`}
-        d="M 43.0 54.2 L 48.0 49.6"
+        d="M 12.2 64.2 H 39.2"
+      />
+      <path
+        className={`${styles.connectorLine} ${styles.connectorStem} ${styles.connectorStemTurn}`}
+        d="M 39.2 64.2 V 50.2"
+      />
+      <path
+        className={`${styles.connectorLine} ${styles.connectorStem} ${styles.connectorStemTip}`}
+        d="M 39.2 50.2 H 44.2"
       />
       <path
         className={`${styles.connectorLine} ${styles.connectorHousing}`}
-        d="M 61.0 65.0 L 56.4 76.6"
+        d="M 57.1 66 H 65.1 V 59.2"
       />
-      <circle className={`${styles.connectorDot} ${styles.dotCap}`} cx="56.4" cy="29.5" r="0.16" />
-      <circle className={`${styles.connectorDot} ${styles.dotStem}`} cx="48.0" cy="49.6" r="0.16" />
-      <circle className={`${styles.connectorDot} ${styles.dotHousing}`} cx="56.4" cy="76.6" r="0.16" />
+      <ellipse className={`${styles.connectorDot} ${styles.dotCap}`} cx="57.1" cy="27" rx="0.2" ry="0.34" />
+      <ellipse className={`${styles.connectorDot} ${styles.dotStem}`} cx="44.2" cy="50.2" rx="0.2" ry="0.34" />
+      <ellipse className={`${styles.connectorDot} ${styles.dotHousing}`} cx="57.1" cy="66" rx="0.2" ry="0.34" />
     </svg>
   );
 });
@@ -186,7 +193,14 @@ export function MainPage() {
       <Panel section={SECTIONS[2]} phase={panelPhase} stagger={0.3} exitStagger={0} />
       <ConnectorLines phase={panelPhase} />
 
-      <div className={styles.hint}>Use keyboard or click key</div>
+      <div className={styles.keyHint}>
+        <span className={styles.keyHintBadge}>
+          Press <kbd className={styles.keyHintKey}>C</kbd>
+        </span>
+        <span className={styles.keyHintDesc}>
+          to disassemble / assemble<br />the key switch.
+        </span>
+      </div>
     </main>
   );
 }

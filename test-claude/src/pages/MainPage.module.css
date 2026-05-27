@@ -64,29 +64,29 @@
 
 .heading {
   position: fixed;
-  top: clamp(58px, 11.8vh, 136px);
+  top: 8.5vh;
   left: clamp(42px, 5.2vw, 108px);
   z-index: 10;
-  width: clamp(300px, 23vw, 500px);
+  width: clamp(360px, 31vw, 640px);
   pointer-events: none;
 }
 
 .headingTitle {
   margin: 0 0 clamp(28px, 3.6vh, 44px);
-  font-size: clamp(52px, 4.25vw, 88px);
+  font-family: 'miller-banner-compressed', 'Times New Roman', serif;
+  font-size: clamp(5rem, 7.2vw, 8.4rem);
   font-weight: 300;
-  line-height: 1.06;
+  line-height: 0.78;
   letter-spacing: 0;
   color: #f4f4f2;
   text-shadow: 0 0 18px rgba(255, 255, 255, 0.14);
 }
 
 .headingTitle span {
-  font-weight: 800;
+  font-weight: 700;
 }
 
-.headingSub,
-.hint {
+.headingSub {
   font-size: clamp(17px, 1.08vw, 22px);
   font-weight: 300;
   line-height: 1.35;
@@ -95,12 +95,59 @@
   text-shadow: 0 0 12px rgba(255, 255, 255, 0.12);
 }
 
-.hint {
+.keyHint {
   position: fixed;
-  bottom: clamp(52px, 12vh, 140px);
+  top: 44vh;
   left: clamp(42px, 5.2vw, 108px);
   z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
   pointer-events: none;
+  animation: keyHintAppear 0.7s cubic-bezier(0.16, 1, 0.3, 1) 1.2s both;
+}
+
+@keyframes keyHintAppear {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.keyHintBadge {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(242, 240, 237, 0.62);
+  font-family: 'Nohemi', 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: clamp(15px, 0.98vw, 19px);
+  font-weight: 300;
+  letter-spacing: 0.01em;
+}
+
+.keyHintKey {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: rgba(242, 240, 237, 0.1);
+  border: 1px solid rgba(242, 240, 237, 0.22);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  font-family: 'Nohemi', 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  font-style: normal;
+  color: rgba(242, 240, 237, 0.75);
+  letter-spacing: 0;
+}
+
+.keyHintDesc {
+  color: rgba(242, 240, 237, 0.35);
+  font-family: 'Nohemi', 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: clamp(14px, 0.86vw, 17px);
+  font-weight: 300;
+  line-height: 1.5;
+  letter-spacing: 0;
 }
 
 .connectorLayer {
@@ -117,61 +164,116 @@
 
 .connectorLine {
   fill: none;
-  stroke: rgba(215, 168, 88, 0.72);
-  stroke-width: 1.35px;
+  stroke: rgba(220, 176, 94, 0.9);
+  stroke-width: 1.25px;
   stroke-linecap: round;
-  stroke-linejoin: round;
+  stroke-linejoin: miter;
   vector-effect: non-scaling-stroke;
+  clip-path: inset(0 100% 0 0);
   opacity: 0;
-  transition:
-    opacity 0.52s ease,
-    transform 0.52s cubic-bezier(0.16, 1, 0.3, 1);
-  transform: translateY(5px);
+}
+
+.connectorCap,
+.connectorHousing {
+  clip-path: inset(0 0 0 100%);
+}
+
+.connectorStem {
+  clip-path: inset(0 100% 0 0);
+}
+
+.connectorStemTurn {
+  clip-path: inset(100% 0 0 0);
 }
 
 .connectorDot {
-  fill: var(--gold);
+  fill: #080807;
+  stroke: rgba(220, 176, 94, 0.95);
+  stroke-width: 0.16px;
   opacity: 0;
   transform-origin: center;
+  transform-box: fill-box;
+  transform: scale(0.65);
+}
+
+.connectorsEntering .connectorLine {
   transition:
-    opacity 0.26s ease,
-    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-  transform: scale(0.55);
+    opacity 0.28s ease,
+    clip-path 1.15s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.connectorsEntering .connectorDot {
+  transition:
+    opacity 0.3s ease,
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .connectorsVisible .connectorLine {
   opacity: 1;
-  transform: translateY(0);
+  clip-path: inset(0 0 0 0);
 }
 
 .connectorsVisible .connectorDot {
   opacity: 1;
   transform: scale(1);
+  animation: connectorDotGlow 2.8s ease-in-out infinite;
 }
 
-.connectorCap,
-.dotCap {
-  transition-delay: 0.08s;
+.connectorsEntering .connectorCap     { transition-delay: 0.05s; }
+.connectorsEntering .dotCap           { transition-delay: 0.78s; }
+.connectorsEntering .connectorStem    { transition-delay: 0.18s; }
+.connectorsEntering .connectorStemTurn { transition-delay: 0.58s; }
+.connectorsEntering .connectorStemTip  { transition-delay: 0.82s; }
+.connectorsEntering .dotStem          { transition-delay: 1.18s; }
+.connectorsEntering .connectorHousing { transition-delay: 0.31s; }
+.connectorsEntering .dotHousing       { transition-delay: 1.08s; }
+
+.connectorsLeaving .connectorLine {
+  opacity: 0;
+  transition:
+    opacity 0.22s ease,
+    clip-path 0.36s ease;
 }
 
-.connectorStem,
-.dotStem {
-  transition-delay: 0.24s;
+.connectorsLeaving .connectorCap,
+.connectorsLeaving .connectorHousing {
+  clip-path: inset(0 0 0 100%);
 }
 
-.connectorHousing,
-.dotHousing {
-  transition-delay: 0.4s;
+.connectorsLeaving .connectorStem {
+  clip-path: inset(0 100% 0 0);
+}
+
+.connectorsLeaving .connectorStemTurn {
+  clip-path: inset(100% 0 0 0);
+}
+
+.connectorsLeaving .connectorDot {
+  opacity: 0;
+  transform: scale(0.65);
+  animation: none;
+  transition: opacity 0.25s ease, transform 0.28s ease;
+}
+
+@keyframes connectorDotGlow {
+  0%, 100% {
+    stroke: rgba(220, 176, 94, 0.78);
+    filter: drop-shadow(0 0 0 rgba(220, 176, 94, 0));
+  }
+  50% {
+    stroke: rgba(255, 213, 128, 1);
+    filter: drop-shadow(0 0 5px rgba(220, 176, 94, 0.32));
+  }
 }
 
 .connectorsLeaving .connectorCap,
 .connectorsLeaving .dotCap {
-  transition-delay: 0.3s;
+  transition-delay: 0.2s;
 }
 
 .connectorsLeaving .connectorStem,
 .connectorsLeaving .dotStem {
-  transition-delay: 0.15s;
+  transition-delay: 0.1s;
 }
 
 .connectorsLeaving .connectorHousing,
@@ -241,23 +343,26 @@
 
 .pos_about {
   top: 8.5vh;
-  left: 62vw;
+  left: 59vw;
 }
 
 .pos_works {
-  top: 45vh;
+  top: 62vh;
   left: 4vw;
 }
 
 .pos_shapes {
   top: 50vh;
-  left: 62vw;
+  left: 59vw;
   right: auto;
   bottom: auto;
 }
 
 .panelHeader {
   position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(14px, 1.2vw, 24px);
   margin: 0;
 }
 
@@ -270,11 +375,14 @@
 }
 
 .sectionNum {
-  display: block;
-  margin-bottom: 8px;
+  display: inline-block;
+  flex: 0 0 auto;
+  margin-bottom: 0;
+  margin-top: clamp(7px, 0.46vw, 9px);
   color: var(--gold);
-  font-size: clamp(20px, 1.36vw, 28px);
-  font-weight: 800;
+  font-family: 'nautica', 'Snell Roundhand', 'Brush Script MT', cursive;
+  font-size: clamp(26px, 1.7vw, 36px);
+  font-weight: 700;
   line-height: 1;
   letter-spacing: 0;
   text-shadow: 0 0 14px rgba(215, 168, 88, 0.3);
@@ -283,20 +391,21 @@
 .sectionTitle {
   margin: 0;
   color: #f2f1ef;
-  font-size: clamp(36px, 2.2vw, 46px);
-  font-weight: 300;
+  font-family: 'miller-banner-compressed', 'Times New Roman', serif;
+  font-size: clamp(42px, 2.65vw, 56px);
+  font-weight: 400;
   line-height: 1.05;
   letter-spacing: 0;
   text-shadow: 0 0 18px rgba(255, 255, 255, 0.15);
 }
 
 .expanded .sectionNum {
-  margin-bottom: 8px;
+  margin-bottom: 0;
 }
 
 .expanded .sectionTitle {
-  font-size: clamp(36px, 2.2vw, 46px);
-  line-height: 1.02;
+  font-size: clamp(42px, 2.65vw, 56px);
+  line-height: 0.96;
 }
 
 .featureList {
@@ -441,28 +550,28 @@
 
 .pos_about.expanded {
   top: 8.5vh;
-  left: 62vw;
-  width: 36vw;
+  left: 59vw;
+  width: 39vw;
 }
 
 .pos_works.expanded {
-  top: 45vh;
+  top: 62vh;
   left: 4vw;
   width: 36vw;
 }
 
 .pos_shapes.expanded {
   top: 50vh;
-  left: 62vw;
+  left: 59vw;
   right: auto;
   bottom: auto;
-  width: 36vw;
+  width: 39vw;
 }
 
 .pos_about.expanded {
   display: grid;
-  grid-template-columns: minmax(210px, 34%) 1fr;
-  column-gap: clamp(34px, 3.6vw, 68px);
+  grid-template-columns: minmax(220px, 32%) 1fr;
+  column-gap: clamp(38px, 3.9vw, 76px);
 }
 
 .pos_about.expanded .panelHeader {
@@ -475,8 +584,8 @@
 
 .pos_shapes.expanded {
   display: grid;
-  grid-template-columns: minmax(250px, 36%) 1fr;
-  column-gap: clamp(34px, 3.5vw, 66px);
+  grid-template-columns: minmax(250px, 34%) 1fr;
+  column-gap: clamp(38px, 3.9vw, 76px);
 }
 
 .pos_shapes.expanded .panelHeader {
@@ -500,8 +609,9 @@
   position: relative;
   padding-left: 26px;
   color: rgba(255, 255, 255, 0.84);
+  font-family: 'miller-banner-compressed', 'Times New Roman', serif;
   font-size: clamp(22px, 1.45vw, 34px);
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.1;
 }
 
@@ -556,6 +666,7 @@
   display: block;
   margin: 0 0 3px;
   color: var(--gold);
+  font-family: 'nautica', 'Snell Roundhand', 'Brush Script MT', cursive;
   font-size: clamp(15px, 0.95vw, 20px);
   font-weight: 700;
   line-height: 1;
@@ -564,8 +675,9 @@
 .workCard h3 {
   margin: 0;
   color: rgba(255, 255, 255, 0.9);
+  font-family: 'miller-banner-compressed', 'Times New Roman', serif;
   font-size: clamp(18px, 1.15vw, 25px);
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.05;
 }
 
@@ -577,7 +689,7 @@
 
 .shapeList {
   display: grid;
-  gap: clamp(16px, 2.1vh, 28px);
+  gap: clamp(14px, 1.8vh, 24px);
 }
 
 .shapeItem {
@@ -588,6 +700,7 @@
 .shapeItem h3 {
   margin: 0 0 4px;
   color: rgba(255, 255, 255, 0.9);
+  font-family: 'miller-banner-compressed', 'Times New Roman', serif;
   font-size: clamp(24px, 1.8vw, 40px);
   font-weight: 300;
   line-height: 1.06;
@@ -596,9 +709,10 @@
 .shapeItem p {
   margin: 0;
   color: rgba(255, 255, 255, 0.38);
-  font-size: clamp(17px, 1.15vw, 28px);
+  font-size: clamp(14px, 0.9vw, 19px);
   font-weight: 200;
-  line-height: 1.15;
+  line-height: 1.08;
+  max-width: 34ch;
 }
 
 .shapePreviewRow {
@@ -650,7 +764,7 @@
   }
 
   .heading,
-  .hint,
+  .keyHint,
   .panel {
     position: relative;
     left: auto;
@@ -665,7 +779,8 @@
   }
 
   .headingTitle {
-    font-size: clamp(42px, 13vw, 66px);
+    font-size: clamp(3rem, 12.5vw, 4.5rem);
+    line-height: 0.84;
   }
 
   .pos_about,
@@ -713,7 +828,7 @@
     height: 128px;
   }
 
-  .hint {
+  .keyHint {
     margin: 24px 0 52px 28px;
   }
 }

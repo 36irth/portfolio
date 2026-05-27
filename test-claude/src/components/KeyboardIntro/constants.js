@@ -1,12 +1,13 @@
 export const SEQUENCE = ['c', 'h', 'a', 'e', 'i'];
 
-export const KEYCAP_CONFIGS = [
-  { letter: 'C', color: '#EDE8DF', textColor: '#1C1C1C', glow: '#FF8040', emissive: '#8B3518' },
-  { letter: 'H', color: '#EDE8DF', textColor: '#1C1C1C', glow: '#FF8040', emissive: '#8B3518' },
-  { letter: 'A', color: '#EDE8DF', textColor: '#1C1C1C', glow: '#FF8040', emissive: '#8B3518' },
-  { letter: 'E', color: '#EDE8DF', textColor: '#1C1C1C', glow: '#FF8040', emissive: '#8B3518' },
-  { letter: 'I', color: '#EDE8DF', textColor: '#1C1C1C', glow: '#FF8040', emissive: '#8B3518' },
-];
+export const KEYCAP_CONFIGS = SEQUENCE.map((letter, index) => ({
+  letter: letter.toUpperCase(),
+  color: '#EDE8DF',
+  textColor: '#1C1C1C',
+  glow: '#FF8040',
+  emissive: '#C05228',
+  labelFont: 'miller',
+}));
 
 export const SCENE = {
   keycapW: 1.1,
@@ -26,6 +27,6 @@ export const SCENE = {
   cameraY: 7.4,
   cameraZ: 7.5,
   bg: '#0d0d0d',
-  pressedColor:    '#C05228',
-  pressedEmissive: '#7A2E10',
+  pressedColor:    '#C8562A',
+  pressedEmissive: '#8B3518',
 };

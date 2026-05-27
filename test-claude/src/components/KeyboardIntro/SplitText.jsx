@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 
 export default function SplitText({
@@ -8,12 +8,18 @@ export default function SplitText({
   duration = 0.85,
   ease = 'power3.out',
   animationDelay = 0.3,
+  onComplete,
 }) {
   const containerRef = useRef(null);
+  const onCompleteRef = useRef(onComplete);
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   useEffect(() => {
     const el = containerRef.current;
-    if (!el) return;
+    if (!el) return undefined;
 
     const chars = el.querySelectorAll('[data-split-char]');
     gsap.set(chars, { opacity: 0, y: 40 });
@@ -25,25 +31,30 @@ export default function SplitText({
       ease,
       stagger,
       delay: animationDelay,
+      onComplete: () => onCompleteRef.current?.(),
     });
 
     return () => tween.kill();
-  }, []);
+  }, [animationDelay, duration, ease, stagger]);
 
   return (
     <h1 ref={containerRef} className={className}>
       {segments.map((seg, si) => {
         if (seg.isBreak) return <br key={`br-${si}`} />;
-        return seg.text.split('').map((char, ci) => (
-          <span
-            key={`${si}-${ci}`}
-            className={seg.className}
-            data-split-char=""
-            style={{ display: 'inline-block' }}
-          >
-            {char === ' ' ? ' ' : char}
+
+        return (
+          <span key={si} className={seg.className}>
+            {seg.text.split('').map((char, ci) => (
+              <span
+                key={`${si}-${ci}`}
+                data-split-char=""
+                style={{ display: 'inline-block' }}
+              >
+                {char === ' ' ? '\u00a0' : char}
+              </span>
+            ))}
           </span>
-        ));
+        );
       })}
     </h1>
   );

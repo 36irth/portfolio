@@ -75,10 +75,10 @@ function makeLegendTexture(letter, textColor) {
 
   ctx.clearRect(0, 0, size, size);
   ctx.fillStyle = textColor;
-  ctx.font = `700 ${Math.round(size * 0.44)}px "Nohemi", "Inter", system-ui, sans-serif`;
+  ctx.font = `300 ${Math.round(size * 0.64)}px "miller-banner-compressed", "Times New Roman", serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(letter, size / 2, size / 2 + size * 0.02);
+  ctx.fillText(letter, size / 2, size / 2 + size * 0.01);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
@@ -330,7 +330,7 @@ export function ExplodedKeyScene({ onExplode, onAssemble }) {
 
     const group = new THREE.Group();
     group.rotation.set(-0.16, SCENE.desktopKeyRotationY, 0.02);
-    group.position.set(0.04, -0.58, 0);
+    group.position.set(0, -0.58, 0);
     group.scale.setScalar(1.08);
     scene.add(group);
     let baseGroupY = group.position.y;
@@ -571,7 +571,7 @@ export function ExplodedKeyScene({ onExplode, onAssemble }) {
       } else {
         group.scale.setScalar(1.08);
         baseGroupY = -0.58;
-        group.position.set(0.04, baseGroupY, 0);
+        group.position.set(0, baseGroupY, 0);
         camera.position.set(0, SCENE.cameraY, SCENE.cameraZ);
       }
       if (explodedRef.current) startFloat();
