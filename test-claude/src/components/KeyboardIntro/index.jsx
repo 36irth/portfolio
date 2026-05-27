@@ -130,6 +130,7 @@ export function KeyboardIntro({ onComplete }) {
       }
       scene.handleKey(e.key);
     };
+
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
@@ -167,7 +168,7 @@ export function KeyboardIntro({ onComplete }) {
             This browser could not start the 3D intro.
           </p>
           <button className={styles.skipButton} onClick={() => onComplete?.()}>
-            Skip
+            <span className={styles.skipLabel}>Skip</span>
           </button>
         </div>
       </div>
@@ -185,31 +186,36 @@ export function KeyboardIntro({ onComplete }) {
       <div className={styles.introCopy}>
         <SplitText
           className={styles.introTitle}
-          stagger={0.045}
-          duration={0.95}
+          stagger={0.012}
+          duration={0.56}
           ease="power3.out"
-          animationDelay={0.55}
+          animationDelay={0.12}
           onComplete={() => setIsTitleDone(true)}
           segments={[
-            { text: 'C', className: styles.introNauticaC },
-            { text: 'HAEI', className: styles.introMiller },
-            { text: ' wants to', className: styles.introMiller },
+            { text: 'CHAEI', className: styles.titleAccent },
+            { text: ' wants to', className: styles.titleLight },
             { isBreak: true },
-            { text: 'share a ', className: styles.introMiller },
-            { text: 'Portfolio', className: styles.introPortfolio },
-            { text: ' with you.', className: styles.introMiller },
+            { text: 'share a ', className: styles.titleStrong },
+            { text: 'PORTFOLIO', className: styles.titleAccent },
+            { text: ' with you.', className: styles.titleLight },
           ]}
         />
 
         <p className={`${styles.introHint} ${isTitleDone ? styles.introHintReady : ''}`}>
-          <span className={styles.shinyText}>Enter CHAEI or click the key</span>
+          CHAEI를 입력하거나 키보드를 클릭해보세요.
         </p>
+      </div>
+
+      <div className={`${styles.introStage} ${isTitleDone ? styles.introStageReady : ''}`}>
+        <div className={styles.messageRail}>
+          <div className={styles.messageBubble}>CHAEI</div>
+          <div className={styles.deliveryMeta}>Delivered</div>
+        </div>
       </div>
 
       {!isSkipping && !showCompletion && (
         <button className={styles.skipButton} onClick={handleSkip}>
-          <span className={styles.skipLabel}>Skip</span>
-          <i className={`fa-solid fa-chevron-down ${styles.skipArrow}`} aria-hidden="true" />
+          <span className={styles.skipLabel}>skip</span>
         </button>
       )}
 
