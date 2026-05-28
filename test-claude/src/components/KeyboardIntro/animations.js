@@ -2,6 +2,13 @@ import gsap from 'gsap';
 import { SCENE } from './constants';
 import { setKeycapDone } from './Keycap';
 
+function setKeycapTreeVisible(keycap, visible) {
+  keycap.visible = visible;
+  keycap.traverse((obj) => {
+    obj.visible = visible;
+  });
+}
+
 export function startNextHighlight(keycap, light) {
   const { glowMat, glowSpriteMat } = keycap.userData;
   gsap.killTweensOf(glowMat);
@@ -218,6 +225,102 @@ export function animateCompletionExit(keycaps, onDone, light) {
   });
 
   gsap.delayedCall(exitDelay + keycaps.length * 0.045 + 1.0, finish);
+  return tl;
+}
+
+export function animateCharacterHandOff(keycaps, onDone, light) {
+  let doneCalled = false;
+  const finish = () => {
+    if (doneCalled) return;
+    doneCalled = true;
+    if (typeof onDone === 'function') onDone();
+  };
+
+  keycaps.forEach((keycap) => {
+    keycap.userData.isCompleting = true;
+    keycap.userData.floatCall?.kill?.();
+    keycap.userData.floatCall = null;
+    stopFloat(keycap);
+    gsap.killTweensOf(keycap.position);
+    const { bodyMat, glowMat, labelMat, glowSpriteMat } = keycap.userData;
+    if (bodyMat) gsap.killTweensOf(bodyMat);
+    if (glowMat) gsap.killTweensOf(glowMat);
+    if (labelMat) gsap.killTweensOf(labelMat);
+    if (glowSpriteMat) gsap.killTweensOf(glowSpriteMat);
+  });
+
+  if (light) {
+    gsap.killTweensOf(light);
+    gsap.to(light, { intensity: 0, duration: 0.24, ease: 'power2.out' });
+  }
+
+  const leadKey = keycaps[0];
+  const trailingKeys = keycaps.slice(1);
+  const tl = gsap.timeline({ onComplete: finish });
+
+  keycaps.forEach((keycap, index) => {
+    const drift = index * 0.34;
+    tl.to(keycap.position, {
+      x: keycap.position.x + 2.5 + drift,
+      y: keycap.userData.restY + 0.03 - index * 0.01,
+      z: keycap.position.z + 0.04,
+      duration: 0.52,
+      ease: 'power2.inOut',
+    }, 0);
+  });
+
+  if (leadKey) {
+    const { bodyMat, glowMat, glowSpriteMat, restY } = leadKey.userData;
+    tl.to(leadKey.position, {
+      x: leadKey.position.x + 3.55,
+      y: restY + 0.06,
+      z: leadKey.position.z - 0.02,
+      duration: 0.88,
+      ease: 'power2.out',
+    }, 0.28);
+    if (bodyMat) {
+      tl.to(bodyMat, { emissiveIntensity: 0.18, duration: 0.34, ease: 'power2.out' }, 0.24);
+    }
+    if (glowMat) {
+      tl.to(glowMat, { opacity: 0.18, duration: 0.22, ease: 'power2.out' }, 0.24);
+      tl.to(glowMat, { opacity: 0, duration: 0.32, ease: 'power2.out' }, 0.48);
+    }
+    if (glowSpriteMat) {
+      tl.to(glowSpriteMat, { opacity: 0.26, duration: 0.18, ease: 'power2.out' }, 0.22);
+      tl.to(glowSpriteMat, { opacity: 0, duration: 0.3, ease: 'power2.out' }, 0.44);
+    }
+  }
+
+  trailingKeys.forEach((keycap, index) => {
+    const { bodyMat, labelMat, glowMat, glowSpriteMat, restY } = keycap.userData;
+    const at = 0.34 + index * 0.06;
+    tl.to(keycap.position, {
+      x: keycap.position.x + 22 + index * 2.4,
+      y: restY - 0.02 + index * 0.008,
+      z: keycap.position.z + 0.08,
+      duration: 0.92,
+      ease: 'power3.in',
+    }, at);
+    if (bodyMat) {
+      bodyMat.transparent = true;
+      bodyMat.needsUpdate = true;
+      tl.to(bodyMat, { opacity: 0, duration: 0.34, ease: 'power2.out' }, at + 0.28);
+    }
+    if (labelMat) {
+      tl.to(labelMat, { opacity: 0, duration: 0.24, ease: 'power2.out' }, at + 0.26);
+    }
+    if (glowMat) {
+      tl.to(glowMat, { opacity: 0, duration: 0.18, ease: 'power2.out' }, at + 0.04);
+    }
+    if (glowSpriteMat) {
+      tl.to(glowSpriteMat, { opacity: 0, duration: 0.18, ease: 'power2.out' }, at + 0.04);
+    }
+    tl.call(() => {
+      setKeycapTreeVisible(keycap, false);
+    }, [], at + 0.72);
+  });
+
+  gsap.delayedCall(1.9, finish);
   return tl;
 }
 

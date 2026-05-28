@@ -1,0 +1,162 @@
+import { useEffect, useRef } from 'react';
+import * as THREE from 'three';
+import gsap from 'gsap';
+import { createKeycap } from '../components/KeyboardIntro/Keycap';
+
+const KEY_CONFIG = {
+  letter: 'C',
+  color: '#EDE8DF',
+  textColor: '#1C1C1C',
+  glow: '#FF8040',
+  emissive: '#C05228',
+  labelFont: 'miller',
+};
+
+export function CharacterKeyDisplay({ pressed = false, scale = 1 }) {
+  const canvasRef = useRef(null);
+  const keycapRef = useRef(null);
+  const switchPartsRef = useRef(null);
+  const restRef = useRef(null);
+  const rendererRef = useRef(null);
+  const cameraRef = useRef(null);
+  const renderRef = useRef(() => {});
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return undefined;
+
+    const width = canvas.clientWidth || 216;
+    const height = canvas.clientHeight || 303;
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: true,
+      powerPreference: 'high-performance',
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    renderer.setSize(width, height, false);
+    renderer.setClearColor(0x000000, 0);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.94;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(26, width / height, 0.1, 100);
+    camera.position.set(0.5, 4.8, 8.5);
+    camera.lookAt(0.2, 0.2, 0);
+
+    const ambient = new THREE.AmbientLight(0xffffff, 0.56);
+    const key = new THREE.DirectionalLight(0xfffaf0, 2.55);
+    key.position.set(-4, 8, 6);
+    const fill = new THREE.DirectionalLight(0xffd8a0, 0.8);
+    fill.position.set(6, 2, 3);
+    const rim = new THREE.DirectionalLight(0xc8d8ff, 0.44);
+    rim.position.set(-3, -1, -6);
+    const point = new THREE.PointLight(0xffeed8, 0.46, 20);
+    point.position.set(0, 5, 1.5);
+    scene.add(ambient, key, fill, rim, point);
+
+    const keycap = createKeycap(KEY_CONFIG, 0);
+    keycap.position.set(0.1, -1.45, 0);
+    keycap.rotation.x = 0.16;
+    keycap.rotation.y = -0.16;
+    scene.add(keycap);
+    keycap.scale.setScalar(scale);
+
+    keycapRef.current = keycap;
+    switchPartsRef.current = keycap.userData.pressParts || [];
+    restRef.current = {
+      groupY: keycap.position.y,
+      pressParts: (keycap.userData.pressParts || []).map(({ obj, restY }) => ({ obj, restY })),
+    };
+    rendererRef.current = renderer;
+    cameraRef.current = camera;
+
+    let rafId = 0;
+    const renderLoop = () => {
+      rafId = window.requestAnimationFrame(renderLoop);
+      renderer.render(scene, camera);
+    };
+    renderRef.current = () => {
+      renderer.render(scene, camera);
+    };
+    renderLoop();
+
+    const resize = () => {
+      const nextWidth = canvas.clientWidth || 216;
+      const nextHeight = canvas.clientHeight || 303;
+      renderer.setSize(nextWidth, nextHeight, false);
+      camera.aspect = nextWidth / nextHeight;
+      camera.updateProjectionMatrix();
+    };
+
+    window.addEventListener('resize', resize);
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      window.cancelAnimationFrame(rafId);
+      scene.traverse((obj) => {
+        if (!obj.isMesh) return;
+        obj.geometry?.dispose?.();
+        const material = obj.material;
+        if (Array.isArray(material)) {
+          material.forEach((mat) => {
+            mat.map?.dispose?.();
+            mat.dispose?.();
+          });
+          return;
+        }
+        material?.map?.dispose?.();
+        material?.dispose?.();
+      });
+      renderer.dispose();
+    };
+  }, [scale]);
+
+  useEffect(() => {
+    const keycap = keycapRef.current;
+    const rest = restRef.current;
+    if (!keycap || !rest) return;
+
+    gsap.killTweensOf(keycap.position);
+    rest.pressParts.forEach(({ obj }) => gsap.killTweensOf(obj.position));
+
+    if (pressed) {
+      gsap.to(keycap.position, {
+        y: rest.groupY - 0.11,
+        duration: 0.22,
+        ease: 'power2.out',
+        onUpdate: renderRef.current,
+      });
+      rest.pressParts.forEach(({ obj, restY }) => {
+        gsap.to(obj.position, {
+          y: restY - 0.15,
+          duration: 0.22,
+          ease: 'power2.out',
+          onUpdate: renderRef.current,
+        });
+      });
+      return;
+    }
+
+    gsap.to(keycap.position, {
+      y: rest.groupY,
+      duration: 0.28,
+      ease: 'power2.out',
+      onUpdate: renderRef.current,
+    });
+    rest.pressParts.forEach(({ obj, restY }) => {
+      gsap.to(obj.position, {
+        y: restY,
+        duration: 0.28,
+        ease: 'power2.out',
+        onUpdate: renderRef.current,
+      });
+    });
+  }, [pressed]);
+
+  return <canvas ref={canvasRef} className="characterKeyCanvas" />;
+}
+
+export default CharacterKeyDisplay;

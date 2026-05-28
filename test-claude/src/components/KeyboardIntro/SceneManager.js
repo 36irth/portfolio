@@ -194,7 +194,7 @@ export class SceneManager {
         const z      = (i - centerIndex) * SCENE.desktopDepthStep + SCENE.desktopOffsetZ;
         const y      = SCENE.desktopOffsetY;
         keycap.position.set(x, y, z);
-        keycap.rotation.x = 0;
+        keycap.rotation.x = SCENE.desktopKeyRotationX || 0;
         keycap.rotation.y = SCENE.desktopKeyRotationY;
         keycap.userData.restY = y;
         this.keycaps.push(keycap);
@@ -257,6 +257,30 @@ export class SceneManager {
     return obj?.userData.letter ? obj : null;
   }
 
+  setCharacterFocus() {
+    if (this.switchLight) {
+      gsap.killTweensOf(this.switchLight);
+      this.switchLight.intensity = 0;
+    }
+
+    this.keycaps.forEach((keycap, index) => {
+      gsap.killTweensOf(keycap.position);
+      if (index === 0) {
+        keycap.visible = true;
+        keycap.traverse((obj) => {
+          obj.visible = true;
+        });
+        return;
+      }
+
+      keycap.visible = false;
+      keycap.position.x += 40;
+      keycap.traverse((obj) => {
+        obj.visible = false;
+      });
+    });
+  }
+
   handleKey(key) {
     if (this.isCompleted) return;
     const expected = SEQUENCE[this.currentIndex];
@@ -277,7 +301,7 @@ export class SceneManager {
       setTimeout(() => {
         this._completionCallback?.();
         this.onComplete?.();
-      }, 500);
+      }, 160);
     }
   }
 

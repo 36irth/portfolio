@@ -10,12 +10,16 @@ function makeLetterTexture(letter, textColor, labelFont = 'miller') {
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, size, size);
   ctx.fillStyle = textColor;
-  const fontSize = labelFont === 'nautica' ? size * 0.58 : size * 0.64;
-  const family = labelFont === 'nautica'
+  const isNautica = labelFont === 'nautica';
+  const isNohemi = labelFont === 'nohemi';
+  const fontSize = isNautica ? size * 0.58 : (isNohemi ? size * 0.54 : size * 0.64);
+  const family = isNautica
     ? '"nautica", "Snell Roundhand", "Brush Script MT", cursive'
-    : '"miller-banner-compressed", "Times New Roman", serif';
-  const weight = labelFont === 'nautica' ? 400 : 300;
-  const yOffset = labelFont === 'nautica' ? size * 0.025 : size * 0.01;
+    : isNohemi
+      ? '"Nohemi", "Inter", system-ui, -apple-system, sans-serif'
+      : '"miller-banner-compressed", "Times New Roman", serif';
+  const weight = isNautica ? 400 : (isNohemi ? 600 : 300);
+  const yOffset = isNautica ? size * 0.025 : (isNohemi ? size * 0.005 : size * 0.01);
   ctx.font = `${weight} ${Math.round(fontSize)}px ${family}`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';

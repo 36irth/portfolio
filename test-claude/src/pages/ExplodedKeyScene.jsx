@@ -285,7 +285,13 @@ function moveParts(parts, exploded) {
   });
 }
 
-export function ExplodedKeyScene({ onExplode, onAssemble }) {
+export function ExplodedKeyScene({
+  onExplode,
+  onAssemble,
+  autoExplode = true,
+  interactive = true,
+  layout = 'center',
+}) {
   const canvasRef = useRef(null);
   const explodedRef = useRef(false);
 
@@ -562,7 +568,12 @@ export function ExplodedKeyScene({ onExplode, onAssemble }) {
       camera.fov = getResponsiveFov(width, height);
       camera.updateProjectionMatrix();
 
-      if (mobile) {
+      if (layout === 'character') {
+        group.scale.setScalar(mobile ? 0.94 : 1.18);
+        baseGroupY = mobile ? -1.26 : -1.55;
+        group.position.set(mobile ? 0.3 : 2.9, baseGroupY, 0);
+        camera.position.set(0, mobile ? 6.05 : 7.35, mobile ? 7.2 : 8.45);
+      } else if (mobile) {
         group.scale.setScalar(0.92);
         baseGroupY = -0.34;
         group.position.y = baseGroupY;
@@ -580,6 +591,7 @@ export function ExplodedKeyScene({ onExplode, onAssemble }) {
     };
 
     const toggle = () => {
+      if (!interactive) return;
       explodedRef.current = !explodedRef.current;
       moveParts(parts, explodedRef.current);
       if (explodedRef.current) {
@@ -592,13 +604,15 @@ export function ExplodedKeyScene({ onExplode, onAssemble }) {
     };
 
     const pointerMove = (e) => {
-      canvas.style.cursor = hitKey(e.clientX, e.clientY) ? 'pointer' : 'default';
+      canvas.style.cursor = interactive && hitKey(e.clientX, e.clientY) ? 'pointer' : 'default';
     };
     const pointerDown = (e) => {
+      if (!interactive) return;
       if (!hitKey(e.clientX, e.clientY)) return;
       toggle();
     };
     const keyDown = (e) => {
+      if (!interactive) return;
       if (![' ', 'Enter', 'c', 'C'].includes(e.key)) return;
       e.preventDefault();
       toggle();
@@ -626,17 +640,19 @@ export function ExplodedKeyScene({ onExplode, onAssemble }) {
     setSize();
     requestRender();
 
-    const autoExplodeTimer = window.setTimeout(() => {
-      if (!explodedRef.current) {
-        explodedRef.current = true;
-        moveParts(parts, true);
-        window.setTimeout(startFloat, 760);
-        onExplode?.();
-      }
-    }, 700);
+    const autoExplodeTimer = autoExplode
+      ? window.setTimeout(() => {
+        if (!explodedRef.current) {
+          explodedRef.current = true;
+          moveParts(parts, true);
+          window.setTimeout(startFloat, 760);
+          onExplode?.();
+        }
+      }, 700)
+      : null;
 
     return () => {
-      window.clearTimeout(autoExplodeTimer);
+      if (autoExplodeTimer) window.clearTimeout(autoExplodeTimer);
       window.removeEventListener('resize', setSize);
       window.removeEventListener('keydown', keyDown);
       canvas.removeEventListener('pointermove', pointerMove);
@@ -678,7 +694,7 @@ export function ExplodedKeyScene({ onExplode, onAssemble }) {
       noiseTexture.dispose();
       renderer.dispose();
     };
-  }, []);
+  }, [autoExplode, interactive, layout, onAssemble, onExplode]);
 
   return <canvas ref={canvasRef} className="exploded-key-canvas" aria-label="Exploded C key switch" />;
 }

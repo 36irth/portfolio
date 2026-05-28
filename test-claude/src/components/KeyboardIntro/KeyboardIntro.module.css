@@ -1,5 +1,13 @@
 @font-face {
   font-family: 'Nohemi';
+  src: url('/fonts/nohemi/Nohemi-ExtraLight.woff2') format('woff2');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nohemi';
   src: url('/fonts/nohemi/Nohemi-Light.woff2') format('woff2');
   font-weight: 300;
   font-style: normal;
@@ -30,183 +38,227 @@
   font-display: swap;
 }
 
-@font-face {
-  font-family: 'Nohemi';
-  src: url('/fonts/nohemi/Nohemi-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
 .wrapper {
-  position: fixed;
-  inset: 0;
+  position: relative;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   background: #0d0d0d;
 }
 
 .canvas {
-  position: fixed;
+  position: absolute;
   inset: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   display: block;
   z-index: 1;
 }
 
-.introCopy {
-  position: absolute;
-  top: clamp(6.2rem, 9.4vw, 8.5rem);
-  left: clamp(4.4rem, 7.9vw, 10rem);
-  z-index: 10;
-  width: min(86rem, calc(100vw - 12rem));
-  color: #ffffff;
-  text-align: left;
+.layout {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding: 100px 150px;
+  box-sizing: border-box;
   pointer-events: none;
+}
+
+.topRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;
+  width: 100%;
+}
+
+.introCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: flex-start;
+  justify-content: flex-end;
+  min-width: 0;
+  color: #ffffff;
 }
 
 .introTitle {
   margin: 0;
-  min-height: calc(clamp(5.15rem, 6.45vw, 7.1rem) * 1.08 * 2);
   font-family: 'Nohemi', 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: clamp(5.15rem, 6.45vw, 7.1rem);
-  font-weight: 300;
-  line-height: 1.02;
-  letter-spacing: -0.06em;
+  font-size: 80px;
+  line-height: 1.1;
+  letter-spacing: 0;
+  white-space: nowrap;
 }
 
-.titleAccent {
-  font-family: 'Nohemi', 'Inter', system-ui, -apple-system, sans-serif;
-  font-weight: 700;
-  color: #1683e9;
-  letter-spacing: -0.065em;
+.titleChaei {
+  color: #0188fb;
+  font-weight: 500;
 }
 
-.titleStrong {
-  font-family: 'Nohemi', 'Inter', system-ui, -apple-system, sans-serif;
-  font-weight: 600;
+.titleWants,
+.titleWithYou {
   color: #ffffff;
-  letter-spacing: -0.07em;
+  font-weight: 200;
 }
 
-.titleLight {
-  font-family: 'Nohemi', 'Inter', system-ui, -apple-system, sans-serif;
-  font-weight: 300;
-  color: #f4f4f4;
-  letter-spacing: -0.07em;
+.titleShare {
+  color: #ffffff;
+  font-weight: 400;
+}
+
+.titlePortfolio {
+  color: #0188fb;
+  font-weight: 600;
 }
 
 .introHint {
-  margin: clamp(2.2rem, 2.7vw, 3rem) 0 0;
-  color: rgba(255, 255, 255, 0.72);
-  font-family: 'Nohemi', 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: clamp(1.62rem, 2vw, 1.95rem);
-  font-weight: 400;
-  line-height: 1.25;
-  letter-spacing: -0.04em;
-  opacity: 0.92;
+  margin: 0;
+  color: #c5c5c5;
+  font-family: 'SUIT Variable', 'Pretendard Variable', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  font-size: 36px;
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: -0.72px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.38s ease,
+    transform 0.38s ease;
 }
 
 .introHintReady {
-  opacity: 0.92;
-}
-
-.introStage {
-  position: absolute;
-  top: clamp(30.5rem, 38vw, 34rem);
-  right: clamp(2.8rem, 5.5vw, 7.4rem);
-  z-index: 8;
-  opacity: 0;
-  transform: translateY(12px);
-  transition:
-    opacity 0.42s ease,
-    transform 0.42s ease;
-  pointer-events: none;
-}
-
-.introStageReady {
   opacity: 1;
   transform: translateY(0);
 }
 
-.messageRail {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.9rem;
+.hintStrong {
+  color: #f0f0f0;
+  font-weight: 800;
 }
 
-.messageBubble {
-  position: relative;
-  min-width: clamp(19rem, 22vw, 24.5rem);
-  padding: 1.15rem 2.1rem 1.25rem;
-  border-radius: 2rem;
-  background: #1683e9;
-  color: #ffffff;
-  font-family: 'Nohemi', 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: clamp(2.2rem, 3vw, 3.2rem);
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: -0.04em;
-  text-align: center;
-}
-
-.messageBubble::after {
-  content: '';
-  position: absolute;
-  right: -0.95rem;
-  bottom: 0.45rem;
-  width: 1.8rem;
-  height: 2rem;
-  background: #1683e9;
-  clip-path: polygon(0 0, 100% 100%, 0 82%);
-}
-
-.deliveryMeta {
-  color: rgba(255, 255, 255, 0.56);
-  font-family: 'Nohemi', 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: clamp(1rem, 1.2vw, 1.12rem);
-  font-weight: 400;
-  letter-spacing: -0.04em;
+.hintLight {
+  color: #c5c5c5;
+  font-weight: 300;
 }
 
 .skipButton {
-  position: absolute;
-  top: clamp(6.8rem, 9.2vw, 8.1rem);
-  right: clamp(4rem, 7vw, 9.4rem);
-  z-index: 12;
+  pointer-events: auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 6rem;
-  min-height: 3.1rem;
-  padding: 0.45rem 1.18rem 0.4rem;
-  border: 1px solid rgba(255, 255, 255, 0.34);
-  border-radius: 999px;
+  padding: 8px 18px;
+  border: 1px solid #989898;
+  border-radius: 555px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.64);
-  font-family: 'Nohemi', 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: 1rem;
-  font-weight: 300;
-  line-height: 1;
-  letter-spacing: -0.04em;
+  color: #989898;
   cursor: pointer;
   transition:
-    border-color 0.22s ease,
-    color 0.22s ease,
-    background-color 0.22s ease;
+    border-color 0.2s ease,
+    color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .skipButton:hover,
 .skipButton:focus-visible {
-  border-color: rgba(255, 255, 255, 0.56);
-  color: rgba(255, 255, 255, 0.88);
-  background: rgba(255, 255, 255, 0.03);
+  border-color: #c3c3c3;
+  color: #d9d9d9;
+  background: rgba(255, 255, 255, 0.04);
   outline: none;
 }
 
 .skipLabel {
   display: block;
+  font-family: 'Nohemi', 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+.bottomRow {
+  display: flex;
+  justify-content: flex-end;
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.42s ease,
+    transform 0.42s ease;
+}
+
+.bottomRowReady {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.introStage {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 1100px;
+}
+
+.messageRail {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: flex-end;
+}
+
+.messageBubbleWrap {
+  position: relative;
+  width: 360px;
+  height: 90px;
+}
+
+.messageBubble {
+  position: absolute;
+  inset: 0 auto auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 360px;
+  height: 90px;
+  padding: 15px 25px;
+  box-sizing: border-box;
+  border-radius: 555px;
+  background: #0188fb;
+  color: #ffffff;
+  font-family: 'Nohemi', 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 55px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.messageTail {
+  position: absolute;
+  right: -16.16px;
+  top: 47.31px;
+  width: 36.346px;
+  height: 42.692px;
+  display: block;
+}
+
+.deliveryMeta {
+  padding-right: 15px;
+  color: #8f8f8f;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.keyboardSlot {
+  width: 1100px;
+  height: 401px;
 }
 
 .fallback {
@@ -217,7 +269,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 16px;
   text-align: center;
 }
 
@@ -225,163 +277,159 @@
   color: rgba(255, 255, 255, 0.55);
   font-family: 'Nohemi', 'Inter', system-ui, -apple-system, sans-serif;
   font-size: clamp(2rem, 5vw, 3.5rem);
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .fallbackText {
   margin: 0;
-  color: rgba(255, 255, 255, 0.32);
+  color: rgba(255, 255, 255, 0.4);
   font-family: 'Nohemi', 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: 0.9rem;
-  line-height: 1.8;
+  font-size: 0.95rem;
 }
 
-.completionOverlay {
-  position: absolute;
-  left: 50%;
-  bottom: 8%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.7rem;
-  z-index: 20;
-  animation: fadeInUp 0.45s ease both;
-  pointer-events: none;
-}
-
-.completionTitle {
-  color: #ffffff;
-  font-family: 'Nohemi', 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: clamp(2rem, 3.6vw, 3rem);
-  font-weight: 500;
-  line-height: 0.95;
-  letter-spacing: -0.05em;
-}
-
-.completionSub {
-  color: rgba(255, 255, 255, 0.42);
-  font-family: 'Nohemi', 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: 0.92rem;
-  font-weight: 400;
-  letter-spacing: -0.02em;
-}
-
-.progressBarWrap {
-  width: 11rem;
-  height: 2px;
-  margin-top: 0.7rem;
-  border-radius: 999px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.progressBarFill {
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(90deg, #1683e9, #55b4ff);
-  animation: fillBar 2.4s ease forwards;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(14px);
+@media (max-width: 1400px) {
+  .layout {
+    padding: 72px 80px;
   }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-}
 
-@keyframes fillBar {
-  from {
-    width: 0%;
+  .introTitle {
+    font-size: 64px;
   }
-  to {
-    width: 100%;
+
+  .introHint {
+    font-size: 28px;
+  }
+
+  .skipLabel {
+    font-size: 24px;
+  }
+
+  .introStage {
+    width: min(78vw, 920px);
+  }
+
+  .keyboardSlot {
+    width: min(78vw, 920px);
+    height: clamp(280px, 29vw, 360px);
+  }
+
+  .messageBubbleWrap {
+    width: 320px;
+    height: 80px;
+  }
+
+  .messageBubble {
+    width: 320px;
+    height: 80px;
+    font-size: 46px;
+  }
+
+  .messageTail {
+    right: -14px;
+    top: 41px;
+    width: 31px;
+    height: 36px;
+  }
+
+  .deliveryMeta {
+    font-size: 24px;
   }
 }
 
 @media (max-width: 900px) {
+  .layout {
+    padding: 40px 24px;
+  }
+
+  .topRow {
+    gap: 20px;
+  }
+
   .introCopy {
-    top: 4rem;
-    left: 2rem;
-    width: calc(100vw - 4rem);
+    gap: 24px;
   }
 
   .introTitle {
-    min-height: calc(clamp(3rem, 10vw, 5rem) * 1.06 * 3);
-    font-size: clamp(3rem, 10vw, 5rem);
-    line-height: 1.04;
+    font-size: clamp(40px, 7.2vw, 56px);
+    white-space: normal;
   }
 
   .introHint {
-    font-size: 1.1rem;
+    font-size: clamp(20px, 3.4vw, 28px);
+    letter-spacing: -0.4px;
   }
 
   .skipButton {
-    top: 4rem;
-    right: 2rem;
+    padding: 6px 14px;
+  }
+
+  .skipLabel {
+    font-size: 22px;
   }
 
   .introStage {
-    top: auto;
-    right: 2rem;
-    bottom: 18rem;
+    width: min(100%, 620px);
+  }
+
+  .keyboardSlot {
+    width: min(100%, 620px);
+    height: clamp(220px, 38vw, 300px);
+  }
+
+  .messageRail {
+    gap: 10px;
+  }
+
+  .messageBubbleWrap {
+    width: min(320px, 64vw);
+    height: clamp(68px, 10vw, 80px);
   }
 
   .messageBubble {
-    min-width: 13rem;
-    font-size: 1.9rem;
-  }
-}
-
-@media (max-width: 600px) {
-  .introCopy {
-    top: 2.2rem;
-    left: 1.2rem;
-    width: calc(100vw - 2.4rem);
+    width: 100%;
+    height: 100%;
+    font-size: clamp(34px, 6vw, 46px);
   }
 
-  .introTitle {
-    min-height: auto;
-    font-size: clamp(2.5rem, 13vw, 3.8rem);
-    line-height: 1.04;
-  }
-
-  .introHint {
-    margin-top: 1.3rem;
-    font-size: 0.98rem;
-  }
-
-  .skipButton {
-    top: 2.4rem;
-    right: 1.2rem;
-    min-width: 4.8rem;
-    min-height: 2.5rem;
-    padding: 0.35rem 0.9rem;
-    font-size: 0.92rem;
-  }
-
-  .introStage {
-    right: 1rem;
-    bottom: 15rem;
-  }
-
-  .messageBubble {
-    min-width: 10rem;
-    padding: 0.9rem 1.35rem 1rem;
-    font-size: 1.45rem;
-  }
-
-  .messageBubble::after {
-    right: -0.72rem;
-    width: 1.3rem;
-    height: 1.45rem;
+  .messageTail {
+    right: -12px;
+    top: calc(100% - 44px);
+    width: 28px;
+    height: 33px;
   }
 
   .deliveryMeta {
-    font-size: 0.86rem;
+    font-size: clamp(18px, 2.8vw, 22px);
+  }
+}
+
+@media (max-width: 640px) {
+  .layout {
+    padding: 24px 16px;
+  }
+
+  .topRow {
+    align-items: flex-start;
+  }
+
+  .introHint {
+    font-size: 18px;
+  }
+
+  .skipLabel {
+    font-size: 18px;
+  }
+
+  .bottomRow {
+    justify-content: center;
+  }
+
+  .introStage {
+    width: 100%;
+  }
+
+  .keyboardSlot {
+    width: 100%;
+    height: 240px;
   }
 }

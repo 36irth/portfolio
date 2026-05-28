@@ -1,0 +1,33 @@
+.appViewport {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #0d0d0d;
+}
+
+.appScroll {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  background: #0d0d0d;
+}
+
+.appScroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.appScroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+
+.appIntroSection {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #0d0d0d;
+}
