@@ -8,6 +8,7 @@ export default function SplitText({
   duration = 0.85,
   ease = 'power3.out',
   animationDelay = 0.3,
+  isActive = true,
   onComplete,
 }) {
   const containerRef = useRef(null);
@@ -23,6 +24,7 @@ export default function SplitText({
 
     const chars = el.querySelectorAll('[data-split-char]');
     gsap.set(chars, { opacity: 0, y: 40 });
+    if (!isActive) return undefined;
 
     const tween = gsap.to(chars, {
       opacity: 1,
@@ -35,7 +37,7 @@ export default function SplitText({
     });
 
     return () => tween.kill();
-  }, [animationDelay, duration, ease, stagger]);
+  }, [animationDelay, duration, ease, isActive, stagger]);
 
   return (
     <h1 ref={containerRef} className={className}>

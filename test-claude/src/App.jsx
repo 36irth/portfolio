@@ -21,7 +21,23 @@ function App() {
   }, []);
 
   const handleScroll = (event) => {
-    setScrollTop(event.currentTarget.scrollTop);
+    const container = event.currentTarget;
+
+    if (phase === 'intro') {
+      if (container.scrollTop !== 0) {
+        container.scrollTop = 0;
+      }
+      setScrollTop(0);
+      return;
+    }
+
+    if (phase === 'main' && container.scrollTop < viewportHeight - 1) {
+      container.scrollTop = viewportHeight;
+      setScrollTop(viewportHeight);
+      return;
+    }
+
+    setScrollTop(container.scrollTop);
   };
 
   const handleIntroComplete = () => {
@@ -29,21 +45,27 @@ function App() {
     if (!container) return;
 
     setPhase('main');
-    container.scrollTo({
-      top: viewportHeight,
-      behavior: 'smooth',
+    requestAnimationFrame(() => {
+      container.scrollTo({
+        top: viewportHeight,
+        behavior: 'smooth',
+      });
     });
   };
 
   const characterProgress = useMemo(() => {
     const start = viewportHeight;
-    const span = viewportHeight * 1.25;
+    const span = viewportHeight * 3.2;
     return Math.max(0, Math.min(1, (scrollTop - start) / span));
   }, [scrollTop, viewportHeight]);
 
   return (
     <div className="appViewport">
-      <div className="appScroll" ref={scrollRef} onScroll={handleScroll}>
+      <div
+        className={`appScroll ${phase === 'intro' ? 'appScrollLocked' : 'appScrollMain'}`}
+        ref={scrollRef}
+        onScroll={handleScroll}
+      >
         <section className="appIntroSection">
           <KeyboardIntro onComplete={handleIntroComplete} />
         </section>

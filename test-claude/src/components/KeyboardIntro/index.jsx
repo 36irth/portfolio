@@ -13,7 +13,7 @@ import { detectWebGL } from '../../utils/webgl';
 import styles from './KeyboardIntro.module.css';
 import SplitText from './SplitText';
 
-const bubbleTail = 'https://www.figma.com/api/mcp/asset/9b0f7292-ef30-456a-9dd4-a66f93a46338';
+const bubbleTail = '/assets/portfolio/bubble-tail-large.svg';
 
 let instanceCount = 0;
 
@@ -135,12 +135,6 @@ export function KeyboardIntro({ onComplete }) {
     const handleKeyDown = (e) => {
       if (isSkippingRef.current) return;
       if (e.repeat) return;
-
-      if (e.key === 'Escape') {
-        handleComplete();
-        return;
-      }
-
       scene.handleKey(e.key);
     };
 
@@ -180,7 +174,7 @@ export function KeyboardIntro({ onComplete }) {
           <div className={styles.fallbackTitle}>chaei</div>
           <p className={styles.fallbackText}>This browser could not start the 3D intro.</p>
           <button className={styles.skipButton} onClick={() => onComplete?.()}>
-            <span className={styles.skipLabel}>skip</span>
+            <span className={styles.skipLabel}>s k i p</span>
           </button>
         </div>
       </div>
@@ -226,7 +220,7 @@ export function KeyboardIntro({ onComplete }) {
 
           {!isSkipping && (
             <button className={styles.skipButton} onClick={handleSkip}>
-              <span className={styles.skipLabel}>skip</span>
+              <span className={styles.skipLabel}>s k i p</span>
             </button>
           )}
         </div>
@@ -235,10 +229,15 @@ export function KeyboardIntro({ onComplete }) {
           <div className={styles.introStage}>
             <div className={styles.messageRail}>
               <div className={styles.messageBubbleWrap}>
-                <div className={styles.messageBubble}>{typedValue || '\u00a0'}</div>
+                <div className={styles.messageBubble}>
+                  <span>{typedValue}</span>
+                  {!isDelivered && <span className={styles.messageCursor} aria-hidden="true" />}
+                </div>
                 <img src={bubbleTail} alt="" className={styles.messageTail} />
               </div>
-              {isDelivered && <div className={styles.deliveryMeta}>Delivered</div>}
+              <div className={`${styles.deliveryMeta} ${isDelivered ? styles.deliveryMetaVisible : ''}`}>
+                Delivered
+              </div>
             </div>
             <div className={styles.keyboardSlot} aria-hidden="true" />
           </div>

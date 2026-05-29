@@ -118,8 +118,8 @@
 
 .introHint {
   margin: 0;
-  color: #c5c5c5;
-  font-family: 'SUIT Variable', 'Pretendard Variable', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  color: #ffffdf;
+  font-family: 'Suit', 'Apple SD Gothic Neo', sans-serif;
   font-size: 36px;
   font-weight: 300;
   line-height: 1.1;
@@ -137,12 +137,12 @@
 }
 
 .hintStrong {
-  color: #f0f0f0;
+  color: #ffffdf;
   font-weight: 800;
 }
 
 .hintLight {
-  color: #c5c5c5;
+  color: #ffffdf;
   font-weight: 300;
 }
 
@@ -178,6 +178,7 @@
   font-weight: 300;
   line-height: 1.1;
   letter-spacing: 0;
+  word-spacing: -0.16em;
 }
 
 .bottomRow {
@@ -199,7 +200,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  width: 1100px;
+  width: 540px;
 }
 
 .messageRail {
@@ -207,6 +208,8 @@
   flex-direction: column;
   gap: 15px;
   align-items: flex-end;
+  min-height: 136px;
+  width: 100%;
 }
 
 .messageBubbleWrap {
@@ -237,6 +240,28 @@
   white-space: nowrap;
 }
 
+.messageCursor {
+  display: inline-block;
+  width: 3px;
+  height: 0.82em;
+  margin-left: 8px;
+  border-radius: 999px;
+  background: #ffffff;
+  animation: cursorBlink 0.9s steps(2, start) infinite;
+}
+
+@keyframes cursorBlink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+
+  46%,
+  100% {
+    opacity: 0;
+  }
+}
+
 .messageTail {
   position: absolute;
   right: -16.16px;
@@ -249,11 +274,21 @@
 .deliveryMeta {
   padding-right: 15px;
   color: #8f8f8f;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: helvetica-lt-pro, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 28px;
   font-weight: 400;
   line-height: 1.1;
   text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.24s ease,
+    visibility 0.24s ease;
+}
+
+.deliveryMetaVisible {
+  opacity: 1;
+  visibility: visible;
 }
 
 .keyboardSlot {
