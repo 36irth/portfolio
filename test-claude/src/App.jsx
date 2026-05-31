@@ -6,6 +6,8 @@ import MainPage from './pages/MainPage';
 function App() {
   const scrollRef = useRef(null);
   const lenisRef = useRef(null);
+  const scrollRafRef = useRef(0);
+  const pendingScrollTopRef = useRef(0);
   const [viewportHeight, setViewportHeight] = useState(
     typeof window !== 'undefined' ? window.innerHeight : 1080,
   );
@@ -105,8 +107,23 @@ function App() {
       return;
     }
 
-    setScrollTop(container.scrollTop);
+    pendingScrollTopRef.current = container.scrollTop;
+    if (scrollRafRef.current) return;
+
+    scrollRafRef.current = window.requestAnimationFrame(() => {
+      scrollRafRef.current = 0;
+      setScrollTop(pendingScrollTopRef.current);
+    });
   };
+
+  useEffect(() => {
+    return () => {
+      if (scrollRafRef.current) {
+        window.cancelAnimationFrame(scrollRafRef.current);
+        scrollRafRef.current = 0;
+      }
+    };
+  }, []);
 
   const handleIntroComplete = () => {
     const container = scrollRef.current;

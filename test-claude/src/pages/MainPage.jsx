@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import SplitText from '../components/KeyboardIntro/SplitText';
 import { animatePress, startFloat, stopFloat } from '../components/KeyboardIntro/animations';
@@ -37,6 +37,7 @@ const imgAiPerplexity = 'https://www.figma.com/api/mcp/asset/f1127c29-1ed4-4d9a-
 const imgAiCodex = 'https://www.figma.com/api/mcp/asset/d6969e1c-8239-4e48-948c-a347c3cf93b8';
 const imgAiMidjourney = 'https://www.figma.com/api/mcp/asset/e80660e3-1016-4684-a7dd-7d3045b81151';
 const imgProfile = 'https://www.figma.com/api/mcp/asset/e36f4ce6-fa79-464a-8174-376c2e64f588';
+const imgInvitationCardPhoto = 'https://www.figma.com/api/mcp/asset/0c9a2c1a-2d80-4acb-95f0-52b0ca1b63d1';
 
 const awards = [
   ['블루어워즈', '시각디자인 분야 입선', '2022.06.14'],
@@ -769,10 +770,16 @@ function EssenceSection() {
   );
 }
 
-function InvitationKeyScene({ onActivate, pressSignal }) {
+function InvitationKeyScene({ onActivate, pressSignal, active }) {
   const canvasRef = useRef(null);
   const keycapRef = useRef(null);
   const frameRef = useRef(0);
+  const renderRef = useRef(null);
+  const activeRef = useRef(active);
+
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -792,7 +799,7 @@ function InvitationKeyScene({ onActivate, pressSignal }) {
       powerPreference: 'high-performance',
     });
     renderer.setSize(width, height, false);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setClearColor(0x000000, 0);
 
@@ -836,14 +843,20 @@ function InvitationKeyScene({ onActivate, pressSignal }) {
     keycapRef.current = keycap;
     startFloat(keycap, 0);
 
-    const render = (time = 0) => {
+    const render = () => {
       renderer.render(scene, camera);
+      if (!activeRef.current) {
+        frameRef.current = 0;
+        return;
+      }
       frameRef.current = window.requestAnimationFrame(render);
     };
+    renderRef.current = render;
     render();
 
     return () => {
       window.cancelAnimationFrame(frameRef.current);
+      renderRef.current = null;
       if (keycapRef.current) stopFloat(keycapRef.current);
       keycapRef.current = null;
       renderer.dispose();
@@ -864,6 +877,11 @@ function InvitationKeyScene({ onActivate, pressSignal }) {
     if (!pressSignal) return;
     if (keycapRef.current) animatePress(keycapRef.current);
   }, [pressSignal]);
+
+  useEffect(() => {
+    if (!active || frameRef.current || !renderRef.current) return;
+    renderRef.current();
+  }, [active]);
 
   return (
     <button type="button" className={styles.invitationKeyButton} onClick={onActivate} aria-label="Open contact card">
@@ -911,6 +929,7 @@ function InvitationSection() {
   return (
     <section ref={sectionRef} className={`${styles.panel} ${styles.invitationPanel}`}>
       <InvitationKeyScene
+        active={isVisible}
         pressSignal={pressSignal}
         onActivate={() => {
           setPressSignal((prev) => prev + 1);
@@ -925,9 +944,9 @@ function InvitationSection() {
       <aside className={`${styles.contactCard} ${isOpen ? styles.contactCardVisible : styles.contactCardHidden}`}>
         <div className={styles.contactTitle}>
           <h3>Contact us</h3>
-          <p>채이의 연락처를 공유하려고 합니다.</p>
+          <p>채이 님이 연락처를 공유하려고 합니다.</p>
         </div>
-        <img src={asset('profile.png')} alt="김채이 연락처 이미지" />
+        <img src={asset('profile.png')} alt="채이 연락처 이미지" />
         <div className={styles.contactActions}>
           <button type="button">View Again</button>
           <button type="button">Accept</button>
@@ -937,14 +956,19 @@ function InvitationSection() {
   );
 }
 
+const MemoHighlightsSection = memo(HighlightsSection);
+const MemoApproachSection = memo(ApproachSection);
+const MemoEssenceSection = memo(EssenceSection);
+const MemoInvitationSection = memo(InvitationSection);
+
 export function MainPage({ isActive = false, scrollProgress = 0 }) {
   return (
     <main className={styles.page}>
       <CharacterSection isActive={isActive} scrollProgress={scrollProgress} />
-      <HighlightsSection />
-      <ApproachSection />
-      <EssenceSection />
-      <InvitationSection />
+      <MemoHighlightsSection />
+      <MemoApproachSection />
+      <MemoEssenceSection />
+      <MemoInvitationSection />
     </main>
   );
 }
