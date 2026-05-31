@@ -9,6 +9,29 @@
   color: #ffffff;
 }
 
+.page :is(
+  .keyActive,
+  .keyInactive,
+  .characterCopy > p,
+  .accentLine,
+  .awardItem,
+  .profileTitle p,
+  .chatBubble,
+  .highlightEyebrow,
+  .highlightTitle,
+  .approachCard p,
+  .folderDrop p,
+  .approachText,
+  .essenceIntro > p,
+  .questionBubble,
+  .answerBubble,
+  .invitationTitle p,
+  .invitationTitle strong,
+  .contactTitle p
+) {
+  letter-spacing: -0.02em;
+}
+
 .panel {
   position: relative;
   width: 100%;
@@ -41,6 +64,45 @@
 
 .sectionTitle h2 span {
   color: var(--blue);
+}
+
+.scrollFloatTitle h2 {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  width: max-content;
+  max-width: none;
+  white-space: nowrap;
+}
+
+.scrollFloatTitle h2 .scrollFloatGlyph {
+  display: inline-block;
+  color: #ffffff;
+  opacity: 1;
+  filter: blur(0);
+  transform: translate3d(0, 0, 0) scale(1) rotate(0);
+}
+
+.scrollFloatTitle h2 .scrollFloatAccent {
+  color: var(--blue);
+}
+
+.scrollFloatTitleVisible .scrollFloatGlyph {
+  animation: scrollFloatIn 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--float-index, 0) * 0.035s);
+}
+
+@keyframes scrollFloatIn {
+  0% {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translate3d(0, 36px, 0) scale(0.94) rotate(1.5deg);
+  }
+
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) scale(1) rotate(0);
+  }
 }
 
 .titleSplit {
@@ -85,6 +147,24 @@
 .keyInactive {
   border: 1px solid #626262;
   color: #626262;
+}
+
+.animatedContent {
+  width: 100%;
+  opacity: 0;
+  filter: blur(var(--ac-blur, 12px));
+  transform: translate3d(0, var(--ac-distance, 38px), 0) scale(var(--ac-scale, 0.96));
+  transition:
+    opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1) var(--ac-delay, 0s),
+    filter 0.52s cubic-bezier(0.22, 1, 0.36, 1) var(--ac-delay, 0s),
+    transform 0.62s cubic-bezier(0.22, 1, 0.36, 1) var(--ac-delay, 0s);
+  will-change: opacity, filter, transform;
+}
+
+.animatedContentVisible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translate3d(0, 0, 0) scale(1);
 }
 
 .characterScrollSection {
@@ -163,6 +243,8 @@
   line-height: 1.12;
   letter-spacing: -0.64px;
   white-space: nowrap;
+  cursor: grab;
+  user-select: none;
 }
 
 .accentLine strong {
@@ -174,6 +256,21 @@
 
 .accentLine span {
   font-weight: 400;
+}
+
+.accentChunk {
+  display: inline-block;
+  transform: translate3d(
+      calc((var(--drag-progress, 0) - 0.5) * (22px - (var(--chunk-index, 0) * 4px))),
+      0,
+      0
+    )
+    rotate(calc((var(--drag-progress, 0) - 0.5) * (2deg - (var(--chunk-index, 0) * 0.35deg))));
+  transition: transform 0.18s ease;
+}
+
+.accentLine:active {
+  cursor: grabbing;
 }
 
 .awards {
@@ -226,8 +323,8 @@
   pointer-events: none;
   transform: translate3d(0, 42px, 0) scale(0.97);
   transition:
-    opacity 0.42s ease,
-    transform 0.58s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.28s ease,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--float-delay, 0s);
   will-change: opacity, transform;
 }
@@ -512,15 +609,299 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 198px;
+  justify-content: space-between;
+}
+
+.highlightsTitle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+  width: auto;
+  min-width: max-content;
+}
+
+.highlightsTitle .keyboardBadge {
+  justify-content: center;
+}
+
+.highlightsTitle h2 {
+  margin: 0;
+  font-family: 'Nohemi', helvetica-lt-pro, sans-serif;
+  font-size: 80px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.highlightsTitle h2 span {
+  color: var(--blue);
+}
+
+.highlightsTitle .keyActive,
+.highlightsTitle .keyInactive {
+  font-family: helvetica-lt-pro, Helvetica, Arial, sans-serif;
+  font-weight: 700;
+}
+
+.highlightsContent {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 35px;
+  width: 1596px;
+}
+
+.highlightsLargeList {
+  display: flex;
+  align-items: flex-start;
+  gap: 35px;
+  width: 1150px;
+}
+
+.highlightsRightList {
+  display: flex;
+  flex-direction: column;
+  gap: 35px;
+  width: 411px;
+  height: 529px;
+}
+
+.highlightLargeCard,
+.highlightSmallCard {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: #1b1b1b;
+  isolation: isolate;
+}
+
+.highlightLargeCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 20px;
+  width: 360px;
+  height: 529px;
+  padding: 30px;
+  border-radius: 35px;
+  box-sizing: border-box;
+}
+
+.highlightSmallCard {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex: 1 0 0;
+  min-height: 153px;
+  padding: 20px;
+  border-radius: 20px;
+  box-sizing: border-box;
+}
+
+.highlightLargeCard > img,
+.highlightSmallCard > img {
+  position: absolute;
+  pointer-events: none;
+}
+
+.highlightCardImage {
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: center center;
+  will-change: transform;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .highlightLargeCard:hover .highlightCardImage,
+  .highlightSmallCard:hover .highlightCardImage {
+    transform: scale(1.08);
+  }
+}
+
+.highlightLargeBlur,
+.highlightSmallBlur {
+  position: absolute;
+  pointer-events: none;
+}
+
+.highlightLargeBlur {
+  left: -1px;
+  bottom: -1px;
+  width: 360px;
+  height: 176px;
+  backdrop-filter: blur(25px);
+  -webkit-mask-image: linear-gradient(to top, #000 0%, #000 72%, transparent 100%);
+  mask-image: linear-gradient(to top, #000 0%, #000 72%, transparent 100%);
+}
+
+.highlightOverlayA {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.01) 100%);
+}
+
+.highlightOverlayB {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.02) 100%);
+}
+
+.highlightOverlayC {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+.highlightSmallBlur {
+  left: -1px;
+  bottom: -1px;
+  width: 411px;
+  height: 52px;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(11px);
+  -webkit-mask-image: linear-gradient(to top, #000 0%, #000 72%, transparent 100%);
+  mask-image: linear-gradient(to top, #000 0%, #000 72%, transparent 100%);
+}
+
+.highlightProjectImageA {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+}
+
+.highlightProjectImageB {
+  top: -0.03%;
+  left: -44.6%;
+  width: 220.71%;
+  height: 393.36%;
+}
+
+.highlightProjectImageC {
+  top: -0.07%;
+  left: 0;
+  width: 100%;
+  height: 130.36%;
+}
+
+.highlightProjectImageD {
+  top: -55.33%;
+  left: 0;
+  width: 268.53%;
+  height: 510.02%;
+}
+
+.highlightProjectImageE {
+  top: -279.68%;
+  left: 0;
+  width: 100%;
+  height: 379.94%;
+}
+
+.highlightProjectImageF {
+  top: -371.49%;
+  left: 0;
+  width: 100%;
+  height: 773.77%;
+}
+
+.highlightCardContent,
+.highlightSmallContent {
+  position: relative;
+  z-index: 1;
+}
+
+.highlightCardContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  width: 100%;
+}
+
+.highlightSmallContent {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.highlightTextBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.6;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.highlightEyebrow,
+.highlightTitle {
+  margin: 0;
+  font-family: 'Suit', sans-serif;
+  letter-spacing: -0.36px;
+}
+
+.highlightEyebrow {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.highlightTitle {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.48px;
+}
+
+.highlightSmallCard .highlightTextBlock {
+  color: #e0e0e0;
+}
+
+.highlightButtonRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.highlightAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100px;
+  padding: 5px 15px;
+  border: 0;
+  border-radius: 555px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(5.55px);
+  color: #000000;
+  cursor: pointer;
+  transition:
+    background-color 0.22s ease,
+    transform 0.22s ease;
+}
+
+.highlightAction:hover,
+.highlightAction:focus-visible {
+  background: rgba(255, 255, 255, 0.58);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.highlightAction span {
+  font-family: helvetica-lt-pro, Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: -0.4px;
+}
+
+.highlightAction img {
+  width: 7px;
+  height: 7px;
 }
 
 .projectGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 360px) 411px;
-  grid-template-rows: repeat(3, 153px);
-  gap: 35px;
-  width: 1596px;
+  display: none;
 }
 
 .projectLarge,
@@ -581,45 +962,149 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 75px;
+  position: relative;
+}
+
+.approachTitle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+  width: auto;
+  min-width: max-content;
+}
+
+.approachTitle h2 {
+  margin: 0;
+  font-family: 'Nohemi', helvetica-lt-pro, sans-serif;
+  font-size: 80px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.approachTitle h2 span {
+  color: var(--blue);
+}
+
+.approachTitle .keyActive,
+.approachTitle .keyInactive {
+  font-family: helvetica-lt-pro, Helvetica, Arial, sans-serif;
+  font-weight: 700;
 }
 
 .approachList {
   display: flex;
   gap: 30px;
-  margin-top: 75px;
+  align-items: center;
 }
 
 .approachCard {
   width: 322px;
   min-height: 398px;
-  border-radius: 10px;
-  background: #f5f5f5;
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(6.6px);
   color: #1a1a1a;
   text-align: center;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 35px;
+  cursor: grab;
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease,
+    box-shadow 0.28s ease;
+  touch-action: none;
+  user-select: none;
 }
 
-.approachCard > img {
-  display: block;
+.approachCardDragging {
+  cursor: grabbing;
+  transform: scale(1.03);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.16);
+  opacity: 0;
+}
+
+.approachCardCollected {
+  opacity: 0;
+  transform: scale(0.92);
+  pointer-events: none;
+}
+
+.approachCardGhost {
+  position: fixed;
+  z-index: 60;
+  margin: 0;
+  pointer-events: none;
+  opacity: 0.96;
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.22);
+  transform: rotate(-2deg);
+}
+
+.approachFigureWrap {
+  position: relative;
   width: 123px;
   height: 162px;
-  margin: 40px auto 35px;
-  object-fit: contain;
 }
 
-.approachCard div {
-  padding: 0 30px 40px;
+.approachFigureObserve,
+.approachFigureOrganize,
+.approachFigureVisualize {
+  position: absolute;
+  display: block;
+  max-width: none;
+}
+
+.approachFigureObserve {
+  top: -10.19%;
+  left: -34.55%;
+  width: 161.21%;
+  height: 123.15%;
+}
+
+.approachFigureOrganize {
+  top: -11.63%;
+  left: -33.13%;
+  width: 163.19%;
+  height: 123.72%;
+}
+
+.approachFigureVisualize {
+  top: -12.26%;
+  left: -32.92%;
+  width: 165.22%;
+  height: 125.47%;
+}
+
+.approachCardText {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+  width: 100%;
 }
 
 .approachCard h3 {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin: 0 0 15px;
+  justify-content: center;
+  margin: 0;
   color: var(--blue);
   font-family: helvetica-lt-pro, Helvetica, Arial, sans-serif;
-  font-size: 32px;
-  line-height: 1.1;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.72px;
 }
 
 .approachCard h3 span {
@@ -631,41 +1116,66 @@
   border-radius: 50%;
   background: var(--blue);
   color: #ffffff;
-  font-size: 25px;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.56px;
 }
 
 .approachCard p {
   margin: 0;
   font-family: 'Suit', sans-serif;
-  font-size: 19px;
-  line-height: 1.55;
-  letter-spacing: -0.38px;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: -0.48px;
+  color: #000000;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .folderDrop {
-  margin-top: 75px;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 50px;
+  transition: transform 0.28s ease, filter 0.28s ease;
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.42s ease,
+    transform 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.28s ease;
 }
 
-.folderDrop > img {
+.folderDropActive {
+  transform: translateY(0) scale(1.03);
+  filter: brightness(1.06);
+}
+
+.folderDropVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.folderImage {
   display: block;
   width: 322px;
   height: 284px;
   object-fit: contain;
-  margin: 0 auto;
 }
 
 .folderDrop p {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin-top: 50px;
   padding: 5px 20px;
-  border: 1px solid #727272;
-  border-radius: 999px;
-  color: #ffffff;
+  border: 1px solid #b9b9b9;
+  border-radius: 555px;
+  color: #b9b9b9;
   font-family: 'Suit', sans-serif;
   font-size: 26px;
+  font-weight: 400;
   line-height: 1.6;
   letter-spacing: -0.52px;
 }
@@ -675,15 +1185,113 @@
   height: 24px;
 }
 
+.approachSummary {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateY(180px);
+  transition:
+    opacity 0.42s ease,
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.approachSummaryVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.approachSummaryImageLeft,
+.approachSummaryImageTop,
+.approachSummaryImageCenter {
+  position: absolute;
+  display: block;
+  border: 1px solid var(--blue);
+  border-radius: 15px;
+  box-sizing: border-box;
+}
+
+.approachSummaryImageLeft {
+  left: 217px;
+  top: 368px;
+  width: 662px;
+  height: 361px;
+  object-fit: cover;
+}
+
+.approachSummaryImageTop {
+  left: 987px;
+  top: 431px;
+  width: 717px;
+  height: 195px;
+  object-fit: cover;
+}
+
+.approachSummaryImageCenter {
+  left: 656px;
+  top: 549px;
+  width: 662px;
+  height: 227px;
+  object-fit: cover;
+}
+
 .approachText {
-  width: min(1036px, 100%);
-  margin: 75px 0 0;
+  position: absolute;
+  left: 50%;
+  top: 820px;
+  width: 1036px;
+  margin: 0;
   color: #ffffff;
   font-family: 'Suit', sans-serif;
   font-size: 28px;
+  font-weight: 400;
   line-height: 1.6;
   text-align: center;
   letter-spacing: -0.56px;
+  transform: translateX(-50%);
+}
+
+.approachText p {
+  margin: 0;
+}
+
+.scrollFloatCopyLine {
+  display: flex;
+  justify-content: center;
+  gap: 0.38em;
+}
+
+.scrollFloatCopyWord {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(10px);
+  transform: translate3d(0, 28px, 0) scale(0.96) rotate(1.2deg);
+  transition: none;
+  will-change: opacity, filter, transform;
+}
+
+.scrollFloatCopyVisible .scrollFloatCopyWord {
+  animation: scrollFloatCopyIn 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--copy-index, 0) * 0.035s);
+}
+
+@keyframes scrollFloatCopyIn {
+  0% {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translate3d(0, 28px, 0) scale(0.96) rotate(1.2deg);
+  }
+
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) scale(1) rotate(0);
+  }
+}
+
+.approachText strong {
+  color: var(--blue);
+  font-weight: 700;
 }
 
 .essencePanel {
@@ -692,6 +1300,7 @@
   align-items: start;
   gap: 138px;
   padding-top: 398px;
+  overflow: visible;
 }
 
 .essenceIntro > p {
@@ -702,12 +1311,24 @@
   letter-spacing: -0.56px;
 }
 
+.essenceIntro {
+  position: sticky;
+  top: 320px;
+  align-self: start;
+  justify-self: start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 617px;
+  text-align: left;
+}
+
 .questionList {
   display: flex;
   flex-direction: column;
   gap: 100px;
-  height: 283px;
-  overflow: hidden;
+  height: auto;
+  overflow: visible;
 }
 
 .questionItem {
@@ -775,14 +1396,23 @@
   padding-top: 100px;
 }
 
-.invitationKey {
+.invitationKeyButton {
   position: absolute;
   left: 50%;
   bottom: 100px;
-  width: 216px;
-  height: 303px;
+  width: 280px;
+  height: 387px;
   transform: translateX(-50%);
-  object-fit: cover;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.invitationKeyCanvas {
+  display: block;
+  width: 280px;
+  height: 387px;
 }
 
 .invitationTitle {
@@ -829,6 +1459,21 @@
   box-shadow: 0 4px 10.6px rgba(0, 0, 0, 0.13);
   transform: translateX(-50%);
   backdrop-filter: blur(5.55px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.contactCardHidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(20px) scale(0.98);
+}
+
+.contactCardVisible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0) scale(1);
 }
 
 .contactTitle {
@@ -1024,17 +1669,56 @@
 
   .highlightsPanel {
     gap: 80px;
+    justify-content: flex-start;
   }
 
-  .projectGrid,
+  .highlightsContent,
+  .approachList {
+    width: 100%;
+  }
+
+  .highlightsContent {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .highlightsLargeList,
+  .highlightsRightList {
+    width: 100%;
+  }
+
+  .highlightsLargeList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .animatedContent {
+    width: 100%;
+  }
+
+  .highlightLargeCard,
+  .highlightSmallCard {
+    width: 100%;
+  }
+
+  .highlightSmallBlur {
+    width: calc(100% + 2px);
+    height: 33.34%;
+  }
+
+  .highlightsRightList,
   .approachList {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    width: 100%;
   }
 
   .approachCard {
     width: 100%;
+  }
+
+  .folderDropActive {
+    transform: scale(1.03);
   }
 
   .questionList {
@@ -1119,14 +1803,29 @@
     width: 100%;
   }
 
-  .projectGrid,
+  .highlightsContent,
+  .highlightsLargeList,
+  .highlightsRightList,
   .approachList {
     grid-template-columns: 1fr;
   }
 
-  .projectLarge,
-  .projectSmall {
+  .approachText {
+    white-space: normal;
+  }
+
+  .highlightLargeCard,
+  .highlightSmallCard {
     height: 420px;
+  }
+
+  .highlightSmallContent {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .highlightTextBlock {
+    white-space: normal;
   }
 
   .folderDrop p {

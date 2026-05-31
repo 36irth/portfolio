@@ -5,6 +5,7 @@ import MainPage from './pages/MainPage';
 
 function App() {
   const scrollRef = useRef(null);
+  const lenisRef = useRef(null);
   const [viewportHeight, setViewportHeight] = useState(
     typeof window !== 'undefined' ? window.innerHeight : 1080,
   );
@@ -19,6 +20,73 @@ function App() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return undefined;
+
+    let isDisposed = false;
+    let rafId = 0;
+    let lenisInstance = null;
+
+    const setupLenis = async () => {
+      try {
+        const module = await import('https://esm.sh/lenis@1.3.13');
+        if (isDisposed) return;
+
+        const Lenis = module.default;
+        lenisInstance = new Lenis({
+          wrapper: container,
+          content: container.firstElementChild ?? container,
+          duration: 1.4,
+          smoothWheel: true,
+          syncTouch: false,
+          wheelMultiplier: 0.9,
+          touchMultiplier: 1,
+          infinite: false,
+        });
+
+        lenisRef.current = lenisInstance;
+
+        const raf = (time) => {
+          lenisInstance?.raf(time);
+          rafId = window.requestAnimationFrame(raf);
+        };
+
+        rafId = window.requestAnimationFrame(raf);
+
+        if (phase === 'intro') {
+          lenisInstance.stop();
+        }
+      } catch (error) {
+        lenisRef.current = null;
+      }
+    };
+
+    setupLenis();
+
+    return () => {
+      isDisposed = true;
+      if (rafId) window.cancelAnimationFrame(rafId);
+      lenisInstance?.destroy?.();
+      if (lenisRef.current === lenisInstance) {
+        lenisRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const lenis = lenisRef.current;
+    if (!lenis) return;
+
+    if (phase === 'intro') {
+      lenis.stop();
+      lenis.scrollTo(0, { immediate: true });
+      return;
+    }
+
+    lenis.start();
+  }, [phase]);
 
   const handleScroll = (event) => {
     const container = event.currentTarget;
@@ -46,6 +114,16 @@ function App() {
 
     setPhase('main');
     requestAnimationFrame(() => {
+      const lenis = lenisRef.current;
+      if (lenis) {
+        lenis.start();
+        lenis.scrollTo(viewportHeight, {
+          duration: 2,
+          lock: true,
+        });
+        return;
+      }
+
       container.scrollTo({
         top: viewportHeight,
         behavior: 'smooth',

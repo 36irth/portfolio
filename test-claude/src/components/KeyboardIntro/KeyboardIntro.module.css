@@ -46,6 +46,10 @@
   background: #0d0d0d;
 }
 
+.wrapper :is(.introHint, .hintStrong, .hintLight, .deliveryMeta) {
+  letter-spacing: -0.02em;
+}
+
 .canvas {
   position: absolute;
   inset: 0;
