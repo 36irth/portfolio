@@ -163,19 +163,7 @@ const questions = [
   ],
 ];
 
-const formatQuestion = (number, question) => {
-  if (number !== '04') {
-    return question;
-  }
-
-  return (
-    <>
-      AI가 자연스러운 도구가 된 지금,
-      <br />
-      디자이너는 무엇을 직접 판단해야 할까요?
-    </>
-  );
-};
+const formatQuestion = (number, question) => question;
 
 const scrollToMainTop = () => {
   const scrollRoot = document.querySelector('.appScroll');
@@ -187,6 +175,47 @@ const scrollToMainTop = () => {
 
 const keys = ['C', 'H', 'A', 'E', 'I'];
 const floatDelays = [0.01, 0.12, 0.06, 0.18, 0.09, 0.16, 0.03];
+
+const cleanAwards = [
+  ['블루어워즈', '시각디자인 분야 입선', '2022.06.14'],
+  ['블루어워즈', '시각디자인 분야 입선', '2022.06.22'],
+  ['관악현대미술대전', '디자인 분야 특선', '2023.11.21'],
+];
+
+const cleanCertificates = [
+  ['웹디자인개발기능사(필기)', '26.01.24'],
+  ['컴퓨터그래픽기능사', '19.07.19'],
+  ['JLPT N2', '19.01.20'],
+];
+
+const cleanApproachCards = [
+  ['1', 'Observe', ['사용자가 어디서 불편함을', '느끼는지 파악합니다.'], imgApproachObserve, styles.approachFigureObserve],
+  ['2', 'Organize', ['사용자가 다음 행동을 쉽게', '찾을 수 있도록 정리합니다.'], imgApproachOrganize, styles.approachFigureOrganize],
+  ['3', 'Visualize', ['기능 뿐만이 아닌,', '기억에 남는 화면을 만듭니다'], imgApproachVisualize, styles.approachFigureVisualize],
+];
+
+const cleanQuestions = [
+  [
+    '01',
+    '고등학교부터 대학교까지, 왜 디자인을 전공하게 되었나요?',
+    '어릴 때부터 시각적으로 아름다운 것을 만드는 일을 좋아해 자연스럽게 시각디자인을 전공했고, 졸업 무렵 UI/UX의 사용자 경험 설계 개념에 흥미를 느껴 올해부터 본격적으로 공부를 시작했습니다.',
+  ],
+  [
+    '02',
+    '어떤 디자이너가 되고 싶나요?',
+    '앞으로는 저의 취향에만 머무는 것이 아닌, 다른 사람에게 닿는 디자인을 해보고 싶습니다. 화면 설계에만 그치지 않고 사용자 리서치와 데이터 기반의 개선 과정까지 이해할 수 있는 디자이너로 성장하는 것이 목표입니다.',
+  ],
+  [
+    '03',
+    '앞으로 무엇을 더 배우고 싶나요?',
+    'UI/UX 디자인 역량을 쌓아가는 동시에 장기적으로는 블렌더, 어도비 디멘션 같은 3D 툴을 익혀 시각적 표현의 폭을 넓히고 싶습니다. 또한 일본어, 중국어 등 낯선 언어를 배우며 다양한 문화권의 디자인 감각을 흡수하는 것도 목표 중 하나입니다.',
+  ],
+  [
+    '04',
+    'AI가 자연스러운 도구가 된 지금, 디자이너는 무엇을 직접 판단해야 할까요?',
+    'AI에 의존하지 않는 것이라고 생각합니다. 직접 사용해보니 도움을 받을수록 오히려 사고가 막히는 경험을 했고, 그래서 큰 그림은 스스로 그린 뒤 신선한 시각이 필요한 순간에만 활용하는 방식을 선호합니다. 처음부터 끝까지 맡기는 것이 아니라, 내 작업 과정의 일부로 두는 것이 중요하다고 생각합니다.',
+  ],
+];
 
 function useReplayInView(threshold = 0.18, rootMargin = '0px 0px -8% 0px') {
   const ref = useRef(null);
@@ -484,7 +513,7 @@ function CharacterSection({ isActive, scrollProgress }) {
           style={floatStyle(6)}
           onClick={dismissCharacterWindow('awards', 6)}
         >
-          {awards.map(([line1, line2, date]) => (
+          {cleanAwards.map(([line1, line2, date]) => (
             <article className={styles.awardItem} key={`${line1}-${line2}-${date}`}>
               <img src={imgAward} alt="" />
               <div>
@@ -565,7 +594,7 @@ function CharacterSection({ isActive, scrollProgress }) {
           </div>
           <h3>Certificate</h3>
           <div className={styles.certificateList}>
-            {certificates.map(([label, date]) => (
+            {cleanCertificates.map(([label, date]) => (
               <p key={label}>
                 <span>{label}</span>
                 <time>{date}</time>
@@ -864,7 +893,7 @@ function ApproachSection() {
       <ScrollFloatTitle title="Approach" active={2} className={styles.approachTitle} />
 
       <div className={styles.approachList}>
-        {approachCards.map((card, index) => {
+        {cleanApproachCards.map((card, index) => {
           const [number, title, lines, image, imageClass] = card;
           const isCollected = collected.includes(number);
           const isDragging = draggingCard?.id === number;
@@ -990,7 +1019,7 @@ function EssenceSection() {
         </p>
       </div>
       <div className={styles.questionList}>
-        {questions.map(([number, question, answer]) => (
+        {cleanQuestions.map(([number, question, answer]) => (
           <article className={styles.questionItem} key={number}>
             <div className={`${styles.questionBubble} ${number === '04' ? styles.questionBubbleLarge : ''}`}>
               <strong>{number}</strong>
@@ -1126,7 +1155,7 @@ function InvitationSection() {
           <h3>Contact us</h3>
           <p>채이 님이 연락처를 공유하려고 합니다.</p>
         </div>
-        <img src={asset('profile.png')} alt="채이 연락처 이미지" />
+        <img src={asset('profile.png')} alt="김채이 연락처 이미지" />
         <div className={styles.contactActions}>
           <button type="button" onClick={scrollToMainTop}>View Again</button>
           <button type="button">Accept</button>

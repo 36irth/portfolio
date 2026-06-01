@@ -2007,63 +2007,286 @@
 }
 
 @media (max-width: 680px) {
+  .page {
+    overflow-x: hidden;
+  }
+
   .panel {
-    padding: 56px 18px;
+    min-height: auto;
+    padding: 50px 20px;
   }
 
   .sectionTitle {
-    gap: 18px;
+    gap: 16px;
   }
 
   .sectionTitle h2 {
-    font-size: 44px;
+    font-size: 40px;
   }
 
   .keyActive,
   .keyInactive {
-    width: 34px;
-    height: 34px;
-    font-size: 21px;
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    font-size: 16px;
   }
 
   .characterCopy > p,
   .approachText,
   .invitationSub p,
   .invitationSub strong {
-    font-size: 20px;
+    font-size: 18px;
   }
 
-  .essenceIntro > p {
-    font-size: 22px;
+  .characterScrollSection {
+    height: 1967px;
+    min-height: 1967px;
+  }
+
+  .characterPanel {
+    position: relative;
+    height: 1967px;
+    min-height: 1967px;
+    padding: 50px 20px;
+    overflow: hidden;
+  }
+
+  .characterCopy,
+  .awards,
+  .designToolsCard,
+  .aiCard,
+  .certificateCard,
+  .profileCard,
+  .chatBubble {
+    transform: none;
+  }
+
+  .characterCopy {
+    left: 20px;
+    top: 50px;
+    width: calc(100% - 40px);
+  }
+
+  .characterTitle {
+    align-items: flex-start;
+  }
+
+  .characterCopy > p {
+    margin-top: 18px;
+    line-height: 1.55;
+  }
+
+  .characterCopy > p br {
+    display: none;
   }
 
   .accentLine {
     flex-wrap: wrap;
     white-space: normal;
+    gap: 4px 0;
+    margin-top: 28px;
     font-size: 22px;
+    line-height: 1.35;
+  }
+
+  .accentLine span:first-of-type {
+    margin-right: 0.55em;
+  }
+
+  .characterFloat {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  .characterFloatDismissed {
+    opacity: 1;
+    transform: none;
   }
 
   .glassHeader,
   .glassBody,
   .certificateCard {
-    padding: 22px;
+    padding: 18px;
+  }
+
+  .glassHeader {
+    min-height: 64px;
+  }
+
+  .windowTitle strong,
+  .toolLeft strong,
+  .toolRow em,
+  .bodyLabel,
+  .certificateList span,
+  .certificateList time {
+    font-size: 16px;
+  }
+
+  .windowTitle img,
+  .windowClose {
+    width: 18px;
+    height: 18px;
+  }
+
+  .glassBody {
+    gap: 16px;
   }
 
   .toolRow,
   .toolLeft {
-    align-items: flex-start;
+    align-items: center;
   }
 
   .toolRow {
-    flex-direction: column;
+    gap: 12px;
+  }
+
+  .toolLeft {
+    gap: 12px;
+  }
+
+  .toolLeft img {
+    width: 36px;
+    height: 36px;
   }
 
   .toolLeft span {
+    font-size: 13px;
     white-space: normal;
+  }
+
+  .designToolsCard {
+    left: 65px;
+    top: 926px;
+    width: 299px;
+    border-radius: 11px;
+  }
+
+  .profileCard {
+    left: 50%;
+    top: 399px;
+    width: 251px;
+    border-radius: 15px;
+    transform: translateX(-50%);
+    transform-origin: top center;
+  }
+
+  .profileCard.characterFloat {
+    transform: translateX(-50%);
   }
 
   .profileCard,
   .profileImage {
+    max-width: calc(100vw - 40px);
+  }
+
+  .profileImage {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  .profileTitle {
+    padding: 18px 0 14px;
+  }
+
+  .profileTitle h3 {
+    font-size: 24px;
+  }
+
+  .profileTitle p,
+  .profileMeta {
+    font-size: 18px;
+  }
+
+  .aiCard {
+    left: 156px;
+    right: auto;
+    top: 1284px;
+    width: 243px;
+    border-radius: 11px;
+  }
+
+  .certificateCard {
+    left: 114px;
+    right: auto;
+    top: 1674px;
+    width: 296px;
+    border-radius: 15px;
+  }
+
+  .cardTop img {
+    width: 36px;
+    height: 36px;
+  }
+
+  .cardTop strong {
+    font-size: 28px;
+  }
+
+  .certificateCard h3 {
+    margin: 14px 0 18px;
+    font-size: 18px;
+  }
+
+  .awards {
+    left: 20px;
+    right: auto;
+    top: 1362px;
+    bottom: auto;
+    flex-direction: column;
+    gap: 22px;
+    width: 98px;
+    transform-origin: top left;
+  }
+
+  .awardItem,
+  .awardItem:last-child {
+    width: 98px;
+    gap: 15px;
+  }
+
+  .awardItem img {
+    width: 57px;
+    height: 75px;
+  }
+
+  .awardItem p,
+  .awardItem time {
+    font-size: 12px;
+  }
+
+  .chatBubble {
+    max-width: calc(100% - 40px);
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 15px;
+  }
+
+  .schoolOne {
+    left: 151px;
+    top: 347px;
+    width: 231px;
+  }
+
+  .schoolTwo {
+    left: 34px;
+    top: 818px;
+    width: 252px;
+  }
+
+  .highlightsPanel {
+    min-height: 1090px;
+    gap: 70px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+  }
+
+  .highlightsTitle,
+  .approachTitle {
+    min-width: 0;
     width: 100%;
   }
 
@@ -2074,13 +2297,185 @@
     grid-template-columns: 1fr;
   }
 
-  .approachText {
+  .highlightsContent {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    width: 390px;
+  }
+
+  .highlightsLargeList,
+  .highlightsRightList {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .highlightsRightList {
+    height: auto;
+  }
+
+  .highlightLargeCard {
+    height: 156px;
+    padding: 15px;
+    border-radius: 15px;
+  }
+
+  .highlightSmallCard {
+    min-height: 91px;
+    padding: 12px 15px;
+    border-radius: 15px;
+  }
+
+  .highlightLargeBlur,
+  .highlightSmallBlur {
+    width: calc(100% + 2px);
+  }
+
+  .highlightLargeBlur {
+    height: 70px;
+  }
+
+  .highlightEyebrow {
+    font-size: 15px;
+  }
+
+  .highlightTitle {
+    font-size: 21px;
+  }
+
+  .highlightAction {
+    width: 84px;
+    gap: 8px;
+    padding: 4px 12px;
+  }
+
+  .highlightAction span {
+    font-size: 16px;
+  }
+
+  .approachPanel {
+    min-height: 1817px;
+    gap: 70px;
+    margin-top: 0;
+    padding-top: 50px;
+    overflow: hidden;
+  }
+
+  .approachList {
+    gap: 17px;
+    justify-items: center;
+  }
+
+  .approachCard {
+    flex-direction: row;
+    width: 276px;
+    min-height: 131px;
+    padding: 20px 17px;
+    border-radius: 18px;
+    gap: 20px;
+    text-align: left;
+  }
+
+  .approachFigureWrap {
+    flex: 0 0 auto;
+    width: 70px;
+    height: 91px;
+  }
+
+  .approachCard h3 {
+    justify-content: flex-start;
+    font-size: 16px;
+  }
+
+  .approachCard h3 span {
+    width: 18px;
+    height: 18px;
+    font-size: 14px;
+  }
+
+  .approachCard p {
+    font-size: 14px;
+    text-align: left;
     white-space: normal;
   }
 
-  .highlightLargeCard,
-  .highlightSmallCard {
-    height: 420px;
+  .folderDrop {
+    gap: 24px;
+    width: 100%;
+    opacity: 1;
+    transform: none;
+  }
+
+  .folderStage {
+    width: 240px;
+    height: 212px;
+  }
+
+  .folderImageBack,
+  .folderImageFront {
+    top: -16px;
+  }
+
+  .folderSlot {
+    left: 48px;
+    right: 48px;
+    top: 70px;
+    height: 72px;
+  }
+
+  .folderSlot span {
+    width: 100px;
+    height: 66px;
+  }
+
+  .approachText {
+    left: 20px;
+    right: 20px;
+    top: 568px;
+    width: auto;
+    transform: none;
+    white-space: normal;
+  }
+
+  .scrollFloatCopyLine {
+    flex-wrap: wrap;
+    gap: 0.22em;
+  }
+
+  .approachSummary {
+    top: 1056px;
+    height: 761px;
+    opacity: 1;
+    transform: none;
+  }
+
+  .approachSummaryImageLeft,
+  .approachSummaryImageTop,
+  .approachSummaryImageCenter {
+    left: 20px;
+    width: calc(100% - 40px);
+    border-radius: 12px;
+  }
+
+  .approachSummaryImageLeft {
+    top: 210px;
+    width: 320px;
+    height: 175px;
+  }
+
+  .approachSummaryImageTop {
+    left: 90px;
+    top: 353px;
+    width: 320px;
+    height: 109px;
+  }
+
+  .approachSummaryImageCenter {
+    left: 67px;
+    top: 453px;
+    width: 320px;
+    height: 87px;
   }
 
   .highlightSmallContent {
@@ -2088,38 +2483,152 @@
     align-items: flex-start;
   }
 
-  .highlightTextBlock {
-    white-space: normal;
-  }
-
   .folderDrop p {
     width: 100%;
     justify-content: center;
-    font-size: 18px;
+    padding: 6px 12px;
+    font-size: 15px;
+    text-align: center;
+    white-space: normal;
   }
 
   .essencePanel {
-    padding-top: 72px;
+    display: flex;
+    flex-direction: column;
+    gap: 70px;
+    min-height: 1341px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    overflow: visible;
+  }
+
+  .essenceIntro {
+    position: relative;
+    top: auto;
+    width: 100%;
+  }
+
+  .essenceIntro > p {
+    margin-top: 24px;
+    font-size: 20px;
+    line-height: 1.55;
+  }
+
+  .questionList {
+    gap: 42px;
+    width: 100%;
+  }
+
+  .questionItem {
+    gap: 8px;
   }
 
   .questionBubble {
-    border-radius: 28px;
-    font-size: 22px;
+    align-self: flex-end;
+    width: max-content;
+    max-width: 390px;
+    min-height: 0;
+    padding: 10px 15px;
+    border-radius: 21px;
+    gap: 10px;
+    font-size: 14px;
+    line-height: 1.45;
   }
 
   .answerBubble {
-    border-radius: 24px;
-    font-size: 19px;
+    max-width: 365px;
+    padding: 10px 15px;
+    border-radius: 17px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .questionBubbleLarge {
+    width: min(100%, 330px);
+    min-height: 0;
+  }
+
+  .questionBubbleLarge strong,
+  .questionBubbleLarge span {
+    width: auto;
   }
 
   .delivered,
   .sender {
-    font-size: 22px;
+    font-size: 14px;
+  }
+
+  .delivered {
+    margin: 0 18px 14px 0;
+  }
+
+  .sender {
+    margin-left: 20px;
+  }
+
+  .invitationPanel {
+    min-height: 932px;
+    padding-top: 213px;
+    overflow: hidden;
+  }
+
+  .invitationTitle {
+    gap: 26px;
+    width: 100%;
+    padding-top: 42px;
+  }
+
+  .invitationSub {
+    width: 100%;
+    gap: 8px;
+  }
+
+  .invitationSub p,
+  .invitationSub strong {
+    max-width: 350px;
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  .invitationSub strong {
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  .invitationKeyButton {
+    bottom: 42px;
+    width: 300px;
+    height: 390px;
+  }
+
+  .contactCard {
+    top: 72px;
+    width: calc(100% - 40px);
+    border-radius: 18px;
+  }
+
+  .contactTitle {
+    height: auto;
+    padding: 24px 18px 18px;
+  }
+
+  .contactTitle h3 {
+    font-size: 26px;
   }
 
   .contactTitle p,
   .contactActions button,
   .profileMeta {
-    font-size: 20px;
+    font-size: 17px;
+  }
+
+  .contactCard > img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  .contactActions button {
+    height: 64px;
   }
 }
