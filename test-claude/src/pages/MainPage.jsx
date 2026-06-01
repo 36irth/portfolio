@@ -1624,6 +1624,9 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
   const [activeSection, setActiveSection] = useState('character');
   const [showTopButton, setShowTopButton] = useState(false);
   const [characterResetSignal, setCharacterResetSignal] = useState(0);
+  const showCharacterInteractionHint =
+    activeSection === 'character' &&
+    characterWindowIds.some((_, index) => getFloatState(isActive, scrollProgress, index));
 
   const scrollToSection = (sectionId) => {
     const target = document.querySelector(`[data-section="${sectionId}"]`);
@@ -1759,7 +1762,7 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
       </div>
       <div
         className={`${styles.characterInteractionHint} ${
-          activeSection === 'character' ? styles.characterInteractionHintVisible : ''
+          showCharacterInteractionHint ? styles.characterInteractionHintVisible : ''
         }`}
         aria-hidden="true"
       >

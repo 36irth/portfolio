@@ -102,6 +102,22 @@ function App() {
     const container = scrollRef.current;
     if (!container) return undefined;
 
+    const preventScrollPastBounds = (event) => {
+      if (phase !== 'main' || scrollLocked) return;
+      const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight);
+      const isAtTop = container.scrollTop <= 1;
+      const isAtBottom = container.scrollTop >= maxScrollTop - 1;
+      const isPushingPastTop = event.deltaY < 0 && isAtTop;
+      const isPushingPastBottom = event.deltaY > 0 && isAtBottom;
+
+      if (!isPushingPastTop && !isPushingPastBottom) return;
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    };
+
+    container.addEventListener('wheel', preventScrollPastBounds, { passive: false, capture: true });
+
     const scrollTo = (top, behavior = 'auto') => {
       const lenis = lenisRef.current;
       if (lenis) {
@@ -137,10 +153,11 @@ function App() {
     window.addEventListener('portfolio:scroll-lock', handleScrollLock);
     window.addEventListener('portfolio:scroll-to', handleScrollTo);
     return () => {
+      container.removeEventListener('wheel', preventScrollPastBounds, { capture: true });
       window.removeEventListener('portfolio:scroll-lock', handleScrollLock);
       window.removeEventListener('portfolio:scroll-to', handleScrollTo);
     };
-  }, [phase]);
+  }, [phase, scrollLocked]);
 
   const handleScroll = (event) => {
     const container = event.currentTarget;
