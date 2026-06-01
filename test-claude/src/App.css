@@ -34,6 +34,11 @@ html.lenis body {
   overflow-y: auto;
 }
 
+.appScrollContent {
+  width: 100%;
+  min-height: 100%;
+}
+
 .appScroll::-webkit-scrollbar {
   width: 10px;
 }

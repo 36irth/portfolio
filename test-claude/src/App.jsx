@@ -5,6 +5,7 @@ import MainPage from './pages/MainPage';
 
 function App() {
   const scrollRef = useRef(null);
+  const contentRef = useRef(null);
   const lenisRef = useRef(null);
   const scrollRafRef = useRef(0);
   const pendingScrollTopRef = useRef(0);
@@ -39,7 +40,7 @@ function App() {
         const Lenis = module.default;
         lenisInstance = new Lenis({
           wrapper: container,
-          content: container.firstElementChild ?? container,
+          content: contentRef.current ?? container,
           duration: 1.4,
           smoothWheel: true,
           syncTouch: false,
@@ -161,13 +162,15 @@ function App() {
         ref={scrollRef}
         onScroll={handleScroll}
       >
-        <section className="appIntroSection">
-          <KeyboardIntro onComplete={handleIntroComplete} />
-        </section>
-        <MainPage
-          isActive={phase === 'main' || scrollTop > viewportHeight * 0.45}
-          scrollProgress={characterProgress}
-        />
+        <div className="appScrollContent" ref={contentRef}>
+          <section className="appIntroSection">
+            <KeyboardIntro onComplete={handleIntroComplete} />
+          </section>
+          <MainPage
+            isActive={phase === 'main' || scrollTop > viewportHeight * 0.45}
+            scrollProgress={characterProgress}
+          />
+        </div>
       </div>
     </div>
   );

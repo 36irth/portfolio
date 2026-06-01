@@ -25,8 +25,8 @@
   .essenceIntro > p,
   .questionBubble,
   .answerBubble,
-  .invitationTitle p,
-  .invitationTitle strong,
+  .invitationSub p,
+  .invitationSub strong,
   .contactTitle p
 ) {
   letter-spacing: -0.02em;
@@ -205,10 +205,10 @@
 .characterCopy > p {
   margin-top: 5px;
   font-family: 'Suit', sans-serif;
-  font-size: 28px;
+  font-size: clamp(22px, 1.6vw, 24px);
   font-weight: 400;
   line-height: 1.6;
-  letter-spacing: -0.56px;
+  letter-spacing: -0.48px;
 }
 
 .characterCopy > p,
@@ -580,7 +580,6 @@
 .chatBubble {
   position: absolute;
   z-index: 20;
-  max-width: 360px;
   padding: 15px 25px;
   border-radius: 25px;
   background: var(--blue);
@@ -592,17 +591,26 @@
 }
 
 .chatBubble p {
+  display: flex;
+  flex-direction: column;
   margin: 0;
+}
+
+.chatBubble span {
+  display: block;
+  white-space: nowrap;
 }
 
 .schoolOne {
   left: 1122px;
   top: 134px;
+  width: 317px;
 }
 
 .schoolTwo {
   left: 1032px;
   top: 234px;
+  width: 352px;
 }
 
 .highlightsPanel {
@@ -761,18 +769,17 @@
 }
 
 .highlightProjectImageA {
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center bottom;
+  top: -1.98%;
+  left: -47.09%;
+  width: 199.8%;
+  height: 101.98%;
 }
 
 .highlightProjectImageB {
-  top: -0.03%;
-  left: -44.6%;
-  width: 220.71%;
-  height: 393.36%;
+  top: 0;
+  left: -40.88%;
+  width: 195.93%;
+  height: 100%;
 }
 
 .highlightProjectImageC {
@@ -783,10 +790,10 @@
 }
 
 .highlightProjectImageD {
-  top: -55.33%;
+  top: -161.75%;
   left: 0;
-  width: 268.53%;
-  height: 510.02%;
+  width: 100%;
+  height: 379.94%;
 }
 
 .highlightProjectImageE {
@@ -958,12 +965,18 @@
 }
 
 .approachPanel {
-  min-height: 1506px;
+  min-height: 1269px;
+  margin-top: 160px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 75px;
   position: relative;
+  transition: min-height 0.36s ease;
+}
+
+.approachPanelExpanded {
+  min-height: 2037px;
 }
 
 .approachTitle {
@@ -1139,7 +1152,6 @@
   flex-direction: column;
   align-items: center;
   gap: 50px;
-  transition: transform 0.28s ease, filter 0.28s ease;
   opacity: 0;
   transform: translateY(28px);
   transition:
@@ -1153,16 +1165,78 @@
   filter: brightness(1.06);
 }
 
+.folderDropOpen {
+  filter: brightness(1.08) drop-shadow(0 18px 30px rgba(1, 136, 251, 0.16));
+}
+
+.folderDropHovering {
+  transform: translateY(0) scale(1.05);
+}
+
 .folderDropVisible {
   opacity: 1;
   transform: translateY(0);
 }
 
-.folderImage {
-  display: block;
+.folderStage {
+  position: relative;
   width: 322px;
   height: 284px;
-  object-fit: contain;
+  perspective: 900px;
+  overflow: visible;
+}
+
+.folderImage {
+  display: block;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: auto;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+}
+
+.folderImageBack {
+  z-index: 1;
+  top: -22px;
+}
+
+.folderSlot {
+  position: absolute;
+  z-index: 2;
+  left: 66px;
+  right: 66px;
+  top: 96px;
+  height: 92px;
+  pointer-events: none;
+}
+
+.folderSlot span {
+  position: absolute;
+  left: calc(var(--slot-index, 0) * 20px);
+  top: calc(var(--slot-index, 0) * 8px);
+  width: 132px;
+  height: 88px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  transform: rotate(calc((var(--slot-index, 0) - 1) * 3deg));
+  opacity: 0.78;
+}
+
+.folderImageFront {
+  z-index: 3;
+  top: -22px;
+  transform: translateY(22px);
+  transform-origin: 50% 88%;
+  transition: transform 0.45s cubic-bezier(0.2, 0.85, 0.2, 1), filter 0.45s ease;
+}
+
+.folderDropOpen .folderImageFront {
+  transform: translateY(54px) rotateX(-18deg) scaleY(0.92);
+  filter: brightness(1.03);
 }
 
 .folderDrop p {
@@ -1187,12 +1261,15 @@
 
 .approachSummary {
   position: absolute;
-  inset: 0;
+  left: 0;
+  top: 1269px;
+  width: 100%;
+  height: 768px;
   opacity: 0;
-  transform: translateY(180px);
+  transform: translateY(90px);
   transition:
-    opacity 0.42s ease,
-    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.32s ease,
+    transform 0.62s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
 }
 
@@ -1209,50 +1286,74 @@
   border: 1px solid var(--blue);
   border-radius: 15px;
   box-sizing: border-box;
+  opacity: 0;
+  transform: translate3d(0, 54px, 0) scale(0.985);
+  transition:
+    opacity 0.38s ease,
+    transform 0.56s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .approachSummaryImageLeft {
-  left: 217px;
-  top: 368px;
+  left: 216.5px;
+  top: 100px;
   width: 662px;
   height: 361px;
   object-fit: cover;
 }
 
 .approachSummaryImageTop {
-  left: 987px;
-  top: 431px;
+  left: 986.5px;
+  top: 163px;
   width: 717px;
   height: 195px;
   object-fit: cover;
 }
 
 .approachSummaryImageCenter {
-  left: 656px;
-  top: 549px;
+  left: 655.5px;
+  top: 281px;
   width: 662px;
   height: 227px;
   object-fit: cover;
 }
 
+.approachSummaryVisible .approachSummaryImageLeft {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  transition-delay: 0.02s;
+}
+
+.approachSummaryVisible .approachSummaryImageTop {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  transition-delay: 0.14s;
+}
+
+.approachSummaryVisible .approachSummaryImageCenter {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  transition-delay: 0.26s;
+}
+
 .approachText {
   position: absolute;
   left: 50%;
-  top: 820px;
+  top: 578px;
   width: 1036px;
   margin: 0;
   color: #ffffff;
   font-family: 'Suit', sans-serif;
-  font-size: 28px;
+  font-size: clamp(22px, 1.6vw, 24px);
   font-weight: 400;
   line-height: 1.6;
   text-align: center;
-  letter-spacing: -0.56px;
+  letter-spacing: -0.48px;
   transform: translateX(-50%);
 }
 
-.approachText p {
-  margin: 0;
+.approachTextAccent {
+  color: var(--blue);
+  font-weight: 700;
 }
 
 .scrollFloatCopyLine {
@@ -1299,6 +1400,7 @@
   grid-template-columns: 617px 865px;
   align-items: start;
   gap: 138px;
+  min-height: 2250px;
   padding-top: 398px;
   overflow: visible;
 }
@@ -1306,9 +1408,9 @@
 .essenceIntro > p {
   margin-top: 35px;
   font-family: 'Suit', sans-serif;
-  font-size: 28px;
+  font-size: clamp(22px, 1.6vw, 24px);
   line-height: 1.6;
-  letter-spacing: -0.56px;
+  letter-spacing: -0.48px;
 }
 
 .essenceIntro {
@@ -1339,8 +1441,14 @@
 }
 
 .questionBubble {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
   align-self: flex-end;
-  max-width: 865px;
+  width: max-content;
+  max-width: 857px;
+  min-height: 95px;
   padding: 25px 35px;
   border-radius: 50px;
   background: var(--blue);
@@ -1351,12 +1459,27 @@
 }
 
 .questionBubble strong {
-  margin-right: 18px;
+  flex: 0 0 auto;
   font-weight: 900;
+  line-height: 1.4;
 }
 
 .questionBubble span {
+  display: block;
   font-weight: 500;
+}
+
+.questionBubbleLarge {
+  width: 653px;
+  min-height: 140px;
+}
+
+.questionBubbleLarge strong {
+  width: 42px;
+}
+
+.questionBubbleLarge span {
+  width: 523px;
 }
 
 .delivered {
@@ -1409,10 +1532,33 @@
   cursor: pointer;
 }
 
-.invitationKeyCanvas {
+.invitationKeyImage {
   display: block;
   width: 280px;
   height: 387px;
+  object-fit: contain;
+  transform: translate3d(0, 0, 0) scale(1);
+  transform-origin: 50% 82%;
+  filter: drop-shadow(0 18px 18px rgba(0, 0, 0, 0.22));
+  transition: transform 0.24s cubic-bezier(0.18, 0.9, 0.22, 1), filter 0.24s ease;
+  animation: invitationKeyFloat 2.8s ease-in-out infinite;
+}
+
+.invitationKeyImagePressed {
+  transform: translate3d(0, 18px, 0) scale(0.94);
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.18));
+  animation-play-state: paused;
+}
+
+@keyframes invitationKeyFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(0, -10px, 0) scale(1.01);
+  }
 }
 
 .invitationTitle {
@@ -1426,20 +1572,27 @@
   text-align: center;
 }
 
-.invitationTitle p,
-.invitationTitle strong {
-  font-family: 'Suit', sans-serif;
-  font-size: 28px;
-  line-height: 1.6;
-  letter-spacing: -0.56px;
+.invitationSub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
 }
 
-.invitationTitle p {
+.invitationSub p,
+.invitationSub strong {
+  font-family: 'Suit', sans-serif;
+  font-size: clamp(22px, 1.6vw, 24px);
+  line-height: 1.6;
+  letter-spacing: -0.48px;
+}
+
+.invitationSub p {
   margin: 0;
   font-weight: 400;
 }
 
-.invitationTitle strong {
+.invitationSub strong {
   display: inline-block;
   padding: 0 3px;
   background: var(--blue);
@@ -1458,22 +1611,41 @@
   color: #1a1a1a;
   box-shadow: 0 4px 10.6px rgba(0, 0, 0, 0.13);
   transform: translateX(-50%);
+  transform-origin: center center;
   backdrop-filter: blur(5.55px);
   transition:
-    opacity 0.35s ease,
-    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.38s ease,
+    transform 0.92s cubic-bezier(0.18, 0.9, 0.22, 1);
 }
 
 .contactCardHidden {
   opacity: 0;
   pointer-events: none;
-  transform: translateX(-50%) translateY(20px) scale(0.98);
+  transform: translateX(-50%) translateY(34px) scale(0.9);
 }
 
 .contactCardVisible {
   opacity: 1;
   pointer-events: auto;
   transform: translateX(-50%) translateY(0) scale(1);
+  animation: contactCardFloatIn 1.08s cubic-bezier(0.18, 0.9, 0.22, 1) both;
+}
+
+@keyframes contactCardFloatIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(34px) scale(0.9);
+  }
+
+  68% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-5px) scale(1.012);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
 }
 
 .contactTitle {
@@ -1677,6 +1849,10 @@
     width: 100%;
   }
 
+  .approachPanel {
+    margin-top: 80px;
+  }
+
   .highlightsContent {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1728,7 +1904,12 @@
 
   .questionBubble,
   .answerBubble {
+    width: 100%;
     max-width: 100%;
+  }
+
+  .questionBubbleLarge span {
+    width: auto;
   }
 
   .contactCard {
@@ -1768,8 +1949,8 @@
   .characterCopy > p,
   .approachText,
   .essenceIntro > p,
-  .invitationTitle p,
-  .invitationTitle strong {
+  .invitationSub p,
+  .invitationSub strong {
     font-size: 20px;
   }
 

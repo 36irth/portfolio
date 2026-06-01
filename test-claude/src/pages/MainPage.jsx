@@ -1,20 +1,16 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import * as THREE from 'three';
 import SplitText from '../components/KeyboardIntro/SplitText';
-import { animatePress, startFloat, stopFloat } from '../components/KeyboardIntro/animations';
-import { createKeycap } from '../components/KeyboardIntro/Keycap';
-import { SCENE } from '../components/KeyboardIntro/constants';
 import styles from './MainPage.module.css';
 
 const asset = (name) => `/assets/portfolio/${name}`;
 
-const imgHighlightsProject = 'https://www.figma.com/api/mcp/asset/49afc43d-377d-458c-a99a-2e2ac8fb6901';
-const imgHighlightsProject1 = 'https://www.figma.com/api/mcp/asset/390f36b6-f416-41dc-8e90-08c4159f42d9';
-const imgHighlightsProject2 = 'https://www.figma.com/api/mcp/asset/fa5e3702-bbe4-4564-8ef2-470ff37edab9';
-const imgHighlightsProject3 = 'https://www.figma.com/api/mcp/asset/05c4c9d8-ab65-4bd1-bf9d-46b4d890d443';
-const imgHighlightsProject4 = 'https://www.figma.com/api/mcp/asset/60d4a4eb-b407-4b2d-88fb-5d0a5868b897';
-const imgHighlightsProject5 = 'https://www.figma.com/api/mcp/asset/dd006139-e932-4658-b72f-c40e31fedbd6';
-const imgHighlightsArrow = 'https://www.figma.com/api/mcp/asset/f3e7a64d-ed43-4cff-b0d9-9e4d3b834ad6';
+const imgHighlightsProject = asset('project-1.png');
+const imgHighlightsProject1 = asset('project-2.png');
+const imgHighlightsProject2 = asset('project-3.png');
+const imgHighlightsProject3 = asset('project-4.png');
+const imgHighlightsProject4 = asset('project-5.png');
+const imgHighlightsProject5 = asset('project-6.png');
+const imgHighlightsArrow = asset('highlight-arrow.svg');
 
 const imgApproachObserve = 'https://www.figma.com/api/mcp/asset/1a3b138a-4381-4877-8aec-251314aeb84b';
 const imgApproachOrganize = 'https://www.figma.com/api/mcp/asset/ebc34bbf-f772-49dc-99f6-65425e915f67';
@@ -24,6 +20,8 @@ const imgApproachDrag = 'https://www.figma.com/api/mcp/asset/b9803712-340d-46d5-
 const imgApproachSummaryTop = asset('approach-image55.png');
 const imgApproachSummaryLeft = 'https://www.figma.com/api/mcp/asset/98bf9130-9092-4e82-8723-ce85f5064582';
 const imgApproachSummaryCenter = 'https://www.figma.com/api/mcp/asset/e1d77281-a5d2-46aa-8dd1-76b70d10006a';
+const imgApproachFolderBack = asset('folder-back.png');
+const imgApproachFolderFront = asset('folder-front.png');
 
 const imgAward = 'https://www.figma.com/api/mcp/asset/e2707fcb-a858-4bcc-b38c-1dbf37f21cfb';
 const imgCertificateIcon = 'https://www.figma.com/api/mcp/asset/59f0f208-8f4d-4ace-8131-785b76c7cda8';
@@ -81,7 +79,7 @@ const highlightLargeProjects = [
   },
   {
     image: imgHighlightsProject1,
-    eyebrow: '콘서트 덕질 일정 공유 앱',
+    eyebrow: '콘서트 특화 일정 공유 앱',
     title: 'STAG',
     buttons: ['Site'],
     imageClass: styles.highlightProjectImageB,
@@ -90,7 +88,7 @@ const highlightLargeProjects = [
   {
     image: imgHighlightsProject2,
     eyebrow: 'K-Brand 글로벌 웹사이트 리뉴얼',
-    title: '룸앤',
+    title: '롬앤',
     buttons: ['Site', 'pdf'],
     imageClass: styles.highlightProjectImageC,
     overlayClass: styles.highlightOverlayC,
@@ -146,9 +144,32 @@ const questions = [
   [
     '04',
     'AI가 자연스러워진 지금, 디자이너는 무엇을 직접 판단해야 할까요?',
-    'AI는 보조 도구일 뿐이라고 생각합니다. 직접 사용해보며 무엇을 맡기고 어디까지 검토할지를 결정하는 경험이 중요합니다. 처음부터 끝까지 맡기는 것이 아니라 작업 과정의 속도를 높이는 도구로서 활용하는 것이 중요하다고 생각합니다.',
+    'AI에 의존하지 않는 것이라고 생각합니다. 직접 사용해보니 도움을 받을수록 오히려 사고가 막히는 경험을 했고, 그래서 큰 그림은 스스로 그린 뒤 신선한 시각이 필요한 순간에만 활용하는 방식을 선호합니다. 처음부터 끝까지 맡기는 것이 아니라, 내 작업 과정의 일부로 두는 것이 중요하다고 생각합니다.',
   ],
 ];
+
+const formatQuestion = (number, question) => {
+  if (number !== '04') {
+    return question;
+  }
+
+  return (
+    <>
+      AI가 자연스러운 도구가 된 지금,
+      <br />
+      디자이너는 무엇을 직접 판단해야 할까요?
+    </>
+  );
+};
+
+const scrollToMainTop = () => {
+  const scrollRoot = document.querySelector('.appScroll');
+  const top = window.innerHeight || 0;
+  scrollRoot?.scrollTo({
+    top,
+    behavior: 'smooth',
+  });
+};
 
 const keys = ['C', 'H', 'A', 'E', 'I'];
 const floatDelays = [0.01, 0.12, 0.06, 0.18, 0.09, 0.16, 0.03];
@@ -459,10 +480,16 @@ function CharacterSection({ isActive, scrollProgress }) {
         </aside>
 
         <div className={`${styles.chatBubble} ${floatClass(isActive, scrollProgress, 4)} ${styles.schoolOne}`} style={floatStyle(4)}>
-          <p>2021~2023 안산대학교 시각미디어디자인학과</p>
+          <p>
+            <span>2021~2023</span>
+            <span>안산대학교 시각미디어디자인학과</span>
+          </p>
         </div>
         <div className={`${styles.chatBubble} ${floatClass(isActive, scrollProgress, 5)} ${styles.schoolTwo}`} style={floatStyle(5)}>
-          <p>2017~2020 안산디자인문화고등학교 시각디자인과</p>
+          <p>
+            <span>2017~2020</span>
+            <span>안산디자인문화고등학교 시각디자인과</span>
+          </p>
         </div>
       </div>
     </section>
@@ -532,11 +559,18 @@ function HighlightsSection() {
 function ApproachSection() {
   const sectionRef = useRef(null);
   const folderRef = useRef(null);
+  const summaryRef = useRef(null);
+  const completedRef = useRef(false);
   const [collected, setCollected] = useState([]);
   const [draggingCard, setDraggingCard] = useState(null);
   const [folderReady, setFolderReady] = useState(false);
+  const [folderOpen, setFolderOpen] = useState(false);
   const [textReady, setTextReady] = useState(false);
   const allCollected = collected.length === approachCards.length;
+
+  useEffect(() => {
+    completedRef.current = allCollected;
+  }, [allCollected]);
 
   useEffect(() => {
     const node = sectionRef.current;
@@ -546,6 +580,7 @@ function ApproachSection() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
+          if (completedRef.current) return;
           window.clearTimeout(timeoutId);
           timeoutId = window.setTimeout(() => {
             setFolderReady(true);
@@ -554,7 +589,9 @@ function ApproachSection() {
         }
 
         window.clearTimeout(timeoutId);
+        if (completedRef.current) return;
         setFolderReady(false);
+        setFolderOpen(false);
         setDraggingCard(null);
         setCollected([]);
         setTextReady(false);
@@ -570,9 +607,48 @@ function ApproachSection() {
   }, []);
 
   useEffect(() => {
+    const scrollRoot = document.querySelector('.appScroll');
+    if (!scrollRoot) return undefined;
+
+    let frame = 0;
+    let previousScrollTop = scrollRoot.scrollTop;
+    const resetWhenReturningToCards = () => {
+      if (frame) return;
+
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        const currentScrollTop = scrollRoot.scrollTop;
+        const isScrollingUp = currentScrollTop < previousScrollTop;
+        previousScrollTop = currentScrollTop;
+
+        if (!isScrollingUp) return;
+        if (!completedRef.current || !sectionRef.current) return;
+
+        const rect = sectionRef.current.getBoundingClientRect();
+        const isBackAtCardArea = rect.top > -420 && rect.top < window.innerHeight * 0.75;
+        if (!isBackAtCardArea) return;
+
+        completedRef.current = false;
+        setCollected([]);
+        setDraggingCard(null);
+        setFolderOpen(false);
+        setTextReady(false);
+        setFolderReady(true);
+      });
+    };
+
+    scrollRoot.addEventListener('scroll', resetWhenReturningToCards, { passive: true });
+    return () => {
+      scrollRoot.removeEventListener('scroll', resetWhenReturningToCards);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!draggingCard) return undefined;
 
     const handlePointerMove = (event) => {
+      setFolderOpen(true);
       setDraggingCard((prev) => {
         if (!prev) return prev;
         return {
@@ -585,17 +661,21 @@ function ApproachSection() {
 
     const handlePointerUp = (event) => {
       const folderRect = folderRef.current?.getBoundingClientRect();
-      if (
+      const isInsideFolder =
         folderRect &&
         event.clientX >= folderRect.left &&
         event.clientX <= folderRect.right &&
         event.clientY >= folderRect.top &&
-        event.clientY <= folderRect.bottom
-      ) {
+        event.clientY <= folderRect.bottom;
+
+      if (isInsideFolder) {
         setCollected((prev) => (prev.includes(draggingCard.id) ? prev : [...prev, draggingCard.id]));
       }
 
       setDraggingCard(null);
+      window.setTimeout(() => {
+        setFolderOpen(false);
+      }, isInsideFolder ? 360 : 0);
     };
 
     window.addEventListener('pointermove', handlePointerMove);
@@ -612,12 +692,20 @@ function ApproachSection() {
       return undefined;
     }
     setFolderReady(false);
-    const timer = window.setTimeout(() => {
+    setFolderOpen(false);
+    const scrollTimer = window.setTimeout(() => {
+      summaryRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }, 360);
+    const revealTimer = window.setTimeout(() => {
       setTextReady(true);
-    }, 620);
+    }, 980);
 
     return () => {
-      window.clearTimeout(timer);
+      window.clearTimeout(scrollTimer);
+      window.clearTimeout(revealTimer);
     };
   }, [allCollected]);
 
@@ -628,6 +716,7 @@ function ApproachSection() {
 
     event.preventDefault();
     const rect = event.currentTarget.getBoundingClientRect();
+    setFolderOpen(true);
     setDraggingCard({
       id,
       title,
@@ -644,7 +733,10 @@ function ApproachSection() {
   };
 
   return (
-    <section ref={sectionRef} className={`${styles.panel} ${styles.approachPanel}`}>
+    <section
+      ref={sectionRef}
+      className={`${styles.panel} ${styles.approachPanel} ${allCollected ? styles.approachPanelExpanded : ''}`}
+    >
       <ScrollFloatTitle title="Approach" active={2} className={styles.approachTitle} />
 
       <div className={styles.approachList}>
@@ -688,25 +780,43 @@ function ApproachSection() {
         ref={folderRef}
         className={`${styles.folderDrop} ${folderReady ? styles.folderDropVisible : ''} ${
           draggingCard ? styles.folderDropActive : ''
+        } ${folderOpen ? styles.folderDropOpen : ''} ${
+          draggingCard && folderOpen ? styles.folderDropHovering : ''
         }`}
       >
-        <img src={imgApproachFolder} alt="" className={styles.folderImage} />
+        <div className={styles.folderStage}>
+          <img src={imgApproachFolderBack} alt="" className={`${styles.folderImage} ${styles.folderImageBack}`} />
+          <div className={styles.folderSlot}>
+            {collected.map((id, index) => (
+              <span key={id} style={{ '--slot-index': index }} />
+            ))}
+          </div>
+          <img src={imgApproachFolderFront} alt="" className={`${styles.folderImage} ${styles.folderImageFront}`} />
+        </div>
         <p>
           <img src={imgApproachDrag} alt="" />
           파일을 드래그해서 폴더 안에 넣어주세요
         </p>
       </div>
-      <div className={`${styles.approachSummary} ${textReady ? styles.approachSummaryVisible : ''}`}>
+      <div ref={summaryRef} className={`${styles.approachSummary} ${textReady ? styles.approachSummaryVisible : ''}`}>
         <img src={imgApproachSummaryLeft} alt="" className={styles.approachSummaryImageLeft} />
         <img src={imgApproachSummaryTop} alt="" className={styles.approachSummaryImageTop} />
         <img src={imgApproachSummaryCenter} alt="" className={styles.approachSummaryImageCenter} />
 
-        <div className={styles.approachText}>
-          <p>
-            저는 완성된 결과물보다 <strong>사용자가 왜 이 화면에서 멈추고, 어디로 이동해야 하는지</strong>를 생각합니다.
-          </p>
-          <p>복잡한 구조를 단순한 흐름으로 정리하고, 그 흐름에 어울리는 시각적 무드를 더하며 디자인합니다.</p>
-        </div>
+        <SplitText
+          className={styles.approachText}
+          isActive={textReady}
+          animationDelay={0.22}
+          stagger={0.008}
+          duration={0.52}
+          segments={[
+            { text: '저는 완성된 결과물보다 ' },
+            { text: '사용자가 왜 이 화면에서 멈추고, 어디로 이동해야 하는지', className: styles.approachTextAccent },
+            { text: '를 생각합니다.' },
+            { isBreak: true },
+            { text: '복잡한 구조를 단순한 흐름으로 정리하고, 그 흐름에 어울리는 시각적 무드를 더하며 디자인합니다.' },
+          ]}
+        />
       </div>
 
       {draggingCard && (
@@ -756,9 +866,9 @@ function EssenceSection() {
       <div className={styles.questionList}>
         {questions.map(([number, question, answer]) => (
           <article className={styles.questionItem} key={number}>
-            <div className={styles.questionBubble}>
+            <div className={`${styles.questionBubble} ${number === '04' ? styles.questionBubbleLarge : ''}`}>
               <strong>{number}</strong>
-              <span>{question}</span>
+              <span>{formatQuestion(number, question)}</span>
             </div>
             <p className={styles.delivered}>Delivered</p>
             <div className={styles.answerBubble}>{answer}</div>
@@ -771,127 +881,34 @@ function EssenceSection() {
 }
 
 function InvitationKeyScene({ onActivate, pressSignal, active }) {
-  const canvasRef = useRef(null);
-  const keycapRef = useRef(null);
-  const frameRef = useRef(0);
-  const renderRef = useRef(null);
-  const activeRef = useRef(active);
-
-  useEffect(() => {
-    activeRef.current = active;
-  }, [active]);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return undefined;
-
-    const width = 280;
-    const height = 387;
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(34, width / height, 0.1, 100);
-    camera.position.set(0, 5.2, 5.75);
-    camera.lookAt(0, 0.2, 0);
-
-    const renderer = new THREE.WebGLRenderer({
-      canvas,
-      antialias: true,
-      alpha: true,
-      powerPreference: 'high-performance',
-    });
-    renderer.setSize(width, height, false);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.2));
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.setClearColor(0x000000, 0);
-
-    scene.add(new THREE.AmbientLight(0xffffff, 0.34));
-
-    const keyLight = new THREE.DirectionalLight(0xfffaf0, 2.45);
-    keyLight.position.set(-5, 9, 6);
-    scene.add(keyLight);
-
-    const fillLight = new THREE.DirectionalLight(0xffd8a0, 0.78);
-    fillLight.position.set(6, 2, 3);
-    scene.add(fillLight);
-
-    const rimLight = new THREE.DirectionalLight(0xc8d8ff, 0.42);
-    rimLight.position.set(-3, -1, -6);
-    scene.add(rimLight);
-
-    const pointLight = new THREE.PointLight(0xffeed8, 0.58, 25);
-    pointLight.position.set(0, 7, 1);
-    scene.add(pointLight);
-
-    const keycap = createKeycap(
-      {
-        letter: 'C',
-        color: '#EDE8DF',
-        textColor: '#1C1C1C',
-        glow: '#FF8040',
-        emissive: '#C05228',
-        labelFont: 'nohemi',
-      },
-      0,
-    );
-    keycap.position.set(0, -0.55, 0.18);
-    keycap.rotation.x = 0.06;
-    keycap.rotation.y = -0.16;
-    keycap.scale.setScalar(1.42);
-    keycap.userData.restY = -0.55;
-    keycap.userData.index = 0;
-    keycap.userData.isCompleting = false;
-    scene.add(keycap);
-    keycapRef.current = keycap;
-    startFloat(keycap, 0);
-
-    const render = () => {
-      renderer.render(scene, camera);
-      if (!activeRef.current) {
-        frameRef.current = 0;
-        return;
-      }
-      frameRef.current = window.requestAnimationFrame(render);
-    };
-    renderRef.current = render;
-    render();
-
-    return () => {
-      window.cancelAnimationFrame(frameRef.current);
-      renderRef.current = null;
-      if (keycapRef.current) stopFloat(keycapRef.current);
-      keycapRef.current = null;
-      renderer.dispose();
-      scene.traverse((obj) => {
-        if (obj.isMesh) {
-          obj.geometry?.dispose?.();
-          if (Array.isArray(obj.material)) {
-            obj.material.forEach((mat) => mat.dispose?.());
-          } else {
-            obj.material?.dispose?.();
-          }
-        }
-      });
-    };
-  }, []);
+  const [isPressed, setIsPressed] = useState(false);
 
   useEffect(() => {
     if (!pressSignal) return;
-    if (keycapRef.current) animatePress(keycapRef.current);
+    setIsPressed(true);
+    const timer = window.setTimeout(() => {
+      setIsPressed(false);
+    }, 260);
+    return () => window.clearTimeout(timer);
   }, [pressSignal]);
-
-  useEffect(() => {
-    if (!active || frameRef.current || !renderRef.current) return;
-    renderRef.current();
-  }, [active]);
 
   return (
     <button type="button" className={styles.invitationKeyButton} onClick={onActivate} aria-label="Open contact card">
-      <canvas ref={canvasRef} className={styles.invitationKeyCanvas} />
+      <img
+        src={asset('invitation-key.png')}
+        alt=""
+        className={`${styles.invitationKeyImage} ${active ? styles.invitationKeyImageActive : ''} ${
+          isPressed ? styles.invitationKeyImagePressed : ''
+        }`}
+        draggable={false}
+      />
     </button>
   );
 }
 
 function InvitationSection() {
   const sectionRef = useRef(null);
+  const openTimerRef = useRef(0);
   const [isVisible, setIsVisible] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [pressSignal, setPressSignal] = useState(0);
@@ -913,33 +930,51 @@ function InvitationSection() {
   }, []);
 
   useEffect(() => {
+    return () => {
+      window.clearTimeout(openTimerRef.current);
+    };
+  }, []);
+
+  const triggerInvitation = () => {
+    setPressSignal((prev) => prev + 1);
+    window.clearTimeout(openTimerRef.current);
+
+    if (isOpen) {
+      setIsOpen(false);
+      return;
+    }
+
+    openTimerRef.current = window.setTimeout(() => {
+      setIsOpen(true);
+    }, 650);
+  };
+
+  useEffect(() => {
     if (!isVisible) return undefined;
 
     const handleKeyDown = (event) => {
       if (event.key.toLowerCase() === 'c') {
-        setPressSignal((prev) => prev + 1);
-        setIsOpen((prev) => !prev);
+        triggerInvitation();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isVisible]);
+  }, [isVisible, isOpen]);
 
   return (
     <section ref={sectionRef} className={`${styles.panel} ${styles.invitationPanel}`}>
       <InvitationKeyScene
         active={isVisible}
         pressSignal={pressSignal}
-        onActivate={() => {
-          setPressSignal((prev) => prev + 1);
-          setIsOpen((prev) => !prev);
-        }}
+        onActivate={triggerInvitation}
       />
       <div className={styles.invitationTitle}>
         <ScrollFloatTitle title="Invitation" active={4} />
-        <p>포트폴리오 공유가 거의 완료되었습니다.</p>
-        <strong>이제 마지막 키를 눌러, 다음 연결을 시작해보세요.</strong>
+        <div className={styles.invitationSub}>
+          <p>포트폴리오 공유가 거의 완료되었습니다.</p>
+          <strong>이제 마지막 키를 눌러, 다음 연결을 시작해보세요.</strong>
+        </div>
       </div>
       <aside className={`${styles.contactCard} ${isOpen ? styles.contactCardVisible : styles.contactCardHidden}`}>
         <div className={styles.contactTitle}>
@@ -948,7 +983,7 @@ function InvitationSection() {
         </div>
         <img src={asset('profile.png')} alt="채이 연락처 이미지" />
         <div className={styles.contactActions}>
-          <button type="button">View Again</button>
+          <button type="button" onClick={scrollToMainTop}>View Again</button>
           <button type="button">Accept</button>
         </div>
       </aside>
