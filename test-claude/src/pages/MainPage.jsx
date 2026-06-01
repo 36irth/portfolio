@@ -169,6 +169,7 @@ const scrollToMainTop = () => {
   window.__portfolioSuppressEssenceSnapUntil = Date.now() + 1400;
   window.__portfolioSuppressApproachPinUntil = Date.now() + 2600;
   window.dispatchEvent(new CustomEvent('portfolio:scroll-lock', { detail: { locked: false } }));
+  window.dispatchEvent(new CustomEvent('portfolio:character-reset'));
   requestAppScrollTo(0, 'smooth');
 };
 
@@ -1103,6 +1104,17 @@ function ApproachSection() {
       const isApproachVisible = rect.top < rootRect.bottom && rect.bottom > rootRect.top;
       if (!isApproachVisible || isApproachPinSuppressed()) return;
 
+      if (pinnedRef.current && event.deltaY < 0) {
+        window.__portfolioSuppressApproachPinUntil = Date.now() + 900;
+        const approachTop = getApproachTop();
+        releaseApproachPin();
+        setFolderReady(false);
+        if (approachTop != null) {
+          requestAppScrollTo(Math.max(0, approachTop - window.innerHeight * 0.82), 'smooth');
+        }
+        return;
+      }
+
       const isReadyToSettle =
         event.deltaY > 0 &&
         rect.top <= rootRect.top + rootRect.height * 0.5 &&
@@ -1594,8 +1606,28 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
 
   const scrollToSection = (sectionId) => {
     const target = document.querySelector(`[data-section="${sectionId}"]`);
-    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const root = document.querySelector('.appScroll');
+    if (!target || !root) return;
+
+    window.__portfolioSuppressEssenceSnapUntil = Date.now() + 1100;
+    window.__portfolioSuppressApproachPinUntil = Date.now() + 1100;
+    window.dispatchEvent(new CustomEvent('portfolio:scroll-lock', { detail: { locked: false } }));
+    if (sectionId === 'character') {
+      window.dispatchEvent(new CustomEvent('portfolio:character-reset'));
+    }
+
+    const rect = target.getBoundingClientRect();
+    const rootRect = root.getBoundingClientRect();
+    const top = root.scrollTop + rect.top - rootRect.top;
+    requestAppScrollTo(top, 'smooth');
+    setActiveSection(sectionId);
   };
+
+  useEffect(() => {
+    const resetCharacter = () => setCharacterResetSignal((prev) => prev + 1);
+    window.addEventListener('portfolio:character-reset', resetCharacter);
+    return () => window.removeEventListener('portfolio:character-reset', resetCharacter);
+  }, []);
 
   useEffect(() => {
     if (!isActive) return undefined;
@@ -1616,9 +1648,11 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
         })
         .filter(Boolean);
 
-      const current = sections
-        .filter((entry) => entry.rect.bottom > 0 && entry.rect.top < window.innerHeight)
-        .sort((a, b) => Math.abs(a.rect.top - 140) - Math.abs(b.rect.top - 140))[0];
+      const viewportCenter = window.innerHeight / 2;
+      const visibleSections = sections.filter((entry) => entry.rect.bottom > 0 && entry.rect.top < window.innerHeight);
+      const current =
+        visibleSections.find((entry) => entry.rect.top <= viewportCenter && entry.rect.bottom >= viewportCenter) ??
+        visibleSections.sort((a, b) => Math.abs(a.rect.top - 140) - Math.abs(b.rect.top - 140))[0];
 
       if (current) {
         setActiveSection(current.id);
@@ -1692,7 +1726,7 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
       </nav>
       <div
         className={`${styles.scrollDownHint} ${
-          activeSection === 'invitation' ? styles.scrollDownHintHidden : ''
+          activeSection === 'approach' || activeSection === 'invitation' ? styles.scrollDownHintHidden : ''
         }`}
         aria-hidden="true"
       >
