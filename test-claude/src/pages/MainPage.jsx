@@ -28,7 +28,7 @@ const imgAward = 'https://www.figma.com/api/mcp/asset/e2707fcb-a858-4bcc-b38c-1d
 const imgCertificateIcon = 'https://www.figma.com/api/mcp/asset/59f0f208-8f4d-4ace-8131-785b76c7cda8';
 const imgToolHeader = 'https://www.figma.com/api/mcp/asset/111b02b5-bba7-41d3-a04e-5255b7e164b8';
 const imgWindowClose = 'https://www.figma.com/api/mcp/asset/71376b88-e591-4baa-907d-1e3da0e78243';
-const imgToolFigma = 'https://www.figma.com/api/mcp/asset/abdb3c56-7316-4b2c-bcc8-1496173913f8';
+const imgToolFigma = asset('figma.png');
 const imgToolCode = 'https://www.figma.com/api/mcp/asset/3ea2786b-a24d-492a-9a29-f20dc9ab8330';
 const imgAiChatGpt = 'https://www.figma.com/api/mcp/asset/7ee665ac-b663-4044-baf1-2ff33cd22134';
 const imgAiClaude = 'https://www.figma.com/api/mcp/asset/16db0de7-8545-4909-98d1-a0e249027932';
@@ -66,7 +66,7 @@ const aiTools = [
   ['Perplexity', 'Survey of data', imgAiPerplexity],
   ['Codex', 'Coding', imgAiCodex],
   ['Midjourney', 'Create images and videos', imgAiMidjourney],
-  ['Gemini', 'Writing / Product management', asset('ai-gemini.png')],
+  ['Gemini', 'Writing / Product management', asset('gemini.png')],
 ];
 
 const highlightLargeProjects = [
@@ -164,13 +164,14 @@ const questions = [
 ];
 
 const formatQuestion = (number, question) => question;
+const characterReturnProgress = 0.38;
 
 const scrollToMainTop = () => {
   window.__portfolioSuppressEssenceSnapUntil = Date.now() + 1400;
   window.__portfolioSuppressApproachPinUntil = Date.now() + 2600;
   window.dispatchEvent(new CustomEvent('portfolio:scroll-lock', { detail: { locked: false } }));
   window.dispatchEvent(new CustomEvent('portfolio:character-reset'));
-  requestAppScrollTo(0, 'smooth');
+  requestAppScrollTo(window.innerHeight * 3.2 * characterReturnProgress, 'smooth');
 };
 
 const requestAppScrollLock = (locked, top) => {
@@ -875,6 +876,7 @@ function ApproachSection() {
   const summaryRef = useRef(null);
   const completedRef = useRef(false);
   const pinnedRef = useRef(false);
+  const settlingRef = useRef(false);
   const approachPinTimerRef = useRef(0);
   const [collected, setCollected] = useState([]);
   const [draggingCard, setDraggingCard] = useState(null);
@@ -908,6 +910,7 @@ function ApproachSection() {
 
   const releaseApproachPin = () => {
     pinnedRef.current = false;
+    settlingRef.current = false;
     window.clearTimeout(approachPinTimerRef.current);
     requestAppScrollLock(false);
   };
@@ -1042,6 +1045,7 @@ function ApproachSection() {
       return undefined;
     }
     pinnedRef.current = false;
+    settlingRef.current = false;
     window.clearTimeout(approachPinTimerRef.current);
     requestAppScrollLock(false);
     setFolderReady(false);
@@ -1094,6 +1098,7 @@ function ApproachSection() {
   useEffect(() => {
     const scrollRoot = document.querySelector('.appScroll');
     if (!scrollRoot) return undefined;
+    let lastScrollTop = scrollRoot.scrollTop;
 
     const handleWheel = (event) => {
       if (completedRef.current) return;
@@ -1104,7 +1109,7 @@ function ApproachSection() {
       const isApproachVisible = rect.top < rootRect.bottom && rect.bottom > rootRect.top;
       if (!isApproachVisible || isApproachPinSuppressed()) return;
 
-      if (pinnedRef.current && event.deltaY < 0) {
+      if ((pinnedRef.current || settlingRef.current) && event.deltaY < 0) {
         window.__portfolioSuppressApproachPinUntil = Date.now() + 900;
         const approachTop = getApproachTop();
         releaseApproachPin();
@@ -1115,35 +1120,51 @@ function ApproachSection() {
         return;
       }
 
-      const isReadyToSettle =
+      const isAtPinPoint =
         event.deltaY > 0 &&
-        rect.top <= rootRect.top + rootRect.height * 0.5 &&
-        rect.bottom >= rootRect.top + rootRect.height * 0.65;
-      const shouldPin = pinnedRef.current || rect.top <= rootRect.top + 12;
+        rect.top <= rootRect.top + 2 &&
+        rect.bottom >= rootRect.top + rootRect.height * 0.58;
 
-      if (pinnedRef.current || shouldPin) {
+      if (pinnedRef.current) {
         event.preventDefault();
-        pinnedRef.current = true;
         setFolderReady(true);
         pinApproachView('lock');
         return;
       }
 
-      if (isReadyToSettle) {
+      if (isAtPinPoint) {
         event.preventDefault();
-        pinApproachView('smooth');
-        window.clearTimeout(approachPinTimerRef.current);
-        approachPinTimerRef.current = window.setTimeout(() => {
-          if (completedRef.current || isApproachPinSuppressed()) return;
-          pinnedRef.current = true;
-          setFolderReady(true);
-          pinApproachView('lock');
-        }, 780);
+        settlingRef.current = false;
+        pinnedRef.current = true;
+        setFolderReady(true);
+        pinApproachView('lock');
       }
     };
 
     const keepPinned = () => {
-      if (!pinnedRef.current || completedRef.current || isApproachPinSuppressed()) return;
+      if (completedRef.current || isApproachPinSuppressed()) return;
+      const currentScrollTop = scrollRoot.scrollTop;
+      const isScrollingDown = currentScrollTop >= lastScrollTop;
+      lastScrollTop = currentScrollTop;
+      const node = sectionRef.current;
+      if (!node) return;
+      const rect = node.getBoundingClientRect();
+      const rootRect = scrollRoot.getBoundingClientRect();
+
+      if (
+        isScrollingDown &&
+        !pinnedRef.current &&
+        rect.top <= rootRect.top + 1 &&
+        rect.bottom >= rootRect.top + rootRect.height * 0.58
+      ) {
+        pinnedRef.current = true;
+        settlingRef.current = false;
+        setFolderReady(true);
+        pinApproachView('lock');
+        return;
+      }
+
+      if (!pinnedRef.current) return;
       pinApproachView('lock');
     };
 
@@ -1618,7 +1639,10 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
 
     const rect = target.getBoundingClientRect();
     const rootRect = root.getBoundingClientRect();
-    const top = root.scrollTop + rect.top - rootRect.top;
+    const top =
+      sectionId === 'character'
+        ? root.scrollTop + rect.top - rootRect.top + window.innerHeight * 3.2 * characterReturnProgress
+        : root.scrollTop + rect.top - rootRect.top;
     requestAppScrollTo(top, 'smooth');
     setActiveSection(sectionId);
   };
@@ -1732,6 +1756,14 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
       >
         <span className={styles.scrollDownMouse} />
         <span>Scroll down</span>
+      </div>
+      <div
+        className={`${styles.characterInteractionHint} ${
+          activeSection === 'character' ? styles.characterInteractionHintVisible : ''
+        }`}
+        aria-hidden="true"
+      >
+        <span>창은 드래그해서 옮기고, 클릭하면 닫을 수 있어요</span>
       </div>
       <button
         type="button"
