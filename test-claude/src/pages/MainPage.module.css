@@ -1591,7 +1591,7 @@
 .invitationKeyButton {
   position: absolute;
   left: 50%;
-  bottom: 245px;
+  bottom: 70px;
   width: 400px;
   height: 540px;
   transform: translateX(-50%);

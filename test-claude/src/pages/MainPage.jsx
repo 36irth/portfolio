@@ -405,6 +405,7 @@ function DragAccentLine() {
       <span className={styles.accentChunk} style={{ '--chunk-index': 1 }}>
         을 고민하는
       </span>
+      {' '}
       <strong className={styles.accentChunk} style={{ '--chunk-index': 2 }}>
         UI/UX 디자이너
       </strong>
