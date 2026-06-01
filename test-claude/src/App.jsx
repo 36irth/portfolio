@@ -15,6 +15,7 @@ function App() {
   );
   const [scrollTop, setScrollTop] = useState(0);
   const [phase, setPhase] = useState('intro');
+  const [scrollLocked, setScrollLocked] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -89,7 +90,56 @@ function App() {
       return;
     }
 
+    if (scrollLocked) {
+      lenis.stop();
+      return;
+    }
+
     lenis.start();
+  }, [phase, scrollLocked]);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return undefined;
+
+    const scrollTo = (top, behavior = 'auto') => {
+      const lenis = lenisRef.current;
+      if (lenis) {
+        lenis.scrollTo(top, { immediate: behavior !== 'smooth' });
+      } else {
+        container.scrollTo({ top, behavior });
+      }
+      pendingScrollTopRef.current = top;
+      setScrollTop(top);
+    };
+
+    const handleScrollLock = (event) => {
+      const { locked, top } = event.detail ?? {};
+      if (typeof top === 'number') {
+        scrollTo(top, 'auto');
+      }
+
+      setScrollLocked(Boolean(locked));
+      const lenis = lenisRef.current;
+      if (locked) {
+        lenis?.stop();
+      } else if (phase === 'main') {
+        lenis?.start();
+      }
+    };
+
+    const handleScrollTo = (event) => {
+      const { top, behavior = 'smooth' } = event.detail ?? {};
+      if (typeof top !== 'number') return;
+      scrollTo(top, behavior);
+    };
+
+    window.addEventListener('portfolio:scroll-lock', handleScrollLock);
+    window.addEventListener('portfolio:scroll-to', handleScrollTo);
+    return () => {
+      window.removeEventListener('portfolio:scroll-lock', handleScrollLock);
+      window.removeEventListener('portfolio:scroll-to', handleScrollTo);
+    };
   }, [phase]);
 
   const handleScroll = (event) => {
@@ -155,7 +205,7 @@ function App() {
       <div
         className={`appScroll ${phase === 'main' ? 'appScrollMain' : 'appScrollLocked'} ${
           phase === 'transition' ? 'appScrollTransition' : ''
-        }`}
+        } ${scrollLocked ? 'appScrollPinned' : ''}`}
         ref={scrollRef}
         onScroll={handleScroll}
       >

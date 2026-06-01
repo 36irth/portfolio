@@ -74,7 +74,7 @@ const highlightLargeProjects = [
     image: imgHighlightsProject,
     eyebrow: '에어소프트건 팬덤 커뮤니티 앱',
     title: 'GUNIT',
-    buttons: ['Site', 'pdf'],
+    buttons: ['App', 'Slide'],
     imageClass: styles.highlightProjectImageA,
     overlayClass: styles.highlightOverlayA,
   },
@@ -82,7 +82,7 @@ const highlightLargeProjects = [
     image: imgHighlightsProject1,
     eyebrow: '콘서트 특화 일정 공유 앱',
     title: 'STAG',
-    buttons: ['Site'],
+    buttons: ['Prototype'],
     imageClass: styles.highlightProjectImageB,
     overlayClass: styles.highlightOverlayB,
   },
@@ -90,7 +90,7 @@ const highlightLargeProjects = [
     image: imgHighlightsProject2,
     eyebrow: 'K-Brand 글로벌 웹사이트 리뉴얼',
     title: '롬앤',
-    buttons: ['Site', 'pdf'],
+    buttons: ['Web', 'Slide'],
     imageClass: styles.highlightProjectImageC,
     overlayClass: styles.highlightOverlayC,
   },
@@ -115,20 +115,20 @@ const highlightSmallProjects = [
     image: imgHighlightsProject5,
     eyebrow: '졸전이였음',
     title: '알렉산더맥퀸',
-    buttons: ['Site'],
+    buttons: ['Prototype'],
     imageClass: styles.highlightProjectImageF,
   },
 ];
 
 const getHighlightHref = (group, projectIndex, label) => {
   const normalized = label.toLowerCase();
-  if (group === 'large' && projectIndex === 0 && normalized === 'site') {
+  if (group === 'large' && projectIndex === 0 && ['site', 'app'].includes(normalized)) {
     return 'https://airsoft-nine.vercel.app/';
   }
-  if (group === 'large' && projectIndex === 1 && normalized === 'site') {
+  if (group === 'large' && projectIndex === 1 && ['site', 'prototype'].includes(normalized)) {
     return 'https://www.figma.com/proto/Q4RWt5mGXgO47PjRUCVS3Y/%EA%B9%80%EC%B1%84%EC%9D%B4?node-id=579-1763&t=rsfcqL7jkvfqttzP-1';
   }
-  if (group === 'large' && projectIndex === 2 && normalized === 'pdf') {
+  if (group === 'large' && projectIndex === 2 && ['pdf', 'slide'].includes(normalized)) {
     return 'https://www.figma.com/deck/KbN24gyULgtsJZ3NgeslmB';
   }
   return '';
@@ -166,15 +166,31 @@ const questions = [
 const formatQuestion = (number, question) => question;
 
 const scrollToMainTop = () => {
-  const scrollRoot = document.querySelector('.appScroll');
-  scrollRoot?.scrollTo({
-    top: 0,
-    behavior: 'smooth',
-  });
+  window.__portfolioSuppressEssenceSnapUntil = Date.now() + 1400;
+  window.__portfolioSuppressApproachPinUntil = Date.now() + 2600;
+  window.dispatchEvent(new CustomEvent('portfolio:scroll-lock', { detail: { locked: false } }));
+  requestAppScrollTo(0, 'smooth');
+};
+
+const requestAppScrollLock = (locked, top) => {
+  window.dispatchEvent(new CustomEvent('portfolio:scroll-lock', { detail: { locked, top } }));
+};
+
+const requestAppScrollTo = (top, behavior = 'smooth') => {
+  window.dispatchEvent(new CustomEvent('portfolio:scroll-to', { detail: { top, behavior } }));
 };
 
 const keys = ['C', 'H', 'A', 'E', 'I'];
+const sectionLetters = ['c', 'h', 'a', 'e', 'i'];
+const sectionEntries = [
+  { id: 'character', letter: 'c', label: 'Character' },
+  { id: 'highlights', letter: 'h', label: 'Highlights' },
+  { id: 'approach', letter: 'a', label: 'Approach' },
+  { id: 'essence', letter: 'e', label: 'Essence' },
+  { id: 'invitation', letter: 'i', label: 'Invitation' },
+];
 const floatDelays = [0.01, 0.12, 0.06, 0.18, 0.09, 0.16, 0.03];
+const characterWindowIds = ['awards', 'tools', 'profile', 'ai', 'certificate', 'school-one', 'school-two'];
 
 const cleanAwards = [
   ['블루어워즈', '시각디자인 분야 입선', '2022.06.14'],
@@ -445,11 +461,17 @@ function DragAccentLine() {
   );
 }
 
+const AiIcon = (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M9.107 5.448C9.705 3.698 12.123 3.645 12.832 5.289L12.892 5.449L13.699 7.809C13.8839 8.35023 14.1828 8.84551 14.5754 9.26142C14.9681 9.67734 15.4453 10.0042 15.975 10.22L16.192 10.301L18.552 11.107C20.302 11.705 20.355 14.123 18.712 14.832L18.552 14.892L16.192 15.699C15.6506 15.8838 15.1551 16.1826 14.739 16.5753C14.3229 16.9679 13.9959 17.4452 13.78 17.975L13.699 18.191L12.893 20.552C12.295 22.302 9.877 22.355 9.169 20.712L9.107 20.552L8.301 18.192C8.11618 17.6506 7.81737 17.1551 7.42474 16.739C7.03211 16.3229 6.55479 15.9959 6.025 15.78L5.809 15.699L3.449 14.893C1.698 14.295 1.645 11.877 3.289 11.169L3.449 11.107L5.809 10.301C6.35023 10.1161 6.84551 9.81719 7.26142 9.42457C7.67733 9.03195 8.00421 8.55469 8.22 8.025L8.301 7.809L9.107 5.448ZM19 2C19.1871 2 19.3704 2.05248 19.5292 2.15147C19.6879 2.25046 19.8157 2.392 19.898 2.56L19.946 2.677L20.296 3.703L21.323 4.053C21.5105 4.1167 21.6748 4.23462 21.7952 4.39182C21.9156 4.54902 21.9866 4.73842 21.9993 4.93602C22.0119 5.13362 21.9656 5.33053 21.8662 5.50179C21.7668 5.67304 21.6188 5.81094 21.441 5.898L21.323 5.946L20.297 6.296L19.947 7.323C19.8832 7.51043 19.7652 7.6747 19.6079 7.79499C19.4507 7.91529 19.2612 7.98619 19.0636 7.99872C18.866 8.01125 18.6692 7.96484 18.498 7.86538C18.3268 7.76591 18.189 7.61787 18.102 7.44L18.054 7.323L17.704 6.297L16.677 5.947C16.4895 5.8833 16.3252 5.76538 16.2048 5.60819C16.0844 5.45099 16.0134 5.26158 16.0007 5.06398C15.9881 4.86638 16.0344 4.66947 16.1338 4.49821C16.2332 4.32696 16.3812 4.18906 16.559 4.102L16.677 4.054L17.703 3.704L18.053 2.677C18.1204 2.47943 18.248 2.30791 18.4178 2.1865C18.5877 2.06509 18.7912 1.99987 19 2Z" fill="#A3A3A3" />
+  </svg>
+);
+
 function GlassHeader({ icon, label }) {
   return (
     <div className={styles.glassHeader}>
       <div className={styles.windowTitle}>
-        <img src={icon} alt="" />
+        {typeof icon === 'string' ? <img src={icon} alt="" /> : icon}
         <strong>{label}</strong>
       </div>
       <img src={imgWindowClose} alt="" className={styles.windowClose} />
@@ -457,46 +479,181 @@ function GlassHeader({ icon, label }) {
   );
 }
 
-function CharacterSection({ isActive, scrollProgress }) {
-  const sectionRef = useRef(null);
+function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal }) {
+  const internalSectionRef = useRef(null);
+  const resolvedSectionRef = sectionRef ?? internalSectionRef;
   const copyReady = isActive;
+  const initialOffsets = useMemo(
+    () => Object.fromEntries(characterWindowIds.map((id) => [id, { x: 0, y: 0 }])),
+    [],
+  );
+  const initialAwardOffsets = useMemo(
+    () => Object.fromEntries(cleanAwards.map(([line1, line2, date]) => [`${line1}-${line2}-${date}`, { x: 0, y: 0 }])),
+    [],
+  );
   const [dismissedWindows, setDismissedWindows] = useState(() => new Set());
-  const allWindowsDismissed = dismissedWindows.size >= 7;
+  const [dismissedAwards, setDismissedAwards] = useState(() => new Set());
+  const [windowOffsets, setWindowOffsets] = useState(initialOffsets);
+  const [awardOffsets, setAwardOffsets] = useState(initialAwardOffsets);
+  const [draggingWindowId, setDraggingWindowId] = useState('');
+  const [draggingAwardKey, setDraggingAwardKey] = useState('');
+  const dragWindowRef = useRef(null);
+  const awardsDismissed = dismissedAwards.size >= cleanAwards.length;
+  const allWindowsDismissed = dismissedWindows.size >= characterWindowIds.length - 1 && awardsDismissed;
 
   useEffect(() => {
     if (!isActive || scrollProgress < 0.14 || scrollProgress > 0.9) {
       setDismissedWindows(new Set());
+      setDismissedAwards(new Set());
+      setWindowOffsets(initialOffsets);
+      setAwardOffsets(initialAwardOffsets);
+      setDraggingWindowId('');
+      setDraggingAwardKey('');
+      dragWindowRef.current = null;
     }
-  }, [isActive, scrollProgress]);
+  }, [initialAwardOffsets, initialOffsets, isActive, scrollProgress]);
+
+  useEffect(() => {
+    if (!resetSignal) return;
+    setDismissedWindows(new Set());
+    setDismissedAwards(new Set());
+    setWindowOffsets(initialOffsets);
+    setAwardOffsets(initialAwardOffsets);
+    setDraggingWindowId('');
+    setDraggingAwardKey('');
+    dragWindowRef.current = null;
+  }, [resetSignal, initialAwardOffsets, initialOffsets]);
+
+  useEffect(() => {
+    const handlePointerMove = (event) => {
+      const dragState = dragWindowRef.current;
+      if (!dragState) return;
+
+      const deltaX = event.clientX - dragState.startX;
+      const deltaY = event.clientY - dragState.startY;
+      if (Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4) {
+        dragState.moved = true;
+      }
+
+      if (dragState.type === 'award') {
+        setAwardOffsets((prev) => ({
+          ...prev,
+          [dragState.id]: {
+            x: dragState.baseX + deltaX,
+            y: dragState.baseY + deltaY,
+          },
+        }));
+        return;
+      }
+
+      setWindowOffsets((prev) => ({
+        ...prev,
+        [dragState.id]: {
+          x: dragState.baseX + deltaX,
+          y: dragState.baseY + deltaY,
+        },
+      }));
+    };
+
+    const handlePointerUp = () => {
+      const dragState = dragWindowRef.current;
+      if (!dragState) return;
+
+      if (!dragState.moved && dragState.type === 'award') {
+        setDismissedAwards((prev) => {
+          const next = new Set(prev);
+          next.add(dragState.id);
+          return next;
+        });
+      } else if (!dragState.moved && dragState.id !== 'awards') {
+        setDismissedWindows((prev) => {
+          const next = new Set(prev);
+          next.add(dragState.id);
+          return next;
+        });
+      }
+
+      dragWindowRef.current = null;
+      setDraggingWindowId('');
+      setDraggingAwardKey('');
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+    };
+  }, []);
 
   const characterWindowClass = (id, index) => {
     const visible = getFloatState(isActive, scrollProgress, index);
-    const dismissed = visible && dismissedWindows.has(id);
-    return `${styles.characterFloat} ${visible && !dismissed ? styles.characterFloatVisible : ''} ${
+    const dismissed = visible && (id === 'awards' ? awardsDismissed : dismissedWindows.has(id));
+    return `${styles.characterFloat} ${styles.characterWindowInteractive} ${
+      draggingWindowId === id ? styles.characterWindowDragging : ''
+    } ${visible && !dismissed ? styles.characterFloatVisible : ''} ${
       dismissed ? styles.characterFloatDismissed : ''
     }`;
   };
 
-  const dismissCharacterWindow = (id, index) => () => {
+  const handleWindowPointerDown = (id, index) => (event) => {
     if (!getFloatState(isActive, scrollProgress, index)) return;
-    setDismissedWindows((prev) => {
-      const next = new Set(prev);
-      next.add(id);
-      return next;
-    });
+    dragWindowRef.current = {
+      type: 'window',
+      id,
+      index,
+      startX: event.clientX,
+      startY: event.clientY,
+      baseX: windowOffsets[id]?.x ?? 0,
+      baseY: windowOffsets[id]?.y ?? 0,
+      moved: false,
+    };
+    setDraggingWindowId(id);
   };
+
+  const handleAwardPointerDown = (awardKey) => (event) => {
+    if (dismissedAwards.has(awardKey)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    dragWindowRef.current = {
+      type: 'award',
+      id: awardKey,
+      startX: event.clientX,
+      startY: event.clientY,
+      baseX: awardOffsets[awardKey]?.x ?? 0,
+      baseY: awardOffsets[awardKey]?.y ?? 0,
+      moved: false,
+    };
+    setDraggingAwardKey(awardKey);
+  };
+
+  const getWindowStyle = (id, index) => ({
+    ...floatStyle(index),
+    '--drag-x': `${windowOffsets[id]?.x ?? 0}px`,
+    '--drag-y': `${windowOffsets[id]?.y ?? 0}px`,
+  });
+
+  const getAwardStyle = (awardKey) => ({
+    '--award-drag-x': `${awardOffsets[awardKey]?.x ?? 0}px`,
+    '--award-drag-y': `${awardOffsets[awardKey]?.y ?? 0}px`,
+  });
 
   const handleCharacterWheel = (event) => {
     if (!allWindowsDismissed || event.deltaY <= 0) return;
     event.preventDefault();
-    sectionRef.current?.nextElementSibling?.scrollIntoView({
+    resolvedSectionRef.current?.nextElementSibling?.scrollIntoView({
       behavior: 'smooth',
       block: 'start',
     });
   };
 
   return (
-    <section ref={sectionRef} className={styles.characterScrollSection} onWheel={handleCharacterWheel}>
+    <section
+      ref={resolvedSectionRef}
+      data-section="character"
+      className={styles.characterScrollSection}
+      onWheel={handleCharacterWheel}
+    >
       <div className={`${styles.panel} ${styles.characterPanel}`}>
         <div className={`${styles.characterCopy} ${copyReady ? styles.characterCopyReady : ''}`}>
           <CharacterTitle isActive={isActive} />
@@ -510,25 +667,36 @@ function CharacterSection({ isActive, scrollProgress }) {
 
         <div
           className={`${styles.awards} ${characterWindowClass('awards', 6)}`}
-          style={floatStyle(6)}
-          onClick={dismissCharacterWindow('awards', 6)}
+          style={getWindowStyle('awards', 6)}
+          onPointerDown={handleWindowPointerDown('awards', 6)}
         >
-          {cleanAwards.map(([line1, line2, date]) => (
-            <article className={styles.awardItem} key={`${line1}-${line2}-${date}`}>
-              <img src={imgAward} alt="" />
-              <div>
-                <p>{line1}</p>
-                <p>{line2}</p>
-                <time>{date}</time>
-              </div>
-            </article>
-          ))}
+          {cleanAwards.map(([line1, line2, date]) => {
+            const awardKey = `${line1}-${line2}-${date}`;
+            const isDismissed = dismissedAwards.has(awardKey);
+            return (
+              <article
+                className={`${styles.awardItem} ${draggingAwardKey === awardKey ? styles.awardItemDragging : ''} ${
+                  isDismissed ? styles.awardItemDismissed : ''
+                }`}
+                key={awardKey}
+                style={getAwardStyle(awardKey)}
+                onPointerDown={handleAwardPointerDown(awardKey)}
+              >
+                <img src={imgAward} alt="" />
+                <div>
+                  <p>{line1}</p>
+                  <p>{line2}</p>
+                  <time>{date}</time>
+                </div>
+              </article>
+            );
+          })}
         </div>
 
         <aside
           className={`${styles.glassCard} ${styles.designToolsCard} ${characterWindowClass('tools', 0)}`}
-          style={floatStyle(0)}
-          onClick={dismissCharacterWindow('tools', 0)}
+          style={getWindowStyle('tools', 0)}
+          onPointerDown={handleWindowPointerDown('tools', 0)}
         >
           <GlassHeader icon={imgToolHeader} label="Tools" />
           <div className={styles.glassBody}>
@@ -550,8 +718,8 @@ function CharacterSection({ isActive, scrollProgress }) {
 
         <aside
           className={`${styles.glassCard} ${styles.profileCard} ${characterWindowClass('profile', 1)}`}
-          style={floatStyle(1)}
-          onClick={dismissCharacterWindow('profile', 1)}
+          style={getWindowStyle('profile', 1)}
+          onPointerDown={handleWindowPointerDown('profile', 1)}
         >
           <div className={styles.profileTitle}>
             <h3>Profile</h3>
@@ -564,10 +732,10 @@ function CharacterSection({ isActive, scrollProgress }) {
 
         <aside
           className={`${styles.glassCard} ${styles.aiCard} ${characterWindowClass('ai', 2)}`}
-          style={floatStyle(2)}
-          onClick={dismissCharacterWindow('ai', 2)}
+          style={getWindowStyle('ai', 2)}
+          onPointerDown={handleWindowPointerDown('ai', 2)}
         >
-          <GlassHeader icon={imgToolHeader} label="AI" />
+          <GlassHeader icon={AiIcon} label="AI" />
           <div className={styles.glassBody}>
             {aiTools.map(([name, desc, image]) => (
               <div className={styles.toolRow} key={name}>
@@ -585,8 +753,8 @@ function CharacterSection({ isActive, scrollProgress }) {
 
         <aside
           className={`${styles.glassCard} ${styles.certificateCard} ${characterWindowClass('certificate', 3)}`}
-          style={floatStyle(3)}
-          onClick={dismissCharacterWindow('certificate', 3)}
+          style={getWindowStyle('certificate', 3)}
+          onPointerDown={handleWindowPointerDown('certificate', 3)}
         >
           <div className={styles.cardTop}>
             <img src={imgCertificateIcon} alt="" />
@@ -605,8 +773,8 @@ function CharacterSection({ isActive, scrollProgress }) {
 
         <div
           className={`${styles.chatBubble} ${characterWindowClass('school-one', 4)} ${styles.schoolOne}`}
-          style={floatStyle(4)}
-          onClick={dismissCharacterWindow('school-one', 4)}
+          style={getWindowStyle('school-one', 4)}
+          onPointerDown={handleWindowPointerDown('school-one', 4)}
         >
           <p>
             <span>2021~2023</span>
@@ -615,8 +783,8 @@ function CharacterSection({ isActive, scrollProgress }) {
         </div>
         <div
           className={`${styles.chatBubble} ${characterWindowClass('school-two', 5)} ${styles.schoolTwo}`}
-          style={floatStyle(5)}
-          onClick={dismissCharacterWindow('school-two', 5)}
+          style={getWindowStyle('school-two', 5)}
+          onPointerDown={handleWindowPointerDown('school-two', 5)}
         >
           <p>
             <span>2017~2020</span>
@@ -630,7 +798,7 @@ function CharacterSection({ isActive, scrollProgress }) {
 
 function HighlightsSection() {
   return (
-    <section className={`${styles.panel} ${styles.highlightsPanel}`}>
+    <section data-section="highlights" className={`${styles.panel} ${styles.highlightsPanel}`}>
       <ScrollFloatTitle title="Highlights" active={1} className={styles.highlightsTitle} />
 
       <div className={styles.highlightsContent}>
@@ -705,12 +873,43 @@ function ApproachSection() {
   const folderRef = useRef(null);
   const summaryRef = useRef(null);
   const completedRef = useRef(false);
+  const pinnedRef = useRef(false);
+  const approachPinTimerRef = useRef(0);
   const [collected, setCollected] = useState([]);
   const [draggingCard, setDraggingCard] = useState(null);
   const [folderReady, setFolderReady] = useState(false);
   const [folderOpen, setFolderOpen] = useState(false);
   const [textReady, setTextReady] = useState(false);
   const allCollected = collected.length === approachCards.length;
+
+  const getApproachTop = () => {
+    const node = sectionRef.current;
+    const scrollRoot = document.querySelector('.appScroll');
+    if (!node || !scrollRoot) return null;
+
+    const rect = node.getBoundingClientRect();
+    const rootRect = scrollRoot.getBoundingClientRect();
+    return scrollRoot.scrollTop + rect.top - rootRect.top;
+  };
+
+  const pinApproachView = (behavior = 'smooth') => {
+    const scrollRoot = document.querySelector('.appScroll');
+    const targetTop = getApproachTop();
+    if (!scrollRoot || targetTop == null) return;
+    if (behavior === 'lock') {
+      requestAppScrollLock(true, targetTop);
+      return;
+    }
+    scrollRoot.scrollTo({ top: targetTop, behavior });
+  };
+
+  const isApproachPinSuppressed = () => Date.now() < (window.__portfolioSuppressApproachPinUntil ?? 0);
+
+  const releaseApproachPin = () => {
+    pinnedRef.current = false;
+    window.clearTimeout(approachPinTimerRef.current);
+    requestAppScrollLock(false);
+  };
 
   useEffect(() => {
     completedRef.current = allCollected;
@@ -719,6 +918,7 @@ function ApproachSection() {
   useEffect(() => {
     const node = sectionRef.current;
     if (!node) return undefined;
+    const scrollRoot = document.querySelector('.appScroll');
 
     let timeoutId = 0;
     const observer = new IntersectionObserver(
@@ -727,20 +927,21 @@ function ApproachSection() {
           if (completedRef.current) return;
           window.clearTimeout(timeoutId);
           timeoutId = window.setTimeout(() => {
-            setFolderReady(true);
+            if (pinnedRef.current) setFolderReady(true);
           }, 850);
           return;
         }
 
         window.clearTimeout(timeoutId);
         if (completedRef.current) return;
+        releaseApproachPin();
         setFolderReady(false);
         setFolderOpen(false);
         setDraggingCard(null);
         setCollected([]);
         setTextReady(false);
       },
-      { threshold: 0.3 },
+      { threshold: 0.32, root: scrollRoot ?? null },
     );
 
     observer.observe(node);
@@ -773,6 +974,10 @@ function ApproachSection() {
         if (!isBackAtCardArea) return;
 
         completedRef.current = false;
+        if (!isApproachPinSuppressed()) {
+          pinnedRef.current = true;
+          pinApproachView('lock');
+        }
         setCollected([]);
         setDraggingCard(null);
         setFolderOpen(false);
@@ -835,6 +1040,9 @@ function ApproachSection() {
       setTextReady(false);
       return undefined;
     }
+    pinnedRef.current = false;
+    window.clearTimeout(approachPinTimerRef.current);
+    requestAppScrollLock(false);
     setFolderReady(false);
     setFolderOpen(false);
     const scrollTimer = window.setTimeout(() => {
@@ -847,10 +1055,7 @@ function ApproachSection() {
       const targetTop =
         scrollRoot.scrollTop + rect.top - rootRect.top - (rootRect.height - rect.height) / 2 - 86;
 
-      scrollRoot.scrollTo({
-        top: targetTop,
-        behavior: 'smooth',
-      });
+      requestAppScrollTo(targetTop, 'smooth');
     }, 220);
     const revealTimer = window.setTimeout(() => {
       setTextReady(true);
@@ -885,9 +1090,64 @@ function ApproachSection() {
     });
   };
 
+  useEffect(() => {
+    const scrollRoot = document.querySelector('.appScroll');
+    if (!scrollRoot) return undefined;
+
+    const handleWheel = (event) => {
+      if (completedRef.current) return;
+      const node = sectionRef.current;
+      if (!node) return;
+      const rect = node.getBoundingClientRect();
+      const rootRect = scrollRoot.getBoundingClientRect();
+      const isApproachVisible = rect.top < rootRect.bottom && rect.bottom > rootRect.top;
+      if (!isApproachVisible || isApproachPinSuppressed()) return;
+
+      const isReadyToSettle =
+        event.deltaY > 0 &&
+        rect.top <= rootRect.top + rootRect.height * 0.5 &&
+        rect.bottom >= rootRect.top + rootRect.height * 0.65;
+      const shouldPin = pinnedRef.current || rect.top <= rootRect.top + 12;
+
+      if (pinnedRef.current || shouldPin) {
+        event.preventDefault();
+        pinnedRef.current = true;
+        setFolderReady(true);
+        pinApproachView('lock');
+        return;
+      }
+
+      if (isReadyToSettle) {
+        event.preventDefault();
+        pinApproachView('smooth');
+        window.clearTimeout(approachPinTimerRef.current);
+        approachPinTimerRef.current = window.setTimeout(() => {
+          if (completedRef.current || isApproachPinSuppressed()) return;
+          pinnedRef.current = true;
+          setFolderReady(true);
+          pinApproachView('lock');
+        }, 780);
+      }
+    };
+
+    const keepPinned = () => {
+      if (!pinnedRef.current || completedRef.current || isApproachPinSuppressed()) return;
+      pinApproachView('lock');
+    };
+
+    scrollRoot.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+    scrollRoot.addEventListener('scroll', keepPinned, { passive: true });
+    return () => {
+      releaseApproachPin();
+      scrollRoot.removeEventListener('wheel', handleWheel, { capture: true });
+      scrollRoot.removeEventListener('scroll', keepPinned);
+    };
+  }, []);
+
   return (
     <section
       ref={sectionRef}
+      data-section="approach"
       className={`${styles.panel} ${styles.approachPanel} ${allCollected ? styles.approachPanelExpanded : ''}`}
     >
       <ScrollFloatTitle title="Approach" active={2} className={styles.approachTitle} />
@@ -1005,9 +1265,164 @@ function ApproachSection() {
   );
 }
 
-function EssenceSection() {
+function EssenceQuestionItem({ number, question, answer, index, itemRef }) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return undefined;
+    const root = document.querySelector('.appScroll');
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setVisible(entry.isIntersecting);
+      },
+      { threshold: 0.04, root: root ?? null, rootMargin: '0px' },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section className={`${styles.panel} ${styles.essencePanel}`}>
+    <article
+      ref={(node) => {
+        ref.current = node;
+        itemRef?.(node);
+      }}
+      className={`${styles.questionItem} ${visible ? styles.questionItemVisible : ''}`}
+      style={{ '--question-index': index }}
+    >
+      <div className={`${styles.questionBubble} ${number === '04' ? styles.questionBubbleLarge : ''}`}>
+        <strong>{number}</strong>
+        <span>{formatQuestion(number, question)}</span>
+      </div>
+      <p className={styles.delivered}>Delivered</p>
+      <div className={styles.answerBubble}>{answer}</div>
+      <p className={styles.sender}>CHAEI</p>
+    </article>
+  );
+}
+
+function EssenceSection() {
+  const sectionRef = useRef(null);
+  const questionRefs = useRef([]);
+  const snapLockRef = useRef(false);
+  const activeQuestionIndexRef = useRef(null);
+
+  const getQuestionTargetIndex = (direction) => {
+    const root = document.querySelector('.appScroll');
+    const rootRect = root ? root.getBoundingClientRect() : { top: 0, height: window.innerHeight };
+    const center = rootRect.top + rootRect.height / 2;
+    const items = questionRefs.current
+      .map((node, index) => {
+        if (!node) return null;
+        const rect = node.getBoundingClientRect();
+        return {
+          index,
+          center: rect.top + rect.height / 2,
+        };
+      })
+      .filter(Boolean);
+
+    if (!items.length) return -1;
+
+    const centered = items
+      .slice()
+      .sort((a, b) => Math.abs(a.center - center) - Math.abs(b.center - center))[0];
+
+    const activeIndex =
+      activeQuestionIndexRef.current == null ? centered.index : activeQuestionIndexRef.current;
+    const activeItem = items.find((item) => item.index === activeIndex);
+    const activeDistance = activeItem ? Math.abs(activeItem.center - center) : Infinity;
+
+    if (activeDistance < 96) {
+      return activeIndex + direction;
+    }
+
+    if (Math.abs(centered.center - center) < 96) {
+      activeQuestionIndexRef.current = centered.index;
+      return centered.index + direction;
+    }
+
+    if (direction > 0) {
+      return centered.center > center ? centered.index : Math.min(centered.index + 1, cleanQuestions.length - 1);
+    }
+
+    return centered.center < center ? centered.index : Math.max(centered.index - 1, 0);
+  };
+
+  const scrollQuestionToCenter = (index) => {
+    const node = questionRefs.current[index];
+    const root = document.querySelector('.appScroll');
+    if (!node || !root) return;
+
+    const rect = node.getBoundingClientRect();
+    const rootRect = root.getBoundingClientRect();
+    const targetTop = root.scrollTop + rect.top - rootRect.top - (rootRect.height - rect.height) / 2;
+
+    activeQuestionIndexRef.current = index;
+    snapLockRef.current = true;
+    requestAppScrollTo(targetTop, 'smooth');
+    window.setTimeout(() => {
+      snapLockRef.current = false;
+    }, 920);
+  };
+
+  const handleEssenceWheel = (event) => {
+    if (Date.now() < (window.__portfolioSuppressEssenceSnapUntil ?? 0)) return;
+    if (snapLockRef.current) {
+      event.preventDefault();
+      return;
+    }
+    if (Math.abs(event.deltaY) < 1) return;
+
+    const direction = event.deltaY > 0 ? 1 : -1;
+    const targetIndex = getQuestionTargetIndex(direction);
+    if (targetIndex < 0 || targetIndex >= cleanQuestions.length) return;
+
+    event.preventDefault();
+    scrollQuestionToCenter(targetIndex);
+  };
+
+  useEffect(() => {
+    const scrollRoot = document.querySelector('.appScroll');
+    if (!scrollRoot) return undefined;
+
+    const handleRootWheel = (event) => {
+      if (Date.now() < (window.__portfolioSuppressEssenceSnapUntil ?? 0)) return;
+      const section = sectionRef.current;
+      if (!section) return;
+
+      const rect = section.getBoundingClientRect();
+      const rootRect = scrollRoot.getBoundingClientRect();
+      const isEssenceFrame = rect.top < rootRect.bottom && rect.bottom > rootRect.top;
+      if (!isEssenceFrame || Math.abs(event.deltaY) < 1) return;
+
+      if (snapLockRef.current) {
+        event.preventDefault();
+        return;
+      }
+
+      const direction = event.deltaY > 0 ? 1 : -1;
+      const targetIndex = getQuestionTargetIndex(direction);
+      if (targetIndex < 0 || targetIndex >= cleanQuestions.length) return;
+
+      event.preventDefault();
+      scrollQuestionToCenter(targetIndex);
+    };
+
+    scrollRoot.addEventListener('wheel', handleRootWheel, { passive: false, capture: true });
+    return () => scrollRoot.removeEventListener('wheel', handleRootWheel, { capture: true });
+  }, []);
+
+  return (
+    <section
+      ref={sectionRef}
+      data-section="essence"
+      className={`${styles.panel} ${styles.essencePanel}`}
+    >
       <div className={styles.essenceIntro}>
         <ScrollFloatTitle title="Essence" active={3} align="left" />
         <p>
@@ -1019,16 +1434,17 @@ function EssenceSection() {
         </p>
       </div>
       <div className={styles.questionList}>
-        {cleanQuestions.map(([number, question, answer]) => (
-          <article className={styles.questionItem} key={number}>
-            <div className={`${styles.questionBubble} ${number === '04' ? styles.questionBubbleLarge : ''}`}>
-              <strong>{number}</strong>
-              <span>{formatQuestion(number, question)}</span>
-            </div>
-            <p className={styles.delivered}>Delivered</p>
-            <div className={styles.answerBubble}>{answer}</div>
-            <p className={styles.sender}>CHAEI</p>
-          </article>
+        {cleanQuestions.map(([number, question, answer], index) => (
+          <EssenceQuestionItem
+            key={number}
+            number={number}
+            question={question}
+            answer={answer}
+            index={index}
+            itemRef={(node) => {
+              questionRefs.current[index] = node;
+            }}
+          />
         ))}
       </div>
     </section>
@@ -1132,6 +1548,7 @@ function InvitationSection() {
   return (
     <section
       ref={sectionRef}
+      data-section="invitation"
       className={`${styles.panel} ${styles.invitationPanel}`}
       onPointerDown={handleInvitationPointerDown}
     >
@@ -1171,9 +1588,125 @@ const MemoEssenceSection = memo(EssenceSection);
 const MemoInvitationSection = memo(InvitationSection);
 
 export function MainPage({ isActive = false, scrollProgress = 0 }) {
+  const [activeSection, setActiveSection] = useState('character');
+  const [showTopButton, setShowTopButton] = useState(false);
+  const [characterResetSignal, setCharacterResetSignal] = useState(0);
+
+  const scrollToSection = (sectionId) => {
+    const target = document.querySelector(`[data-section="${sectionId}"]`);
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  useEffect(() => {
+    if (!isActive) return undefined;
+
+    const root = document.querySelector('.appScroll');
+    if (!root) return undefined;
+
+    let frame = 0;
+
+    const measureSections = () => {
+      frame = 0;
+      const sections = sectionEntries
+        .map((entry) => {
+          const node = document.querySelector(`[data-section="${entry.id}"]`);
+          if (!node) return null;
+          const rect = node.getBoundingClientRect();
+          return { ...entry, rect };
+        })
+        .filter(Boolean);
+
+      const current = sections
+        .filter((entry) => entry.rect.bottom > 0 && entry.rect.top < window.innerHeight)
+        .sort((a, b) => Math.abs(a.rect.top - 140) - Math.abs(b.rect.top - 140))[0];
+
+      if (current) {
+        setActiveSection(current.id);
+      }
+
+      setShowTopButton(root.scrollTop > window.innerHeight * 0.75);
+    };
+
+    const handleScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(measureSections);
+    };
+
+    measureSections();
+    root.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+
+    return () => {
+      root.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, [isActive]);
+
+  useEffect(() => {
+    if (!isActive) return undefined;
+
+    const handleKeyDown = (event) => {
+      const letter = event.key.toLowerCase();
+      if (!sectionLetters.includes(letter)) return;
+      if (activeSection === 'invitation' && letter === 'c') return;
+
+      const target = sectionEntries.find((entry) => entry.letter === letter);
+      if (!target) return;
+
+      event.preventDefault();
+      scrollToSection(target.id);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeSection, isActive]);
+
   return (
     <main className={styles.page}>
-      <CharacterSection isActive={isActive} scrollProgress={scrollProgress} />
+      <nav className={styles.sectionNavigation} aria-label="Section navigation">
+        <div className={styles.sectionNavigationList}>
+          {sectionEntries.map((entry) => (
+            <button
+              key={entry.id}
+              type="button"
+              className={`${styles.sectionNavigationButton} ${
+                activeSection === entry.id ? styles.sectionNavigationButtonActive : ''
+              }`}
+              onClick={() => scrollToSection(entry.id)}
+              aria-label={`Go to ${entry.label}`}
+            >
+              {entry.letter}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          className={`${styles.windowResetButton} ${activeSection === 'character' ? styles.windowResetButtonVisible : ''}`}
+          onClick={() => setCharacterResetSignal((prev) => prev + 1)}
+          aria-label="창 초기화"
+          title="창 초기화"
+        >
+          ↺
+        </button>
+      </nav>
+      <div
+        className={`${styles.scrollDownHint} ${
+          activeSection === 'invitation' ? styles.scrollDownHintHidden : ''
+        }`}
+        aria-hidden="true"
+      >
+        <span className={styles.scrollDownMouse} />
+        <span>Scroll down</span>
+      </div>
+      <button
+        type="button"
+        className={`${styles.topButton} ${showTopButton ? styles.topButtonVisible : ''}`}
+        onClick={scrollToMainTop}
+      >
+        Top
+      </button>
+      <CharacterSection isActive={isActive} scrollProgress={scrollProgress} resetSignal={characterResetSignal} />
       <MemoHighlightsSection />
       <MemoApproachSection />
       <MemoEssenceSection />
