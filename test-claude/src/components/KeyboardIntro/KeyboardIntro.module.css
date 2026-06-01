@@ -220,6 +220,56 @@
   position: relative;
   width: 360px;
   height: 90px;
+  transform-origin: 50% 50%;
+}
+
+.messageBubbleTyping {
+  animation: messageTypeLift 0.28s cubic-bezier(0.2, 0.9, 0.24, 1) both;
+}
+
+.messageBubbleDelivered {
+  animation: messageDeliveredBuzz 0.48s cubic-bezier(0.18, 0.9, 0.22, 1) both;
+}
+
+@keyframes messageTypeLift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  48% {
+    transform: translate3d(0, -9px, 0) scale(1.018);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes messageDeliveredBuzz {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0);
+  }
+
+  14% {
+    transform: translate3d(-3px, -2px, 0) rotate(-0.45deg);
+  }
+
+  28% {
+    transform: translate3d(4px, 1px, 0) rotate(0.4deg);
+  }
+
+  42% {
+    transform: translate3d(-2px, 2px, 0) rotate(-0.25deg);
+  }
+
+  58% {
+    transform: translate3d(2px, -1px, 0) rotate(0.2deg);
+  }
+
+  74% {
+    transform: translate3d(-1px, 1px, 0) rotate(-0.12deg);
+  }
 }
 
 .messageBubble {

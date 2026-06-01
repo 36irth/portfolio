@@ -4,6 +4,8 @@ import { gsap } from 'gsap';
 export default function TypeText({
   segments,
   className,
+  as: Component = 'h1',
+  isActive = true,
   typingSpeed = 70,
   initialDelay = 400,
   showCursor = true,
@@ -31,6 +33,12 @@ export default function TypeText({
   const completedRef = useRef(false);
 
   useEffect(() => {
+    if (isActive) return;
+    setTypedCount(0);
+    completedRef.current = false;
+  }, [isActive]);
+
+  useEffect(() => {
     if (typedCount >= totalChars && !completedRef.current) {
       completedRef.current = true;
       onComplete?.();
@@ -51,11 +59,12 @@ export default function TypeText({
   }, [showCursor, cursorBlinkDuration]);
 
   useEffect(() => {
+    if (!isActive) return;
     if (typedCount >= totalChars) return;
     const delay = typedCount === 0 ? initialDelay : typingSpeed;
     const timer = setTimeout(() => setTypedCount(c => c + 1), delay);
     return () => clearTimeout(timer);
-  }, [typedCount, totalChars, typingSpeed, initialDelay]);
+  }, [typedCount, totalChars, typingSpeed, initialDelay, isActive]);
 
   let charsCounted = 0;
   const rendered = segments.map((seg, si) => {
@@ -65,20 +74,20 @@ export default function TypeText({
     const charsToShow = Math.min(seg.text.length, Math.max(0, typedCount - charsCounted));
     charsCounted += seg.text.length;
     return (
-      <span key={si} className={seg.className}>
+      <span key={si} className={seg.className} style={seg.style}>
         {seg.text.slice(0, charsToShow)}
       </span>
     );
   });
 
   return (
-    <h1 className={className}>
+    <Component className={className}>
       {rendered}
       {showCursor && (
         <span ref={cursorRef} style={{ display: 'inline-block', opacity: 1 }}>
           {cursorCharacter}
         </span>
       )}
-    </h1>
+    </Component>
   );
 }

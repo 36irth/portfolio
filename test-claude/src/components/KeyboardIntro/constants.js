@@ -4,8 +4,8 @@ export const KEYCAP_CONFIGS = SEQUENCE.map((letter, index) => ({
   letter: letter.toUpperCase(),
   color: '#EDE8DF',
   textColor: '#1C1C1C',
-  glow: '#FF8040',
-  emissive: '#C05228',
+  glow: '#7FDBFF',
+  emissive: '#35AEE6',
   labelFont: 'nohemi',
 }));
 

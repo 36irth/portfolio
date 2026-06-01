@@ -228,7 +228,12 @@ export function KeyboardIntro({ onComplete }) {
         <div className={`${styles.bottomRow} ${isTitleDone ? styles.bottomRowReady : ''}`}>
           <div className={styles.introStage}>
             <div className={styles.messageRail}>
-              <div className={styles.messageBubbleWrap}>
+              <div
+                key={progress}
+                className={`${styles.messageBubbleWrap} ${
+                  progress > 0 && !isDelivered ? styles.messageBubbleTyping : ''
+                } ${isDelivered ? styles.messageBubbleDelivered : ''}`}
+              >
                 <div className={styles.messageBubble}>
                   <span>{typedValue}</span>
                   {!isDelivered && <span className={styles.messageCursor} aria-hidden="true" />}
