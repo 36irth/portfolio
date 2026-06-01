@@ -35,6 +35,7 @@ html.lenis body {
 }
 
 .appScrollContent {
+  position: relative;
   width: 100%;
   min-height: 100%;
 }
@@ -55,4 +56,51 @@ html.lenis body {
   min-height: 100vh;
   overflow: hidden;
   background: #0d0d0d;
+}
+
+.appIntroLeaving {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  animation: introPageLeave 0.86s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.appMainSection {
+  position: relative;
+  z-index: 1;
+  min-height: 100%;
+  background: #0d0d0d;
+}
+
+.appMainEntering {
+  animation: mainPageEnter 0.86s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes introPageLeave {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translate3d(0, -42px, 0) scale(0.985);
+  }
+}
+
+@keyframes mainPageEnter {
+  0% {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translate3d(0, 56px, 0) scale(0.985);
+  }
+
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
 }

@@ -1,5 +1,6 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import SplitText from '../components/KeyboardIntro/SplitText';
+import CharacterKeyDisplay from './CharacterKeyDisplay';
 import styles from './MainPage.module.css';
 
 const asset = (name) => `/assets/portfolio/${name}`;
@@ -119,31 +120,45 @@ const highlightSmallProjects = [
   },
 ];
 
+const getHighlightHref = (group, projectIndex, label) => {
+  const normalized = label.toLowerCase();
+  if (group === 'large' && projectIndex === 0 && normalized === 'site') {
+    return 'https://airsoft-nine.vercel.app/';
+  }
+  if (group === 'large' && projectIndex === 1 && normalized === 'site') {
+    return 'https://www.figma.com/proto/Q4RWt5mGXgO47PjRUCVS3Y/%EA%B9%80%EC%B1%84%EC%9D%B4?node-id=579-1763&t=rsfcqL7jkvfqttzP-1';
+  }
+  if (group === 'large' && projectIndex === 2 && normalized === 'pdf') {
+    return 'https://www.figma.com/deck/KbN24gyULgtsJZ3NgeslmB';
+  }
+  return '';
+};
+
 const approachCards = [
   ['1', 'Observe', ['사용자가 어디서 불편함을', '느끼는지 파악합니다'], imgApproachObserve, styles.approachFigureObserve],
   ['2', 'Organize', ['사용자가 다음 행동을 쉽게', '찾을 수 있도록 정리합니다'], imgApproachOrganize, styles.approachFigureOrganize],
-  ['3', 'Visualize', ['기능만이 아니라', '기억에 남는 화면을 만듭니다.'], imgApproachVisualize, styles.approachFigureVisualize],
+  ['3', 'Visualize', ['기능 뿐만이 아닌,', '기억에 남는 화면을 만듭니다'], imgApproachVisualize, styles.approachFigureVisualize],
 ];
 
 const questions = [
   [
     '01',
     '고등학교부터 대학교까지, 왜 디자인을 전공하게 되었나요?',
-    '어릴 때부터 시각적으로 아름다운 것을 만드는 일을 좋아했고 자연스럽게 시각디자인을 전공하게 되었습니다. 졸업 무렵 UI/UX가 사용자 경험과 연결된다는 점에 끌려 본격적으로 공부를 시작했습니다.',
+    '어릴 때부터 시각적으로 아름다운 것을 만드는 일을 좋아해 자연스럽게 시각디자인을 전공했고, 졸업 무렵 UI/UX의 사용자 경험 설계 개념에 흥미를 느껴 올해부터 본격적으로 공부를 시작했습니다.',
   ],
   [
     '02',
     '어떤 디자이너가 되고 싶나요?',
-    '앞으로는 단순 취향에만 머무는 것이 아니라 더 많은 사람들이 편하게 쓰는 디자인을 해보고 싶습니다. 화면 설계에만 그치지 않고 사용자 리서치와 데이터 기반 개선 과정까지 이해하는 디자이너로 성장하는 것이 목표입니다.',
+    '앞으로는 저의 취향에만 머무는 것이 아닌, 다른 사람에게 닿는 디자인을 해보고 싶습니다. 화면 설계에만 그치지 않고 사용자 리서치와 데이터 기반의 개선 과정까지 이해할 수 있는 디자이너로 성장하는 것이 목표입니다.',
   ],
   [
     '03',
     '앞으로 무엇을 배우고 싶나요?',
-    'UI/UX 디자이너로 경험을 쌓아가면서 장기적으로는 블렌더와 인터랙티브 같은 3D 툴을 통해 시각 표현 영역도 넓혀가고 싶습니다. 또한 일본어와 중국어를 배우며 다양한 문화권의 사용자 감각도 이해하고 싶습니다.',
+    'UI/UX 디자인 역량을 쌓아가는 동시에 장기적으로는 블렌더, 어도비 디멘션 같은 3D 툴을 익혀 시각적 표현의 폭을 넓히고 싶습니다. 또한 일본어, 중국어 등 낯선 언어를 배우며 다양한 문화권의 디자인 감각을 흡수하는 것도 목표 중 하나입니다.',
   ],
   [
     '04',
-    'AI가 자연스러워진 지금, 디자이너는 무엇을 직접 판단해야 할까요?',
+    'AI가 자연스러운 도구가 된 지금, 디자이너는 무엇을 직접 판단해야 할까요?',
     'AI에 의존하지 않는 것이라고 생각합니다. 직접 사용해보니 도움을 받을수록 오히려 사고가 막히는 경험을 했고, 그래서 큰 그림은 스스로 그린 뒤 신선한 시각이 필요한 순간에만 활용하는 방식을 선호합니다. 처음부터 끝까지 맡기는 것이 아니라, 내 작업 과정의 일부로 두는 것이 중요하다고 생각합니다.',
   ],
 ];
@@ -164,9 +179,8 @@ const formatQuestion = (number, question) => {
 
 const scrollToMainTop = () => {
   const scrollRoot = document.querySelector('.appScroll');
-  const top = window.innerHeight || 0;
   scrollRoot?.scrollTo({
-    top,
+    top: 0,
     behavior: 'smooth',
   });
 };
@@ -248,9 +262,13 @@ function floatStyle(index) {
 
 function KeyboardBadge({ active = 0 }) {
   return (
-    <div className={styles.keyboardBadge} aria-hidden="true">
+    <div className={`${styles.keyboardBadge} ${styles.scrollFloatBadge}`} aria-hidden="true">
       {keys.map((key, index) => (
-        <span key={key} className={index === active ? styles.keyActive : styles.keyInactive}>
+        <span
+          key={key}
+          className={index === active ? styles.keyActive : styles.keyInactive}
+          style={{ '--badge-index': index }}
+        >
           {key}
         </span>
       ))}
@@ -258,14 +276,34 @@ function KeyboardBadge({ active = 0 }) {
   );
 }
 
-function ScrollFloatTitle({ title, active = 0, align = 'center', className = '' }) {
+function FloatingTitleText({ title, visible }) {
   return (
-    <header className={`${styles.sectionTitle} ${align === 'left' ? styles.sectionTitleLeft : ''} ${className}`}>
+    <h2>
+      {title.split('').map((char, index) => (
+        <span
+          key={`${char}-${index}`}
+          className={`${styles.scrollFloatGlyph} ${index === 0 ? styles.scrollFloatAccent : ''}`}
+          style={{ '--float-index': index }}
+        >
+          {char === ' ' ? '\u00A0' : char}
+        </span>
+      ))}
+    </h2>
+  );
+}
+
+function ScrollFloatTitle({ title, active = 0, align = 'center', className = '' }) {
+  const [ref, visible] = useReplayInView(0.32, '0px 0px -10% 0px');
+
+  return (
+    <header
+      ref={ref}
+      className={`${styles.sectionTitle} ${styles.scrollFloatTitle} ${
+        visible ? styles.scrollFloatTitleVisible : ''
+      } ${align === 'left' ? styles.sectionTitleLeft : ''} ${className}`}
+    >
       <KeyboardBadge active={active} />
-      <h2>
-        <span>{title.slice(0, 1)}</span>
-        {title.slice(1)}
-      </h2>
+      <FloatingTitleText title={title} visible={visible} />
     </header>
   );
 }
@@ -294,25 +332,26 @@ function ScrollFloatCopy({ lines, visible = false, className = '' }) {
 
 function CharacterTitle({ isActive }) {
   return (
-    <header className={`${styles.sectionTitle} ${styles.sectionTitleLeft} ${styles.characterTitle}`}>
-      <div className={`${styles.keyboardBadge} ${isActive ? styles.titlePartReady : ''}`} aria-hidden="true">
+    <header
+      className={`${styles.sectionTitle} ${styles.scrollFloatTitle} ${
+        isActive ? styles.scrollFloatTitleVisible : ''
+      } ${styles.sectionTitleLeft} ${styles.characterTitle}`}
+    >
+      <div
+        className={`${styles.keyboardBadge} ${styles.scrollFloatBadge} ${isActive ? styles.titlePartReady : ''}`}
+        aria-hidden="true"
+      >
         {keys.map((key, index) => (
-          <span key={key} className={index === 0 ? styles.keyActive : styles.keyInactive}>
+          <span
+            key={key}
+            className={index === 0 ? styles.keyActive : styles.keyInactive}
+            style={{ '--badge-index': index }}
+          >
             {key}
           </span>
         ))}
       </div>
-      <SplitText
-        isActive={isActive}
-        className={styles.titleSplit}
-        stagger={0.025}
-        duration={0.72}
-        animationDelay={0.04}
-        segments={[
-          { text: 'C', className: styles.titleAccent },
-          { text: 'haracter' },
-        ]}
-      />
+      <FloatingTitleText title="Character" visible={isActive} />
     </header>
   );
 }
@@ -389,10 +428,45 @@ function GlassHeader({ icon, label }) {
 }
 
 function CharacterSection({ isActive, scrollProgress }) {
+  const sectionRef = useRef(null);
   const copyReady = isActive;
+  const [dismissedWindows, setDismissedWindows] = useState(() => new Set());
+  const allWindowsDismissed = dismissedWindows.size >= 7;
+
+  useEffect(() => {
+    if (!isActive || scrollProgress < 0.14 || scrollProgress > 0.9) {
+      setDismissedWindows(new Set());
+    }
+  }, [isActive, scrollProgress]);
+
+  const characterWindowClass = (id, index) => {
+    const visible = getFloatState(isActive, scrollProgress, index);
+    const dismissed = visible && dismissedWindows.has(id);
+    return `${styles.characterFloat} ${visible && !dismissed ? styles.characterFloatVisible : ''} ${
+      dismissed ? styles.characterFloatDismissed : ''
+    }`;
+  };
+
+  const dismissCharacterWindow = (id, index) => () => {
+    if (!getFloatState(isActive, scrollProgress, index)) return;
+    setDismissedWindows((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  };
+
+  const handleCharacterWheel = (event) => {
+    if (!allWindowsDismissed || event.deltaY <= 0) return;
+    event.preventDefault();
+    sectionRef.current?.nextElementSibling?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  };
 
   return (
-    <section className={styles.characterScrollSection}>
+    <section ref={sectionRef} className={styles.characterScrollSection} onWheel={handleCharacterWheel}>
       <div className={`${styles.panel} ${styles.characterPanel}`}>
         <div className={`${styles.characterCopy} ${copyReady ? styles.characterCopyReady : ''}`}>
           <CharacterTitle isActive={isActive} />
@@ -404,7 +478,11 @@ function CharacterSection({ isActive, scrollProgress }) {
           <DragAccentLine />
         </div>
 
-        <div className={`${styles.awards} ${floatClass(isActive, scrollProgress, 6)}`} style={floatStyle(6)}>
+        <div
+          className={`${styles.awards} ${characterWindowClass('awards', 6)}`}
+          style={floatStyle(6)}
+          onClick={dismissCharacterWindow('awards', 6)}
+        >
           {awards.map(([line1, line2, date]) => (
             <article className={styles.awardItem} key={`${line1}-${line2}-${date}`}>
               <img src={imgAward} alt="" />
@@ -417,7 +495,11 @@ function CharacterSection({ isActive, scrollProgress }) {
           ))}
         </div>
 
-        <aside className={`${styles.glassCard} ${styles.designToolsCard} ${floatClass(isActive, scrollProgress, 0)}`} style={floatStyle(0)}>
+        <aside
+          className={`${styles.glassCard} ${styles.designToolsCard} ${characterWindowClass('tools', 0)}`}
+          style={floatStyle(0)}
+          onClick={dismissCharacterWindow('tools', 0)}
+        >
           <GlassHeader icon={imgToolHeader} label="Tools" />
           <div className={styles.glassBody}>
             <p className={styles.bodyLabel}>Tools I can use</p>
@@ -436,7 +518,11 @@ function CharacterSection({ isActive, scrollProgress }) {
           </div>
         </aside>
 
-        <aside className={`${styles.glassCard} ${styles.profileCard} ${floatClass(isActive, scrollProgress, 1)}`} style={floatStyle(1)}>
+        <aside
+          className={`${styles.glassCard} ${styles.profileCard} ${characterWindowClass('profile', 1)}`}
+          style={floatStyle(1)}
+          onClick={dismissCharacterWindow('profile', 1)}
+        >
           <div className={styles.profileTitle}>
             <h3>Profile</h3>
             <p>김채이</p>
@@ -446,7 +532,11 @@ function CharacterSection({ isActive, scrollProgress }) {
           <p className={styles.profileMeta}>36irth@gmail.com</p>
         </aside>
 
-        <aside className={`${styles.glassCard} ${styles.aiCard} ${floatClass(isActive, scrollProgress, 2)}`} style={floatStyle(2)}>
+        <aside
+          className={`${styles.glassCard} ${styles.aiCard} ${characterWindowClass('ai', 2)}`}
+          style={floatStyle(2)}
+          onClick={dismissCharacterWindow('ai', 2)}
+        >
           <GlassHeader icon={imgToolHeader} label="AI" />
           <div className={styles.glassBody}>
             {aiTools.map(([name, desc, image]) => (
@@ -463,7 +553,11 @@ function CharacterSection({ isActive, scrollProgress }) {
           </div>
         </aside>
 
-        <aside className={`${styles.glassCard} ${styles.certificateCard} ${floatClass(isActive, scrollProgress, 3)}`} style={floatStyle(3)}>
+        <aside
+          className={`${styles.glassCard} ${styles.certificateCard} ${characterWindowClass('certificate', 3)}`}
+          style={floatStyle(3)}
+          onClick={dismissCharacterWindow('certificate', 3)}
+        >
           <div className={styles.cardTop}>
             <img src={imgCertificateIcon} alt="" />
             <strong>3</strong>
@@ -479,13 +573,21 @@ function CharacterSection({ isActive, scrollProgress }) {
           </div>
         </aside>
 
-        <div className={`${styles.chatBubble} ${floatClass(isActive, scrollProgress, 4)} ${styles.schoolOne}`} style={floatStyle(4)}>
+        <div
+          className={`${styles.chatBubble} ${characterWindowClass('school-one', 4)} ${styles.schoolOne}`}
+          style={floatStyle(4)}
+          onClick={dismissCharacterWindow('school-one', 4)}
+        >
           <p>
             <span>2021~2023</span>
             <span>안산대학교 시각미디어디자인학과</span>
           </p>
         </div>
-        <div className={`${styles.chatBubble} ${floatClass(isActive, scrollProgress, 5)} ${styles.schoolTwo}`} style={floatStyle(5)}>
+        <div
+          className={`${styles.chatBubble} ${characterWindowClass('school-two', 5)} ${styles.schoolTwo}`}
+          style={floatStyle(5)}
+          onClick={dismissCharacterWindow('school-two', 5)}
+        >
           <p>
             <span>2017~2020</span>
             <span>안산디자인문화고등학교 시각디자인과</span>
@@ -514,12 +616,24 @@ function HighlightsSection() {
                     <p className={styles.highlightTitle}>{project.title}</p>
                   </div>
                   <div className={styles.highlightButtonRow}>
-                    {project.buttons.map((label) => (
-                      <button key={label} type="button" className={styles.highlightAction}>
-                        <span>{label}</span>
-                        <img src={imgHighlightsArrow} alt="" />
-                      </button>
-                    ))}
+                    {project.buttons.map((label) => {
+                      const href = getHighlightHref('large', index, label);
+                      const content = (
+                        <>
+                          <span>{label}</span>
+                          <img src={imgHighlightsArrow} alt="" />
+                        </>
+                      );
+                      return href ? (
+                        <a key={label} href={href} target="_blank" rel="noreferrer" className={styles.highlightAction}>
+                          {content}
+                        </a>
+                      ) : (
+                        <button key={label} type="button" className={styles.highlightAction}>
+                          {content}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </article>
@@ -694,14 +808,23 @@ function ApproachSection() {
     setFolderReady(false);
     setFolderOpen(false);
     const scrollTimer = window.setTimeout(() => {
-      summaryRef.current?.scrollIntoView({
+      const summary = summaryRef.current;
+      const scrollRoot = document.querySelector('.appScroll');
+      if (!summary || !scrollRoot) return;
+
+      const rect = summary.getBoundingClientRect();
+      const rootRect = scrollRoot.getBoundingClientRect();
+      const targetTop =
+        scrollRoot.scrollTop + rect.top - rootRect.top - (rootRect.height - rect.height) / 2 - 86;
+
+      scrollRoot.scrollTo({
+        top: targetTop,
         behavior: 'smooth',
-        block: 'start',
       });
-    }, 360);
+    }, 220);
     const revealTimer = window.setTimeout(() => {
       setTextReady(true);
-    }, 980);
+    }, 620);
 
     return () => {
       window.clearTimeout(scrollTimer);
@@ -795,7 +918,7 @@ function ApproachSection() {
         </div>
         <p>
           <img src={imgApproachDrag} alt="" />
-          파일을 드래그해서 폴더 안에 넣어주세요
+          파일을 드래그해서 폴더 안에 넣어주세요!
         </p>
       </div>
       <div ref={summaryRef} className={`${styles.approachSummary} ${textReady ? styles.approachSummaryVisible : ''}`}>
@@ -858,9 +981,11 @@ function EssenceSection() {
       <div className={styles.essenceIntro}>
         <ScrollFloatTitle title="Essence" active={3} align="left" />
         <p>
-          그래서 저는 어떤 디자이너가 되고 싶은지,
+          <span className={styles.essenceIntroBold}>
+            그래서, 저는 <span className={styles.essenceIntroAccent}>어떤 디자이너</span>가 되고 싶은 걸까요?
+          </span>
           <br />
-          만들고 배우며 스스로에게 던진 질문들을 하나씩 꺼내봅니다.
+          만들고 배우며 제게 남은 질문들을 하나씩 펼쳐보았습니다.
         </p>
       </div>
       <div className={styles.questionList}>
@@ -893,21 +1018,22 @@ function InvitationKeyScene({ onActivate, pressSignal, active }) {
   }, [pressSignal]);
 
   return (
-    <button type="button" className={styles.invitationKeyButton} onClick={onActivate} aria-label="Open contact card">
-      <img
-        src={asset('invitation-key.png')}
-        alt=""
-        className={`${styles.invitationKeyImage} ${active ? styles.invitationKeyImageActive : ''} ${
-          isPressed ? styles.invitationKeyImagePressed : ''
-        }`}
-        draggable={false}
-      />
+    <button
+      type="button"
+      className={`${styles.invitationKeyButton} ${active ? styles.invitationKeyActive : ''}`}
+      onClick={onActivate}
+      aria-label="Open contact card"
+    >
+      <div className={styles.invitationKeyFloat}>
+        <CharacterKeyDisplay pressed={isPressed} scale={1.42} className={styles.invitationKeyCanvas} />
+      </div>
     </button>
   );
 }
 
 function InvitationSection() {
   const sectionRef = useRef(null);
+  const contactRef = useRef(null);
   const openTimerRef = useRef(0);
   const [isVisible, setIsVisible] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -921,6 +1047,10 @@ function InvitationSection() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
+        if (!entry.isIntersecting) {
+          window.clearTimeout(openTimerRef.current);
+          setIsOpen(false);
+        }
       },
       { threshold: 0.35, root: root ?? null },
     );
@@ -946,7 +1076,14 @@ function InvitationSection() {
 
     openTimerRef.current = window.setTimeout(() => {
       setIsOpen(true);
-    }, 650);
+    }, 220);
+  };
+
+  const handleInvitationPointerDown = (event) => {
+    if (!isOpen) return;
+    if (contactRef.current?.contains(event.target)) return;
+    window.clearTimeout(openTimerRef.current);
+    setIsOpen(false);
   };
 
   useEffect(() => {
@@ -963,7 +1100,11 @@ function InvitationSection() {
   }, [isVisible, isOpen]);
 
   return (
-    <section ref={sectionRef} className={`${styles.panel} ${styles.invitationPanel}`}>
+    <section
+      ref={sectionRef}
+      className={`${styles.panel} ${styles.invitationPanel}`}
+      onPointerDown={handleInvitationPointerDown}
+    >
       <InvitationKeyScene
         active={isVisible}
         pressSignal={pressSignal}
@@ -971,12 +1112,15 @@ function InvitationSection() {
       />
       <div className={styles.invitationTitle}>
         <ScrollFloatTitle title="Invitation" active={4} />
-        <div className={styles.invitationSub}>
+        <div className={`${styles.invitationSub} ${isVisible ? styles.invitationSubVisible : ''}`}>
           <p>포트폴리오 공유가 거의 완료되었습니다.</p>
           <strong>이제 마지막 키를 눌러, 다음 연결을 시작해보세요.</strong>
         </div>
       </div>
-      <aside className={`${styles.contactCard} ${isOpen ? styles.contactCardVisible : styles.contactCardHidden}`}>
+      <aside
+        ref={contactRef}
+        className={`${styles.contactCard} ${isOpen ? styles.contactCardVisible : styles.contactCardHidden}`}
+      >
         <div className={styles.contactTitle}>
           <h3>Contact us</h3>
           <p>채이 님이 연락처를 공유하려고 합니다.</p>

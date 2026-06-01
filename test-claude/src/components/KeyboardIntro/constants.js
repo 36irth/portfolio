@@ -2,7 +2,7 @@ export const SEQUENCE = ['c', 'h', 'a', 'e', 'i'];
 
 export const KEYCAP_CONFIGS = SEQUENCE.map((letter, index) => ({
   letter: letter.toUpperCase(),
-  color: '#EDE8DF',
+  color: '#F9F9F4',
   textColor: '#1C1C1C',
   glow: '#7FDBFF',
   emissive: '#35AEE6',

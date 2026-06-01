@@ -207,30 +207,30 @@ function addSwitchInside(group, { keycapW, keycapH, keycapD }) {
   });
 
   const stemMat = new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color('#efe8da'),
-    emissive: new THREE.Color('#9f8965'),
-    emissiveIntensity: 0.025,
-    roughness: 0.18,
-    metalness: 0,
-    clearcoat: 0.9,
-    clearcoatRoughness: 0.08,
+    color: new THREE.Color('#f4f6f7'),
+    emissive: new THREE.Color('#d9e2e6'),
+    emissiveIntensity: 0.016,
+    roughness: 0.16,
+    metalness: 0.08,
+    clearcoat: 0.95,
+    clearcoatRoughness: 0.07,
   });
 
   const stemEdgeMat = stemMat.clone();
-  stemEdgeMat.color = new THREE.Color('#d7ccbb');
+  stemEdgeMat.color = new THREE.Color('#c8d0d4');
 
   const springMat = new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color('#f0d99f'),
-    roughness: 0.18,
-    metalness: 0.72,
-    clearcoat: 0.45,
+    color: new THREE.Color('#d7dde0'),
+    roughness: 0.13,
+    metalness: 0.86,
+    clearcoat: 0.58,
   });
 
   const contactMat = new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color('#c99745'),
-    roughness: 0.2,
-    metalness: 0.82,
-    clearcoat: 0.35,
+    color: new THREE.Color('#b8c0c4'),
+    roughness: 0.16,
+    metalness: 0.9,
+    clearcoat: 0.45,
   });
 
   const glassDenseMat = housingMat.clone();
@@ -387,7 +387,7 @@ export function createKeycap({ letter, color, textColor, glow, emissive, labelFo
   const geo = createTaperedKeycapGeometry(keycapW, capH, keycapD, capRadius, 6);
   const mat = new THREE.MeshPhysicalMaterial({
     color: new THREE.Color(color),
-    emissive: new THREE.Color('#fff7e8'),
+    emissive: new THREE.Color('#ffffff'),
     emissiveIntensity: 0,
     roughness: 0.22,
     metalness: 0,

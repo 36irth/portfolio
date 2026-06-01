@@ -137,7 +137,7 @@ export class SceneManager {
     point.position.set(0, 7, 1);
     this.scene.add(point);
 
-    const switchLight = new THREE.PointLight(0xFF6010, 0, 9);
+    const switchLight = new THREE.PointLight(0x7FDBFF, 0, 9);
     switchLight.position.set(0, -0.8, 0);
     this.scene.add(switchLight);
     this.switchLight = switchLight;

@@ -122,7 +122,7 @@
 
 .introHint {
   margin: 0;
-  color: #ffffdf;
+  color: #ffffff;
   font-family: 'Suit', 'Apple SD Gothic Neo', sans-serif;
   font-size: 36px;
   font-weight: 300;
@@ -141,12 +141,12 @@
 }
 
 .hintStrong {
-  color: #ffffdf;
+  color: #ffffff;
   font-weight: 800;
 }
 
 .hintLight {
-  color: #ffffdf;
+  color: #ffffff;
   font-weight: 300;
 }
 
@@ -214,6 +214,11 @@
   align-items: flex-end;
   min-height: 136px;
   width: 100%;
+  transform-origin: 100% 50%;
+}
+
+.messageRailDelivered {
+  animation: messageDeliveredFloat 1.18s ease-in-out both;
 }
 
 .messageBubbleWrap {
@@ -225,10 +230,6 @@
 
 .messageBubbleTyping {
   animation: messageTypeLift 0.28s cubic-bezier(0.2, 0.9, 0.24, 1) both;
-}
-
-.messageBubbleDelivered {
-  animation: messageDeliveredBuzz 0.48s cubic-bezier(0.18, 0.9, 0.22, 1) both;
 }
 
 @keyframes messageTypeLift {
@@ -245,30 +246,21 @@
   }
 }
 
-@keyframes messageDeliveredBuzz {
-  0%,
+@keyframes messageDeliveredFloat {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  38% {
+    transform: translate3d(0, -16px, 0) scale(1.018);
+  }
+
+  68% {
+    transform: translate3d(0, -10px, 0) scale(1.01);
+  }
+
   100% {
-    transform: translate3d(0, 0, 0) rotate(0);
-  }
-
-  14% {
-    transform: translate3d(-3px, -2px, 0) rotate(-0.45deg);
-  }
-
-  28% {
-    transform: translate3d(4px, 1px, 0) rotate(0.4deg);
-  }
-
-  42% {
-    transform: translate3d(-2px, 2px, 0) rotate(-0.25deg);
-  }
-
-  58% {
-    transform: translate3d(2px, -1px, 0) rotate(0.2deg);
-  }
-
-  74% {
-    transform: translate3d(-1px, 1px, 0) rotate(-0.12deg);
+    transform: translate3d(0, -12px, 0) scale(1.012);
   }
 }
 

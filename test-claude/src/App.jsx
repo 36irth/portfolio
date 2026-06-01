@@ -9,6 +9,7 @@ function App() {
   const lenisRef = useRef(null);
   const scrollRafRef = useRef(0);
   const pendingScrollTopRef = useRef(0);
+  const transitionTimerRef = useRef(0);
   const [viewportHeight, setViewportHeight] = useState(
     typeof window !== 'undefined' ? window.innerHeight : 1080,
   );
@@ -58,7 +59,7 @@ function App() {
 
         rafId = window.requestAnimationFrame(raf);
 
-        if (phase === 'intro') {
+        if (phase !== 'main') {
           lenisInstance.stop();
         }
       } catch (error) {
@@ -82,7 +83,7 @@ function App() {
     const lenis = lenisRef.current;
     if (!lenis) return;
 
-    if (phase === 'intro') {
+    if (phase !== 'main') {
       lenis.stop();
       lenis.scrollTo(0, { immediate: true });
       return;
@@ -94,17 +95,11 @@ function App() {
   const handleScroll = (event) => {
     const container = event.currentTarget;
 
-    if (phase === 'intro') {
+    if (phase !== 'main') {
       if (container.scrollTop !== 0) {
         container.scrollTop = 0;
       }
       setScrollTop(0);
-      return;
-    }
-
-    if (phase === 'main' && container.scrollTop < viewportHeight - 1) {
-      container.scrollTop = viewportHeight;
-      setScrollTop(viewportHeight);
       return;
     }
 
@@ -123,6 +118,7 @@ function App() {
         window.cancelAnimationFrame(scrollRafRef.current);
         scrollRafRef.current = 0;
       }
+      window.clearTimeout(transitionTimerRef.current);
     };
   }, []);
 
@@ -130,46 +126,53 @@ function App() {
     const container = scrollRef.current;
     if (!container) return;
 
-    setPhase('main');
+    setPhase('transition');
+    setScrollTop(0);
+    pendingScrollTopRef.current = 0;
+
     requestAnimationFrame(() => {
       const lenis = lenisRef.current;
       if (lenis) {
-        lenis.start();
-        lenis.scrollTo(viewportHeight, {
-          duration: 2,
-          lock: true,
-        });
-        return;
+        lenis.scrollTo(0, { immediate: true });
+      } else {
+        container.scrollTo({ top: 0, behavior: 'auto' });
       }
 
-      container.scrollTo({
-        top: viewportHeight,
-        behavior: 'smooth',
-      });
+      window.clearTimeout(transitionTimerRef.current);
+      transitionTimerRef.current = window.setTimeout(() => {
+        setPhase('main');
+      }, 860);
     });
   };
 
   const characterProgress = useMemo(() => {
-    const start = viewportHeight;
     const span = viewportHeight * 3.2;
-    return Math.max(0, Math.min(1, (scrollTop - start) / span));
+    return Math.max(0, Math.min(1, scrollTop / span));
   }, [scrollTop, viewportHeight]);
 
   return (
     <div className="appViewport">
       <div
-        className={`appScroll ${phase === 'intro' ? 'appScrollLocked' : 'appScrollMain'}`}
+        className={`appScroll ${phase === 'main' ? 'appScrollMain' : 'appScrollLocked'} ${
+          phase === 'transition' ? 'appScrollTransition' : ''
+        }`}
         ref={scrollRef}
         onScroll={handleScroll}
       >
         <div className="appScrollContent" ref={contentRef}>
-          <section className="appIntroSection">
-            <KeyboardIntro onComplete={handleIntroComplete} />
-          </section>
-          <MainPage
-            isActive={phase === 'main' || scrollTop > viewportHeight * 0.45}
-            scrollProgress={characterProgress}
-          />
+          {phase !== 'main' && (
+            <section className={`appIntroSection ${phase === 'transition' ? 'appIntroLeaving' : ''}`}>
+              <KeyboardIntro onComplete={handleIntroComplete} />
+            </section>
+          )}
+          {phase !== 'intro' && (
+            <div className={`appMainSection ${phase === 'transition' ? 'appMainEntering' : ''}`}>
+            <MainPage
+              isActive={phase === 'main'}
+              scrollProgress={characterProgress}
+            />
+            </div>
+          )}
         </div>
       </div>
     </div>

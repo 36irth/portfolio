@@ -2,17 +2,13 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { createKeycap } from '../components/KeyboardIntro/Keycap';
+import { KEYCAP_CONFIGS } from '../components/KeyboardIntro/constants';
 
 const KEY_CONFIG = {
-  letter: 'C',
-  color: '#EDE8DF',
-  textColor: '#1C1C1C',
-  glow: '#FF8040',
-  emissive: '#C05228',
-  labelFont: 'miller',
+  ...KEYCAP_CONFIGS[0],
 };
 
-export function CharacterKeyDisplay({ pressed = false, scale = 1 }) {
+export function CharacterKeyDisplay({ pressed = false, scale = 1, className = 'characterKeyCanvas' }) {
   const canvasRef = useRef(null);
   const keycapRef = useRef(null);
   const switchPartsRef = useRef(null);
@@ -156,7 +152,7 @@ export function CharacterKeyDisplay({ pressed = false, scale = 1 }) {
     });
   }, [pressed]);
 
-  return <canvas ref={canvasRef} className="characterKeyCanvas" />;
+  return <canvas ref={canvasRef} className={className} />;
 }
 
 export default CharacterKeyDisplay;
