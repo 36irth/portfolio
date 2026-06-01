@@ -38,9 +38,9 @@ export function CharacterKeyDisplay({ pressed = false, scale = 1, className = 'c
     renderer.toneMappingExposure = 0.94;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(26, width / height, 0.1, 100);
-    camera.position.set(0.5, 4.8, 8.5);
-    camera.lookAt(0.2, 0.2, 0);
+    const camera = new THREE.PerspectiveCamera(32, width / height, 0.1, 100);
+    camera.position.set(0.5, 4.9, 9.35);
+    camera.lookAt(0.2, -0.12, 0);
 
     const ambient = new THREE.AmbientLight(0xffffff, 0.56);
     const key = new THREE.DirectionalLight(0xfffaf0, 2.55);
@@ -54,7 +54,7 @@ export function CharacterKeyDisplay({ pressed = false, scale = 1, className = 'c
     scene.add(ambient, key, fill, rim, point);
 
     const keycap = createKeycap(KEY_CONFIG, 0);
-    keycap.position.set(0.1, -1.45, 0);
+    keycap.position.set(0.1, -0.62, 0);
     keycap.rotation.x = 0.16;
     keycap.rotation.y = -0.16;
     scene.add(keycap);
@@ -84,6 +84,7 @@ export function CharacterKeyDisplay({ pressed = false, scale = 1, className = 'c
       const nextHeight = canvas.clientHeight || 303;
       renderer.setSize(nextWidth, nextHeight, false);
       camera.aspect = nextWidth / nextHeight;
+      camera.fov = 32;
       camera.updateProjectionMatrix();
     };
 
