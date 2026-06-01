@@ -291,7 +291,7 @@
 }
 
 .accentLine span:first-of-type {
-  margin-right: 0.14em;
+  margin-right: 0.45em;
 }
 
 .accentLine span {
@@ -1665,8 +1665,12 @@
   animation: invitationSubFloatIn 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.invitationSubVisible p {
+  animation-delay: 0.18s;
+}
+
 .invitationSubVisible strong {
-  animation-delay: 0.11s;
+  animation-delay: 0.29s;
 }
 
 @keyframes invitationSubFloatIn {

@@ -1,12 +1,16 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import gsap from 'gsap';
-import { createKeycap } from '../components/KeyboardIntro/Keycap';
+import { createKeycap, makeLetterTexture } from '../components/KeyboardIntro/Keycap';
 import { KEYCAP_CONFIGS } from '../components/KeyboardIntro/constants';
 
 const KEY_CONFIG = {
   ...KEYCAP_CONFIGS[0],
 };
+const KEY_REST_COLOR = new THREE.Color(KEY_CONFIG.color);
+const KEY_REST_EMISSIVE = new THREE.Color('#ffffff');
+const KEY_PRESSED_COLOR = new THREE.Color('#0188fb');
+const KEY_PRESSED_EMISSIVE = new THREE.Color('#0168c0');
 
 export function CharacterKeyDisplay({ pressed = false, scale = 1, className = 'characterKeyCanvas' }) {
   const canvasRef = useRef(null);
@@ -64,6 +68,10 @@ export function CharacterKeyDisplay({ pressed = false, scale = 1, className = 'c
     switchPartsRef.current = keycap.userData.pressParts || [];
     restRef.current = {
       groupY: keycap.position.y,
+      bodyMat: keycap.userData.bodyMat,
+      labelMat: keycap.userData.labelMat,
+      labelFont: keycap.userData.labelFont,
+      letter: keycap.userData.letter,
       pressParts: (keycap.userData.pressParts || []).map(({ obj, restY }) => ({ obj, restY })),
     };
     rendererRef.current = renderer;
@@ -117,9 +125,43 @@ export function CharacterKeyDisplay({ pressed = false, scale = 1, className = 'c
     if (!keycap || !rest) return;
 
     gsap.killTweensOf(keycap.position);
+    if (rest.bodyMat) {
+      gsap.killTweensOf(rest.bodyMat.color);
+      gsap.killTweensOf(rest.bodyMat.emissive);
+      gsap.killTweensOf(rest.bodyMat);
+    }
     rest.pressParts.forEach(({ obj }) => gsap.killTweensOf(obj.position));
 
     if (pressed) {
+      if (rest.bodyMat) {
+        if (rest.labelMat) {
+          rest.labelMat.map?.dispose?.();
+          rest.labelMat.map = makeLetterTexture(rest.letter, '#FFFFFF', rest.labelFont);
+          rest.labelMat.needsUpdate = true;
+        }
+        gsap.to(rest.bodyMat.color, {
+          r: KEY_PRESSED_COLOR.r,
+          g: KEY_PRESSED_COLOR.g,
+          b: KEY_PRESSED_COLOR.b,
+          duration: 0.16,
+          ease: 'power2.out',
+          onUpdate: renderRef.current,
+        });
+        gsap.to(rest.bodyMat.emissive, {
+          r: KEY_PRESSED_EMISSIVE.r,
+          g: KEY_PRESSED_EMISSIVE.g,
+          b: KEY_PRESSED_EMISSIVE.b,
+          duration: 0.16,
+          ease: 'power2.out',
+          onUpdate: renderRef.current,
+        });
+        gsap.to(rest.bodyMat, {
+          emissiveIntensity: 0.08,
+          duration: 0.16,
+          ease: 'power2.out',
+          onUpdate: renderRef.current,
+        });
+      }
       gsap.to(keycap.position, {
         y: rest.groupY - 0.11,
         duration: 0.22,
@@ -137,6 +179,35 @@ export function CharacterKeyDisplay({ pressed = false, scale = 1, className = 'c
       return;
     }
 
+    if (rest.bodyMat) {
+      if (rest.labelMat) {
+        rest.labelMat.map?.dispose?.();
+        rest.labelMat.map = makeLetterTexture(rest.letter, '#1C1C1C', rest.labelFont);
+        rest.labelMat.needsUpdate = true;
+      }
+      gsap.to(rest.bodyMat.color, {
+        r: KEY_REST_COLOR.r,
+        g: KEY_REST_COLOR.g,
+        b: KEY_REST_COLOR.b,
+        duration: 0.24,
+        ease: 'power2.out',
+        onUpdate: renderRef.current,
+      });
+      gsap.to(rest.bodyMat.emissive, {
+        r: KEY_REST_EMISSIVE.r,
+        g: KEY_REST_EMISSIVE.g,
+        b: KEY_REST_EMISSIVE.b,
+        duration: 0.24,
+        ease: 'power2.out',
+        onUpdate: renderRef.current,
+      });
+      gsap.to(rest.bodyMat, {
+        emissiveIntensity: 0,
+        duration: 0.24,
+        ease: 'power2.out',
+        onUpdate: renderRef.current,
+      });
+    }
     gsap.to(keycap.position, {
       y: rest.groupY,
       duration: 0.28,

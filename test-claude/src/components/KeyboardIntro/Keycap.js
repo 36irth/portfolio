@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { SCENE } from './constants';
 
-function makeLetterTexture(letter, textColor, labelFont = 'miller') {
+export function makeLetterTexture(letter, textColor, labelFont = 'miller') {
   const size = 192;
   const canvas = document.createElement('canvas');
   canvas.width = size;

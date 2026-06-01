@@ -141,7 +141,7 @@ function App() {
       window.clearTimeout(transitionTimerRef.current);
       transitionTimerRef.current = window.setTimeout(() => {
         setPhase('main');
-      }, 860);
+      }, 1120);
     });
   };
 

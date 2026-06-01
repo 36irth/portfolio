@@ -63,7 +63,8 @@ html.lenis body {
   inset: 0;
   z-index: 3;
   pointer-events: none;
-  animation: introPageLeave 0.86s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: 50% 46%;
+  animation: introPageLeave 1.12s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .appMainSection {
@@ -74,7 +75,8 @@ html.lenis body {
 }
 
 .appMainEntering {
-  animation: mainPageEnter 0.86s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: 50% 42%;
+  animation: mainPageEnter 1.12s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes introPageLeave {
@@ -84,18 +86,36 @@ html.lenis body {
     transform: translate3d(0, 0, 0) scale(1);
   }
 
+  42% {
+    opacity: 0.74;
+    filter: blur(3px);
+    transform: translate3d(0, -10px, 0) scale(0.996);
+  }
+
   100% {
     opacity: 0;
-    filter: blur(10px);
-    transform: translate3d(0, -42px, 0) scale(0.985);
+    filter: blur(8px);
+    transform: translate3d(0, -24px, 0) scale(0.99);
   }
 }
 
 @keyframes mainPageEnter {
   0% {
     opacity: 0;
-    filter: blur(12px);
-    transform: translate3d(0, 56px, 0) scale(0.985);
+    filter: blur(8px);
+    transform: translate3d(0, 28px, 0) scale(0.992);
+  }
+
+  34% {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translate3d(0, 28px, 0) scale(0.992);
+  }
+
+  72% {
+    opacity: 0.9;
+    filter: blur(2px);
+    transform: translate3d(0, 5px, 0) scale(0.998);
   }
 
   100% {
