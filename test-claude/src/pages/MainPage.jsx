@@ -794,7 +794,7 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
             <h3>Profile</h3>
             <p>김채이</p>
           </div>
-          <img src={asset('profile.png')} alt="김채이 프로필" className={styles.profileImage} />
+          <img src={asset('profile.png')} alt="김채이 프로필" className={styles.profileImage} draggable={false} />
           <p className={styles.profileMeta}>2001.03.06</p>
           <p className={styles.profileMeta}>36irth@gmail.com</p>
         </aside>
@@ -937,7 +937,7 @@ function HighlightsSection() {
   );
 }
 
-function ApproachSection() {
+function ApproachSection({ onAllCollected }) {
   const sectionRef = useRef(null);
   const folderRef = useRef(null);
   const summaryRef = useRef(null);
@@ -1011,7 +1011,8 @@ function ApproachSection() {
 
   useEffect(() => {
     completedRef.current = allCollected;
-  }, [allCollected]);
+    onAllCollected?.(allCollected);
+  }, [allCollected, onAllCollected]);
 
   useEffect(() => {
     if (isCompact) return undefined;
@@ -1919,6 +1920,7 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
   const [activeSection, setActiveSection] = useState('character');
   const [showTopButton, setShowTopButton] = useState(false);
   const [characterResetSignal, setCharacterResetSignal] = useState(0);
+  const [approachAllCollected, setApproachAllCollected] = useState(false);
   const showCharacterInteractionHint =
     activeSection === 'character' &&
     characterWindowIds.some((_, index) => getFloatState(isActive, scrollProgress, index));
@@ -2048,7 +2050,7 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
       </nav>
       <div
         className={`${styles.scrollDownHint} ${
-          activeSection === 'approach' || activeSection === 'invitation' ? styles.scrollDownHintHidden : ''
+          (activeSection === 'approach' && !approachAllCollected) || activeSection === 'invitation' ? styles.scrollDownHintHidden : ''
         }`}
         aria-hidden="true"
       >
@@ -2072,7 +2074,7 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
       </button>
       <CharacterSection isActive={isActive} scrollProgress={scrollProgress} resetSignal={characterResetSignal} />
       <MemoHighlightsSection />
-      <MemoApproachSection />
+      <MemoApproachSection onAllCollected={setApproachAllCollected} />
       <MemoEssenceSection />
       <MemoInvitationSection />
     </main>
