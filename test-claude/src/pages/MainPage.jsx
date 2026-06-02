@@ -133,6 +133,9 @@ const getHighlightHref = (group, projectIndex, label) => {
   if (group === 'large' && projectIndex === 0 && ['site', 'app'].includes(normalized)) {
     return 'https://airsoft-nine.vercel.app/';
   }
+  if (group === 'large' && projectIndex === 0 && normalized === 'slide') {
+    return 'https://www.figma.com/deck/DOYuW7zigrKfKCXuutEt1d';
+  }
   if (group === 'large' && projectIndex === 1 && ['site', 'prototype'].includes(normalized)) {
     return 'https://www.figma.com/proto/Q4RWt5mGXgO47PjRUCVS3Y/%EA%B9%80%EC%B1%84%EC%9D%B4?node-id=579-1763&t=rsfcqL7jkvfqttzP-1';
   }
