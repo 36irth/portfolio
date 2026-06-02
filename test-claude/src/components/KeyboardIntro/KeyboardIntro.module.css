@@ -122,7 +122,7 @@
 
 .introHint {
   margin: 0;
-  color: #ffffff;
+  color: #b7b7b7;
   font-family: 'Suit', 'Apple SD Gothic Neo', sans-serif;
   font-size: 36px;
   font-weight: 300;
@@ -141,12 +141,12 @@
 }
 
 .hintStrong {
-  color: #ffffff;
-  font-weight: 800;
+  color: #b7b7b7;
+  font-weight: 700;
 }
 
 .hintLight {
-  color: #ffffff;
+  color: #b7b7b7;
   font-weight: 300;
 }
 

@@ -23,6 +23,11 @@ const imgApproachSummaryLeft = 'https://www.figma.com/api/mcp/asset/98bf9130-909
 const imgApproachSummaryCenter = 'https://www.figma.com/api/mcp/asset/e1d77281-a5d2-46aa-8dd1-76b70d10006a';
 const imgApproachFolderBack = asset('folder-back.png');
 const imgApproachFolderFront = asset('folder-front.png');
+const imgProcessIa = asset('process-ia.png');
+const imgProcessLean = asset('process-lean.png');
+const imgProcessFlow = asset('process-flow.png');
+const imgProcessChevron = asset('chevron-right.svg');
+const imgProcessCheck = asset('process-check.svg');
 
 const imgAward = 'https://www.figma.com/api/mcp/asset/e2707fcb-a858-4bcc-b38c-1dbf37f21cfb';
 const imgCertificateIcon = 'https://www.figma.com/api/mcp/asset/59f0f208-8f4d-4ace-8131-785b76c7cda8';
@@ -211,6 +216,27 @@ const cleanApproachCards = [
   ['1', 'Observe', ['사용자가 어디서 불편함을', '느끼는지 파악합니다.'], imgApproachObserve, styles.approachFigureObserve],
   ['2', 'Organize', ['사용자가 다음 행동을 쉽게', '찾을 수 있도록 정리합니다.'], imgApproachOrganize, styles.approachFigureOrganize],
   ['3', 'Visualize', ['기능 뿐만이 아닌,', '기억에 남는 화면을 만듭니다'], imgApproachVisualize, styles.approachFigureVisualize],
+];
+
+const processCards = [
+  {
+    id: 'ia',
+    label: 'IA Structural Design',
+    image: imgProcessIa,
+    imageClass: styles.processCardImageIa,
+  },
+  {
+    id: 'lean',
+    label: 'Lean Canvas',
+    image: imgProcessLean,
+    imageClass: styles.processCardImageLean,
+  },
+  {
+    id: 'flow',
+    label: 'User Flow',
+    image: imgProcessFlow,
+    imageClass: styles.processCardImageFlow,
+  },
 ];
 
 const cleanQuestions = [
@@ -875,15 +901,20 @@ function ApproachSection() {
   const sectionRef = useRef(null);
   const folderRef = useRef(null);
   const summaryRef = useRef(null);
+  const processRef = useRef(null);
   const completedRef = useRef(false);
   const pinnedRef = useRef(false);
   const settlingRef = useRef(false);
+  const processSnapLockRef = useRef(false);
   const approachPinTimerRef = useRef(0);
+  const processReleaseTimerRef = useRef(0);
   const [collected, setCollected] = useState([]);
   const [draggingCard, setDraggingCard] = useState(null);
   const [folderReady, setFolderReady] = useState(false);
   const [folderOpen, setFolderOpen] = useState(false);
   const [textReady, setTextReady] = useState(false);
+  const [activeProcessIndex, setActiveProcessIndex] = useState(0);
+  const [pressedProcessIndex, setPressedProcessIndex] = useState(0);
   const [isCompact, setIsCompact] = useState(() => (typeof window === 'undefined' ? false : isCompactViewport()));
   const allCollected = collected.length === approachCards.length;
 
@@ -902,6 +933,18 @@ function ApproachSection() {
     const rect = node.getBoundingClientRect();
     const rootRect = scrollRoot.getBoundingClientRect();
     return scrollRoot.scrollTop + rect.top - rootRect.top;
+  };
+
+  const getProcessPinnedTop = () => {
+    const summary = summaryRef.current;
+    const scrollRoot = document.querySelector('.appScroll');
+    const section = sectionRef.current;
+    if (!summary || !scrollRoot || !section) return null;
+
+    const sectionTop = getApproachTop();
+    if (sectionTop == null) return null;
+
+    return sectionTop + summary.offsetTop + Math.max(0, summary.offsetHeight - scrollRoot.clientHeight);
   };
 
   const pinApproachView = (behavior = 'smooth') => {
@@ -949,6 +992,8 @@ function ApproachSection() {
         window.clearTimeout(timeoutId);
         if (completedRef.current) return;
         releaseApproachPin();
+        window.clearTimeout(processReleaseTimerRef.current);
+        requestAppScrollLock(false);
         setFolderReady(false);
         setFolderOpen(false);
         setDraggingCard(null);
@@ -1053,6 +1098,8 @@ function ApproachSection() {
   useEffect(() => {
     if (!allCollected) {
       setTextReady(false);
+      setActiveProcessIndex(0);
+      setPressedProcessIndex(0);
       return undefined;
     }
     pinnedRef.current = false;
@@ -1062,15 +1109,8 @@ function ApproachSection() {
     setFolderReady(false);
     setFolderOpen(false);
     const scrollTimer = window.setTimeout(() => {
-      const summary = summaryRef.current;
-      const scrollRoot = document.querySelector('.appScroll');
-      if (!summary || !scrollRoot) return;
-
-      const rect = summary.getBoundingClientRect();
-      const rootRect = scrollRoot.getBoundingClientRect();
-      const targetTop =
-        scrollRoot.scrollTop + rect.top - rootRect.top - (rootRect.height - rect.height) / 2 - 86;
-
+      const targetTop = getProcessPinnedTop();
+      if (targetTop == null) return;
       requestAppScrollTo(targetTop, 'smooth');
     }, 220);
     const revealTimer = window.setTimeout(() => {
@@ -1082,6 +1122,104 @@ function ApproachSection() {
       window.clearTimeout(revealTimer);
     };
   }, [allCollected]);
+
+  const selectProcessCard = (nextIndex) => {
+    const boundedIndex = Math.max(0, Math.min(processCards.length - 1, nextIndex));
+    setActiveProcessIndex((prev) => {
+      setPressedProcessIndex(boundedIndex);
+      window.setTimeout(() => {
+        setPressedProcessIndex((current) => (current === boundedIndex ? null : current));
+      }, 260);
+      if (prev === boundedIndex) return prev;
+      return boundedIndex;
+    });
+  };
+
+  const releaseProcessLockSoon = (delay = 620) => {
+    window.clearTimeout(processReleaseTimerRef.current);
+    processReleaseTimerRef.current = window.setTimeout(() => {
+      processSnapLockRef.current = false;
+      requestAppScrollLock(false);
+    }, delay);
+  };
+
+  useEffect(() => {
+    return () => {
+      window.clearTimeout(processReleaseTimerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!allCollected || !textReady || isCompact) return undefined;
+    const scrollRoot = document.querySelector('.appScroll');
+    if (!scrollRoot) return undefined;
+
+    const handleProcessWheel = (event) => {
+      const processNode = processRef.current;
+      if (!processNode || Math.abs(event.deltaY) < 1) return;
+
+      const rect = processNode.getBoundingClientRect();
+      const rootRect = scrollRoot.getBoundingClientRect();
+      const processCenter = rect.top + rect.height / 2;
+      const viewportCenter = rootRect.top + rootRect.height / 2;
+      const isProcessFocused =
+        rect.top < rootRect.bottom - 80 &&
+        rect.bottom > rootRect.top + 80 &&
+        Math.abs(processCenter - viewportCenter) < rootRect.height * 0.42;
+
+      if (!isProcessFocused) return;
+
+      const direction = event.deltaY > 0 ? 1 : -1;
+      const nextIndex = activeProcessIndex + direction;
+      const targetTop = getProcessPinnedTop();
+
+      if (nextIndex < 0) return;
+
+      if (nextIndex >= processCards.length) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        if (targetTop != null) {
+          requestAppScrollLock(true, targetTop);
+        }
+        if (processSnapLockRef.current) return;
+        processSnapLockRef.current = true;
+        window.clearTimeout(processReleaseTimerRef.current);
+        processReleaseTimerRef.current = window.setTimeout(() => {
+          const root = document.querySelector('.appScroll');
+          const essence = document.querySelector('[data-section="essence"]');
+          if (!root || !essence) {
+            processSnapLockRef.current = false;
+            requestAppScrollLock(false);
+            return;
+          }
+
+          const rect = essence.getBoundingClientRect();
+          const rootRect = root.getBoundingClientRect();
+          const top = root.scrollTop + rect.top - rootRect.top;
+          processSnapLockRef.current = false;
+          requestAppScrollLock(false);
+          window.__portfolioSuppressEssenceSnapUntil = Date.now() + 650;
+          requestAppScrollTo(top, 'smooth');
+        }, 360);
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      if (targetTop != null) {
+        requestAppScrollLock(true, targetTop);
+      }
+      if (processSnapLockRef.current) return;
+      processSnapLockRef.current = true;
+      selectProcessCard(nextIndex);
+      releaseProcessLockSoon(620);
+    };
+
+    scrollRoot.addEventListener('wheel', handleProcessWheel, { passive: false, capture: true });
+    return () => scrollRoot.removeEventListener('wheel', handleProcessWheel, { capture: true });
+  }, [activeProcessIndex, allCollected, isCompact, textReady]);
 
   const handlePointerDown = (card) => (event) => {
     if (isCompact) return;
@@ -1261,24 +1399,65 @@ function ApproachSection() {
         </p>
       </div>
       <div ref={summaryRef} className={`${styles.approachSummary} ${visibleTextReady ? styles.approachSummaryVisible : ''}`}>
-        <img src={imgApproachSummaryLeft} alt="" className={styles.approachSummaryImageLeft} />
-        <img src={imgApproachSummaryTop} alt="" className={styles.approachSummaryImageTop} />
-        <img src={imgApproachSummaryCenter} alt="" className={styles.approachSummaryImageCenter} />
+        <div className={`${styles.approachText} ${visibleTextReady ? styles.approachTextReady : ''}`}>
+          <p>
+            <span>저는 완성된 결과물보다 </span>
+            <span className={styles.approachTextAccent}>사용자가 왜 이 화면에서 멈추고, 어디로 이동해야 하는지</span>
+            <span>를 생각합니다.</span>
+          </p>
+          <p>복잡한 구조를 단순한 흐름으로 정리하고, 그 흐름에 어울리는 시각적 무드를 더하며 디자인합니다.</p>
+        </div>
+        <div ref={processRef} className={styles.processFrame}>
+          <div className={styles.processTop}>
+            <div className={styles.processHeaderLeft}>
+              <div className={styles.processIcon} aria-hidden="true" />
+              <div className={styles.processHeaderText}>
+                <strong>1 Process Selected</strong>
+                <button
+                  type="button"
+                  className={styles.processOption}
+                  onClick={() => selectProcessCard((activeProcessIndex + 1) % processCards.length)}
+                >
+                  <span>{processCards[activeProcessIndex].label}</span>
+                  <img src={imgProcessChevron} alt="" />
+                </button>
+              </div>
+            </div>
+            <button type="button" className={styles.processCloseButton} aria-label="Close process preview">
+              <span />
+              <span />
+            </button>
+          </div>
 
-        <SplitText
-          className={styles.approachText}
-          isActive={visibleTextReady}
-          animationDelay={0.22}
-          stagger={0.008}
-          duration={0.52}
-          segments={[
-            { text: '저는 완성된 결과물보다 ' },
-            { text: '사용자가 왜 이 화면에서 멈추고, 어디로 이동해야 하는지', className: styles.approachTextAccent },
-            { text: '를 생각합니다.' },
-            { isBreak: true },
-            { text: '복잡한 구조를 단순한 흐름으로 정리하고, 그 흐름에 어울리는 시각적 무드를 더하며 디자인합니다.' },
-          ]}
-        />
+          <div className={styles.processViewport}>
+            <div
+              className={styles.processTrack}
+              style={{ '--process-index': activeProcessIndex }}
+            >
+              {processCards.map((card, index) => {
+                const isActive = index === activeProcessIndex;
+                const isPressed = index === pressedProcessIndex;
+
+                return (
+                  <button
+                    key={card.id}
+                    type="button"
+                    className={`${styles.processCard} ${isActive ? styles.processCardActive : ''} ${
+                      isPressed ? styles.processCardPressed : ''
+                    }`}
+                    onClick={() => selectProcessCard(index)}
+                    aria-label={`Show ${card.label}`}
+                  >
+                    <img src={card.image} alt="" className={card.imageClass} draggable={false} />
+                    <span className={styles.processCheckMark}>
+                      {isActive && <img src={imgProcessCheck} alt="" />}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </div>
 
       {draggingCard && (
@@ -1474,7 +1653,7 @@ function EssenceSection() {
       className={`${styles.panel} ${styles.essencePanel}`}
     >
       <div className={styles.essenceIntro}>
-        <ScrollFloatTitle title="Essence" active={3} align="left" />
+        <ScrollFloatTitle title="Essence" active={3} align="left" className={styles.essenceTitle} />
         <p>
           <span className={styles.essenceIntroBold}>
             그래서, 저는 <span className={styles.essenceIntroAccent}>어떤 디자이너</span>가 되고 싶은 걸까요?
@@ -1594,6 +1773,32 @@ function InvitationSection() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isVisible, isOpen]);
+
+  useEffect(() => {
+    const scrollRoot = document.querySelector('.appScroll');
+    if (!scrollRoot) return undefined;
+
+    const handleBottomWheel = (event) => {
+      const section = sectionRef.current;
+      if (!section || event.deltaY <= 0) return;
+
+      const rect = section.getBoundingClientRect();
+      const rootRect = scrollRoot.getBoundingClientRect();
+      const maxScrollTop = Math.max(0, scrollRoot.scrollHeight - scrollRoot.clientHeight);
+      const isInvitationAtEnd = rect.bottom <= rootRect.bottom + 2 && rect.top < rootRect.bottom;
+      const isScrollRootAtEnd = scrollRoot.scrollTop >= maxScrollTop - 2;
+
+      if (!isInvitationAtEnd && !isScrollRootAtEnd) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      requestAppScrollTo(maxScrollTop, 'auto');
+    };
+
+    scrollRoot.addEventListener('wheel', handleBottomWheel, { passive: false, capture: true });
+    return () => scrollRoot.removeEventListener('wheel', handleBottomWheel, { capture: true });
+  }, []);
 
   return (
     <section
