@@ -413,9 +413,6 @@
   top: 0;
   height: 100vh;
   min-height: 760px;
-  max-width: 1920px;
-  margin-right: auto;
-  margin-left: auto;
 }
 
 .characterCopy {
@@ -783,20 +780,20 @@
 }
 
 .designToolsCard {
-  left: 274px;
-  top: 67px;
+  left: max(274px, 14.27vw);
+  top: max(67px, 6.2vh);
   width: 532px;
 }
 
 .aiCard {
-  left: 1233px;
-  top: 414px;
+  left: max(1233px, 64.22vw);
+  top: max(414px, 38.33vh);
   width: 433px;
 }
 
 .certificateCard {
-  left: 1469px;
-  top: 90px;
+  left: max(1469px, 76.51vw);
+  top: max(90px, 8.33vh);
   width: 394px;
   padding: 30px;
 }
@@ -856,8 +853,8 @@
 }
 
 .profileCard {
-  left: 793px;
-  top: 255px;
+  left: max(793px, 41.3vw);
+  top: max(255px, 23.61vh);
   width: 335px;
   text-align: center;
 }
@@ -933,14 +930,14 @@
 }
 
 .schoolOne {
-  left: 1122px;
-  top: 134px;
+  left: max(1122px, 58.44vw);
+  top: max(134px, 12.41vh);
   width: 317px;
 }
 
 .schoolTwo {
-  left: 1032px;
-  top: 234px;
+  left: max(1032px, 53.75vw);
+  top: max(234px, 21.67vh);
   width: 352px;
 }
 

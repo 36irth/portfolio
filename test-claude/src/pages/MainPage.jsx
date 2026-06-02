@@ -1069,21 +1069,25 @@ function ApproachSection() {
         previousScrollTop = currentScrollTop;
 
         if (!isScrollingUp) return;
-        if (completedRef.current || !sectionRef.current) return;
+        if (!sectionRef.current) return;
 
         const rect = sectionRef.current.getBoundingClientRect();
         const isBackAtCardArea = rect.top > -420 && rect.top < window.innerHeight * 0.75;
         if (!isBackAtCardArea) return;
 
+        completedRef.current = false;
+        window.clearTimeout(processReleaseTimerRef.current);
+        processExitRef.current = false;
         if (!isApproachPinSuppressed()) {
           pinnedRef.current = true;
-          pinApproachView('lock');
         }
         setCollected([]);
         setDraggingCard(null);
         setFolderOpen(false);
         setTextReady(false);
         setFolderReady(true);
+        setActiveProcessIndex(0);
+        setPressedProcessIndex(0);
       });
     };
 
@@ -1380,7 +1384,9 @@ function ApproachSection() {
       }
 
       if (!pinnedRef.current) return;
-      pinApproachView('lock');
+      if (Math.abs(rect.top - rootRect.top) <= 4) {
+        pinApproachView('lock');
+      }
     };
 
     scrollRoot.addEventListener('wheel', handleWheel, { passive: false, capture: true });
@@ -1896,7 +1902,7 @@ function InvitationSection() {
         <img src={asset('profile.png')} alt="김채이 연락처 이미지" />
         <div className={styles.contactActions}>
           <button type="button" onClick={scrollToMainTop}>View Again</button>
-          <button type="button">Accept</button>
+          <button type="button" onClick={() => window.open('mailto:36irth@gmail.com')}>Accept</button>
         </div>
       </aside>
     </section>
