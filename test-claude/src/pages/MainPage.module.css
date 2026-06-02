@@ -233,6 +233,7 @@
   overflow: hidden;
   background: var(--bg);
   padding: 100px 150px;
+  box-sizing: border-box;
 }
 
 .sectionTitle {
@@ -411,6 +412,9 @@
   top: 0;
   height: 100vh;
   min-height: 760px;
+  max-width: 1920px;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .characterCopy {
@@ -1295,7 +1299,8 @@
 
 .approachPanel {
   min-height: 1080px;
-  margin-top: 160px;
+  max-width: 1920px;
+  margin: 160px auto 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1730,6 +1735,9 @@
   grid-template-columns: 617px 865px;
   align-items: start;
   gap: 138px;
+  max-width: 1920px;
+  margin-right: auto;
+  margin-left: auto;
   min-height: 2250px;
   padding-top: 398px;
   overflow: visible;
@@ -2184,6 +2192,44 @@
 
 }
 
+@media (min-width: 1501px) {
+  .approachPanel {
+    margin: 160px auto 0;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1500px) {
+  .page {
+    --desktop-medium-shift: clamp(120px, 10vw, 170px);
+  }
+
+  .characterCopy,
+  .awards {
+    left: calc(80px + var(--desktop-medium-shift));
+  }
+
+  .designToolsCard {
+    left: calc(160px + var(--desktop-medium-shift));
+  }
+
+  .approachSummaryImageLeft {
+    left: calc(216.5px + var(--desktop-medium-shift));
+  }
+
+  .approachSummaryImageTop {
+    left: calc(986.5px + var(--desktop-medium-shift));
+  }
+
+  .approachSummaryImageCenter {
+    left: calc(655.5px + var(--desktop-medium-shift));
+  }
+
+  .essenceIntro,
+  .questionList {
+    transform: translateX(var(--desktop-medium-shift));
+  }
+}
+
 @media (max-width: 1024px) {
   .sectionNavigation {
     right: 16px;
@@ -2329,9 +2375,65 @@
     transform: scale(1.03);
   }
 
+  .approachSummary {
+    left: 40px;
+    right: 40px;
+    width: auto;
+  }
+
+  .approachSummaryImageLeft {
+    left: 0;
+    width: min(48vw, 480px);
+    height: auto;
+    aspect-ratio: 662 / 361;
+  }
+
+  .approachSummaryImageTop {
+    left: auto;
+    right: 0;
+    width: min(50vw, 520px);
+    height: auto;
+    aspect-ratio: 717 / 195;
+  }
+
+  .approachSummaryImageCenter {
+    left: 50%;
+    width: min(56vw, 520px);
+    height: auto;
+    aspect-ratio: 662 / 227;
+    transform: translate3d(-50%, 54px, 0) scale(0.985);
+  }
+
+  .approachSummaryVisible .approachSummaryImageCenter {
+    transform: translate3d(-50%, 0, 0) scale(1);
+  }
+
+  .approachText {
+    width: min(100%, 820px);
+  }
+
   .questionList {
     height: auto;
     overflow: visible;
+  }
+
+  .essencePanel {
+    display: flex;
+    flex-direction: column;
+    gap: 88px;
+    min-height: auto;
+    padding-top: 96px;
+    overflow: visible;
+  }
+
+  .essenceIntro {
+    position: relative;
+    top: auto;
+    width: min(100%, 680px);
+  }
+
+  .questionList {
+    width: 100%;
   }
 
   .questionBubble,
@@ -2521,10 +2623,11 @@
   }
 
   .designToolsCard {
-    left: 65px;
+    left: 50%;
     top: 926px;
-    width: 299px;
+    width: min(299px, calc(100vw - 40px));
     border-radius: 11px;
+    transform: translateX(-50%);
   }
 
   .profileCard {
@@ -2565,18 +2668,19 @@
   }
 
   .aiCard {
-    left: 156px;
+    left: auto;
     right: auto;
     top: 1284px;
-    width: 243px;
+    right: 20px;
+    width: min(243px, calc(100vw - 40px));
     border-radius: 11px;
   }
 
   .certificateCard {
-    left: 114px;
-    right: auto;
+    left: auto;
+    right: 20px;
     top: 1674px;
-    width: 296px;
+    width: min(296px, calc(100vw - 40px));
     border-radius: 15px;
   }
 
@@ -2629,15 +2733,16 @@
   }
 
   .schoolOne {
-    left: 151px;
+    left: auto;
+    right: 20px;
     top: 347px;
-    width: 231px;
+    width: min(231px, calc(100vw - 40px));
   }
 
   .schoolTwo {
     left: 34px;
     top: 818px;
-    width: 252px;
+    width: min(252px, calc(100vw - 40px));
   }
 
   .highlightsPanel {
@@ -2664,7 +2769,8 @@
     display: flex;
     flex-direction: column;
     gap: 30px;
-    width: 390px;
+    width: 100%;
+    max-width: 390px;
   }
 
   .highlightsLargeList,
@@ -2719,10 +2825,12 @@
   }
 
   .approachPanel {
-    min-height: 1817px;
+    min-height: 1760px;
     gap: 70px;
     margin-top: 0;
     padding-top: 50px;
+    padding-left: 20px;
+    padding-right: 20px;
     overflow: hidden;
   }
 
@@ -2733,7 +2841,7 @@
 
   .approachCard {
     flex-direction: row;
-    width: 276px;
+    width: min(100%, 340px);
     min-height: 131px;
     padding: 20px 17px;
     border-radius: 18px;
@@ -2772,8 +2880,9 @@
   }
 
   .folderStage {
-    width: 240px;
-    height: 212px;
+    width: min(240px, 68vw);
+    height: auto;
+    aspect-ratio: 240 / 212;
   }
 
   .folderImageBack,
@@ -2809,7 +2918,10 @@
 
   .approachSummary {
     top: 1056px;
-    height: 761px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 704px;
     opacity: 1;
     transform: none;
   }
@@ -2824,22 +2936,32 @@
 
   .approachSummaryImageLeft {
     top: 210px;
-    width: 320px;
-    height: 175px;
+    left: 20px;
+    width: min(320px, calc(100% - 80px));
+    height: auto;
+    aspect-ratio: 662 / 361;
   }
 
   .approachSummaryImageTop {
-    left: 90px;
+    left: auto;
+    right: 20px;
     top: 353px;
-    width: 320px;
-    height: 109px;
+    width: min(320px, calc(100% - 80px));
+    height: auto;
+    aspect-ratio: 717 / 195;
   }
 
   .approachSummaryImageCenter {
-    left: 67px;
+    left: 50%;
     top: 453px;
-    width: 320px;
-    height: 87px;
+    width: min(320px, calc(100% - 80px));
+    height: auto;
+    aspect-ratio: 662 / 227;
+    transform: translateX(-50%);
+  }
+
+  .approachSummaryVisible .approachSummaryImageCenter {
+    transform: translateX(-50%);
   }
 
   .highlightSmallContent {
@@ -2889,8 +3011,8 @@
 
   .questionBubble {
     align-self: flex-end;
-    width: max-content;
-    max-width: 390px;
+    width: fit-content;
+    max-width: min(100%, 390px);
     min-height: 0;
     padding: 10px 15px;
     border-radius: 21px;
@@ -2900,7 +3022,7 @@
   }
 
   .answerBubble {
-    max-width: 365px;
+    max-width: min(100%, 365px);
     padding: 10px 15px;
     border-radius: 17px;
     font-size: 14px;

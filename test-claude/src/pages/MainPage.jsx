@@ -99,21 +99,21 @@ const highlightLargeProjects = [
 const highlightSmallProjects = [
   {
     image: imgHighlightsProject3,
-    eyebrow: '이거 뭔 프로젝트엿더라',
+    eyebrow: 'RE 프로젝트',
     title: '대학농구 홈커밍',
     buttons: ['pdf'],
     imageClass: styles.highlightProjectImageD,
   },
   {
     image: imgHighlightsProject4,
-    eyebrow: '이거 뭔 프로젝트엿더라 로고엿는데',
+    eyebrow: '로컬 브랜드 로고 리디자인',
     title: '카페유일',
     buttons: ['pdf'],
     imageClass: styles.highlightProjectImageE,
   },
   {
     image: imgHighlightsProject5,
-    eyebrow: '졸전이였음',
+    eyebrow: '웹디자인 졸업전시',
     title: '알렉산더맥퀸',
     buttons: ['Prototype'],
     imageClass: styles.highlightProjectImageF,
@@ -165,6 +165,7 @@ const questions = [
 
 const formatQuestion = (number, question) => question;
 const characterReturnProgress = 0.38;
+const isCompactViewport = () => window.matchMedia?.('(max-width: 680px)').matches ?? window.innerWidth <= 680;
 
 const scrollToMainTop = () => {
   window.__portfolioSuppressEssenceSnapUntil = Date.now() + 1400;
@@ -883,7 +884,15 @@ function ApproachSection() {
   const [folderReady, setFolderReady] = useState(false);
   const [folderOpen, setFolderOpen] = useState(false);
   const [textReady, setTextReady] = useState(false);
+  const [isCompact, setIsCompact] = useState(() => (typeof window === 'undefined' ? false : isCompactViewport()));
   const allCollected = collected.length === approachCards.length;
+
+  useEffect(() => {
+    const syncCompact = () => setIsCompact(isCompactViewport());
+    syncCompact();
+    window.addEventListener('resize', syncCompact);
+    return () => window.removeEventListener('resize', syncCompact);
+  }, []);
 
   const getApproachTop = () => {
     const node = sectionRef.current;
@@ -920,6 +929,7 @@ function ApproachSection() {
   }, [allCollected]);
 
   useEffect(() => {
+    if (isCompact) return undefined;
     const node = sectionRef.current;
     if (!node) return undefined;
     const scrollRoot = document.querySelector('.appScroll');
@@ -953,9 +963,10 @@ function ApproachSection() {
       window.clearTimeout(timeoutId);
       observer.disconnect();
     };
-  }, []);
+  }, [isCompact]);
 
   useEffect(() => {
+    if (isCompact) return undefined;
     const scrollRoot = document.querySelector('.appScroll');
     if (!scrollRoot) return undefined;
 
@@ -995,7 +1006,7 @@ function ApproachSection() {
       scrollRoot.removeEventListener('scroll', resetWhenReturningToCards);
       if (frame) window.cancelAnimationFrame(frame);
     };
-  }, []);
+  }, [isCompact]);
 
   useEffect(() => {
     if (!draggingCard) return undefined;
@@ -1073,6 +1084,7 @@ function ApproachSection() {
   }, [allCollected]);
 
   const handlePointerDown = (card) => (event) => {
+    if (isCompact) return;
     if (!folderReady) return;
     const [id, title, lines, image, imageClass] = card;
     if (collected.includes(id)) return;
@@ -1096,6 +1108,7 @@ function ApproachSection() {
   };
 
   useEffect(() => {
+    if (isCompact) return undefined;
     const scrollRoot = document.querySelector('.appScroll');
     if (!scrollRoot) return undefined;
     let lastScrollTop = scrollRoot.scrollTop;
@@ -1175,7 +1188,10 @@ function ApproachSection() {
       scrollRoot.removeEventListener('wheel', handleWheel, { capture: true });
       scrollRoot.removeEventListener('scroll', keepPinned);
     };
-  }, []);
+  }, [isCompact]);
+
+  const visibleFolderReady = isCompact || folderReady;
+  const visibleTextReady = isCompact || textReady;
 
   return (
     <section
@@ -1224,7 +1240,7 @@ function ApproachSection() {
 
       <div
         ref={folderRef}
-        className={`${styles.folderDrop} ${folderReady ? styles.folderDropVisible : ''} ${
+        className={`${styles.folderDrop} ${visibleFolderReady ? styles.folderDropVisible : ''} ${
           draggingCard ? styles.folderDropActive : ''
         } ${folderOpen ? styles.folderDropOpen : ''} ${
           draggingCard && folderOpen ? styles.folderDropHovering : ''
@@ -1244,14 +1260,14 @@ function ApproachSection() {
           파일을 드래그해서 폴더 안에 넣어주세요!
         </p>
       </div>
-      <div ref={summaryRef} className={`${styles.approachSummary} ${textReady ? styles.approachSummaryVisible : ''}`}>
+      <div ref={summaryRef} className={`${styles.approachSummary} ${visibleTextReady ? styles.approachSummaryVisible : ''}`}>
         <img src={imgApproachSummaryLeft} alt="" className={styles.approachSummaryImageLeft} />
         <img src={imgApproachSummaryTop} alt="" className={styles.approachSummaryImageTop} />
         <img src={imgApproachSummaryCenter} alt="" className={styles.approachSummaryImageCenter} />
 
         <SplitText
           className={styles.approachText}
-          isActive={textReady}
+          isActive={visibleTextReady}
           animationDelay={0.22}
           stagger={0.008}
           duration={0.52}
@@ -1420,6 +1436,7 @@ function EssenceSection() {
   };
 
   useEffect(() => {
+    if (isCompactViewport()) return undefined;
     const scrollRoot = document.querySelector('.appScroll');
     if (!scrollRoot) return undefined;
 
