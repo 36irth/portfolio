@@ -536,6 +536,24 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
   const awardsDismissed = dismissedAwards.size >= cleanAwards.length;
   const allWindowsDismissed = dismissedWindows.size >= characterWindowIds.length - 1 && awardsDismissed;
 
+  const clampDragOffset = (dragState, deltaX, deltaY) => {
+    const nextX = dragState.baseX + deltaX;
+    const nextY = dragState.baseY + deltaY;
+    if (!dragState.startRect || !dragState.bounds) {
+      return { x: nextX, y: nextY };
+    }
+
+    const minX = dragState.baseX + dragState.bounds.left - dragState.startRect.left;
+    const maxX = dragState.baseX + dragState.bounds.right - dragState.startRect.right;
+    const minY = dragState.baseY + dragState.bounds.top - dragState.startRect.top;
+    const maxY = dragState.baseY + dragState.bounds.bottom - dragState.startRect.bottom;
+
+    return {
+      x: minX <= maxX ? Math.max(minX, Math.min(maxX, nextX)) : nextX,
+      y: minY <= maxY ? Math.max(minY, Math.min(maxY, nextY)) : nextY,
+    };
+  };
+
   useEffect(() => {
     if (!isActive || scrollProgress < 0.14 || scrollProgress > 0.9) {
       setDismissedWindows(new Set());
@@ -571,21 +589,23 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
       }
 
       if (dragState.type === 'award') {
+        const next = clampDragOffset(dragState, deltaX, deltaY);
         setAwardOffsets((prev) => ({
           ...prev,
           [dragState.id]: {
-            x: dragState.baseX + deltaX,
-            y: dragState.baseY + deltaY,
+            x: next.x,
+            y: next.y,
           },
         }));
         return;
       }
 
+      const next = clampDragOffset(dragState, deltaX, deltaY);
       setWindowOffsets((prev) => ({
         ...prev,
         [dragState.id]: {
-          x: dragState.baseX + deltaX,
-          y: dragState.baseY + deltaY,
+          x: next.x,
+          y: next.y,
         },
       }));
     };
@@ -641,6 +661,13 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
       startY: event.clientY,
       baseX: windowOffsets[id]?.x ?? 0,
       baseY: windowOffsets[id]?.y ?? 0,
+      startRect: event.currentTarget.getBoundingClientRect(),
+      bounds: {
+        left: 24,
+        top: 24,
+        right: window.innerWidth - 24,
+        bottom: window.innerHeight - 24,
+      },
       moved: false,
     };
     setDraggingWindowId(id);
@@ -657,6 +684,13 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
       startY: event.clientY,
       baseX: awardOffsets[awardKey]?.x ?? 0,
       baseY: awardOffsets[awardKey]?.y ?? 0,
+      startRect: event.currentTarget.getBoundingClientRect(),
+      bounds: {
+        left: 24,
+        top: 24,
+        right: window.innerWidth - 24,
+        bottom: window.innerHeight - 24,
+      },
       moved: false,
     };
     setDraggingAwardKey(awardKey);
@@ -1035,13 +1069,12 @@ function ApproachSection() {
         previousScrollTop = currentScrollTop;
 
         if (!isScrollingUp) return;
-        if (!completedRef.current || !sectionRef.current) return;
+        if (completedRef.current || !sectionRef.current) return;
 
         const rect = sectionRef.current.getBoundingClientRect();
         const isBackAtCardArea = rect.top > -420 && rect.top < window.innerHeight * 0.75;
         if (!isBackAtCardArea) return;
 
-        completedRef.current = false;
         if (!isApproachPinSuppressed()) {
           pinnedRef.current = true;
           pinApproachView('lock');
