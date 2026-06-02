@@ -1078,9 +1078,6 @@ function ApproachSection() {
         completedRef.current = false;
         window.clearTimeout(processReleaseTimerRef.current);
         processExitRef.current = false;
-        if (!isApproachPinSuppressed()) {
-          pinnedRef.current = true;
-        }
         setCollected([]);
         setDraggingCard(null);
         setFolderOpen(false);
@@ -1384,9 +1381,7 @@ function ApproachSection() {
       }
 
       if (!pinnedRef.current) return;
-      if (Math.abs(rect.top - rootRect.top) <= 4) {
-        pinApproachView('lock');
-      }
+      pinApproachView('lock');
     };
 
     scrollRoot.addEventListener('wheel', handleWheel, { passive: false, capture: true });

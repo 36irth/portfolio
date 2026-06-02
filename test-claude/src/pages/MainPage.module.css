@@ -1109,7 +1109,7 @@
   left: -1px;
   bottom: -1px;
   width: 411px;
-  height: 52px;
+  height: 100%;
   background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(11px);
   -webkit-mask-image: linear-gradient(to top, #000 0%, #000 72%, transparent 100%);
@@ -2706,7 +2706,7 @@
 
   .highlightSmallBlur {
     width: calc(100% + 2px);
-    height: 33.34%;
+    height: 100%;
   }
 
   .highlightsRightList,
