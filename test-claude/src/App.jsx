@@ -121,9 +121,12 @@ function App() {
     const scrollTo = (top, behavior = 'auto') => {
       const lenis = lenisRef.current;
       if (lenis) {
-        lenis.scrollTo(top, { immediate: behavior !== 'smooth' });
+        lenis.scrollTo(top, {
+          immediate: behavior !== 'smooth' && behavior !== 'slow',
+          duration: behavior === 'slow' ? 2.6 : undefined,
+        });
       } else {
-        container.scrollTo({ top, behavior });
+        container.scrollTo({ top, behavior: behavior === 'slow' ? 'smooth' : behavior });
       }
       pendingScrollTopRef.current = top;
       setScrollTop(top);

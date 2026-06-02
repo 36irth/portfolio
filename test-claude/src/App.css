@@ -29,6 +29,7 @@ html.lenis body {
   height: 100%;
   overflow-x: hidden;
   overscroll-behavior: none;
+  scrollbar-gutter: stable;
   scroll-behavior: smooth;
   background: #0d0d0d;
 }

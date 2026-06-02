@@ -28,6 +28,9 @@ const imgProcessLean = asset('process-lean.png');
 const imgProcessFlow = asset('process-flow.png');
 const imgProcessChevron = asset('chevron-right.svg');
 const imgProcessCheck = asset('process-check.svg');
+const imgProcessIconIa = asset('process-icon-ia.png');
+const imgProcessIconLean = asset('process-icon-lean.png');
+const imgProcessIconFlow = asset('process-icon-flow.png');
 
 const imgAward = 'https://www.figma.com/api/mcp/asset/e2707fcb-a858-4bcc-b38c-1dbf37f21cfb';
 const imgCertificateIcon = 'https://www.figma.com/api/mcp/asset/59f0f208-8f4d-4ace-8131-785b76c7cda8';
@@ -223,18 +226,21 @@ const processCards = [
     id: 'ia',
     label: 'IA Structural Design',
     image: imgProcessIa,
+    icon: imgProcessIconIa,
     imageClass: styles.processCardImageIa,
   },
   {
     id: 'lean',
     label: 'Lean Canvas',
     image: imgProcessLean,
+    icon: imgProcessIconLean,
     imageClass: styles.processCardImageLean,
   },
   {
     id: 'flow',
     label: 'User Flow',
     image: imgProcessFlow,
+    icon: imgProcessIconFlow,
     imageClass: styles.processCardImageFlow,
   },
 ];
@@ -906,6 +912,7 @@ function ApproachSection() {
   const pinnedRef = useRef(false);
   const settlingRef = useRef(false);
   const processSnapLockRef = useRef(false);
+  const processExitRef = useRef(false);
   const approachPinTimerRef = useRef(0);
   const processReleaseTimerRef = useRef(0);
   const [collected, setCollected] = useState([]);
@@ -993,6 +1000,7 @@ function ApproachSection() {
         if (completedRef.current) return;
         releaseApproachPin();
         window.clearTimeout(processReleaseTimerRef.current);
+        processExitRef.current = false;
         requestAppScrollLock(false);
         setFolderReady(false);
         setFolderOpen(false);
@@ -1100,6 +1108,7 @@ function ApproachSection() {
       setTextReady(false);
       setActiveProcessIndex(0);
       setPressedProcessIndex(0);
+      processExitRef.current = false;
       return undefined;
     }
     pinnedRef.current = false;
@@ -1111,7 +1120,7 @@ function ApproachSection() {
     const scrollTimer = window.setTimeout(() => {
       const targetTop = getProcessPinnedTop();
       if (targetTop == null) return;
-      requestAppScrollTo(targetTop, 'smooth');
+      requestAppScrollTo(targetTop, 'slow');
     }, 220);
     const revealTimer = window.setTimeout(() => {
       setTextReady(true);
@@ -1135,11 +1144,14 @@ function ApproachSection() {
     });
   };
 
-  const releaseProcessLockSoon = (delay = 620) => {
+  const settleProcessSnapSoon = (delay = 620) => {
     window.clearTimeout(processReleaseTimerRef.current);
     processReleaseTimerRef.current = window.setTimeout(() => {
       processSnapLockRef.current = false;
-      requestAppScrollLock(false);
+      const targetTop = getProcessPinnedTop();
+      if (targetTop != null) {
+        requestAppScrollLock(true, targetTop);
+      }
     }, delay);
   };
 
@@ -1173,23 +1185,39 @@ function ApproachSection() {
       const nextIndex = activeProcessIndex + direction;
       const targetTop = getProcessPinnedTop();
 
-      if (nextIndex < 0) return;
+      if (nextIndex < 0) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        processSnapLockRef.current = false;
+        processExitRef.current = false;
+        window.clearTimeout(processReleaseTimerRef.current);
+        requestAppScrollLock(false);
+        const sectionTop = getApproachTop();
+        if (sectionTop != null) {
+          requestAppScrollTo(Math.max(0, sectionTop), 'slow');
+        }
+        return;
+      }
 
       if (nextIndex >= processCards.length) {
         event.preventDefault();
         event.stopPropagation();
         event.stopImmediatePropagation();
+        if (processExitRef.current) return;
         if (targetTop != null) {
           requestAppScrollLock(true, targetTop);
         }
         if (processSnapLockRef.current) return;
         processSnapLockRef.current = true;
+        processExitRef.current = true;
         window.clearTimeout(processReleaseTimerRef.current);
         processReleaseTimerRef.current = window.setTimeout(() => {
           const root = document.querySelector('.appScroll');
           const essence = document.querySelector('[data-section="essence"]');
           if (!root || !essence) {
             processSnapLockRef.current = false;
+            processExitRef.current = false;
             requestAppScrollLock(false);
             return;
           }
@@ -1197,11 +1225,14 @@ function ApproachSection() {
           const rect = essence.getBoundingClientRect();
           const rootRect = root.getBoundingClientRect();
           const top = root.scrollTop + rect.top - rootRect.top;
-          processSnapLockRef.current = false;
           requestAppScrollLock(false);
-          window.__portfolioSuppressEssenceSnapUntil = Date.now() + 650;
-          requestAppScrollTo(top, 'smooth');
-        }, 360);
+          window.__portfolioSuppressEssenceSnapUntil = Date.now() + 3200;
+          requestAppScrollTo(top, 'slow');
+          window.setTimeout(() => {
+            processSnapLockRef.current = false;
+            processExitRef.current = false;
+          }, 3200);
+        }, 620);
         return;
       }
 
@@ -1214,7 +1245,7 @@ function ApproachSection() {
       if (processSnapLockRef.current) return;
       processSnapLockRef.current = true;
       selectProcessCard(nextIndex);
-      releaseProcessLockSoon(620);
+      settleProcessSnapSoon(620);
     };
 
     scrollRoot.addEventListener('wheel', handleProcessWheel, { passive: false, capture: true });
@@ -1410,7 +1441,9 @@ function ApproachSection() {
         <div ref={processRef} className={styles.processFrame}>
           <div className={styles.processTop}>
             <div className={styles.processHeaderLeft}>
-              <div className={styles.processIcon} aria-hidden="true" />
+              <div className={styles.processIcon} aria-hidden="true">
+                <img key={processCards[activeProcessIndex].id} src={processCards[activeProcessIndex].icon} alt="" />
+              </div>
               <div className={styles.processHeaderText}>
                 <strong>1 Process Selected</strong>
                 <button
