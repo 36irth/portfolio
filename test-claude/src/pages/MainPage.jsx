@@ -2041,7 +2041,10 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
         <button
           type="button"
           className={`${styles.windowResetButton} ${activeSection === 'character' ? styles.windowResetButtonVisible : ''}`}
-          onClick={() => setCharacterResetSignal((prev) => prev + 1)}
+          onClick={() => {
+            setCharacterResetSignal((prev) => prev + 1);
+            requestAppScrollTo(window.innerHeight * 3.2 * characterReturnProgress, 'smooth');
+          }}
           aria-label="창 초기화"
           title="창 초기화"
         >
