@@ -947,6 +947,7 @@ function ApproachSection() {
   const settlingRef = useRef(false);
   const processSnapLockRef = useRef(false);
   const processExitRef = useRef(false);
+  const processWheelActiveRef = useRef(false);
   const approachPinTimerRef = useRef(0);
   const processReleaseTimerRef = useRef(0);
   const [collected, setCollected] = useState([]);
@@ -1076,6 +1077,7 @@ function ApproachSection() {
         if (!isBackAtCardArea) return;
 
         completedRef.current = false;
+        processWheelActiveRef.current = false;
         window.clearTimeout(processReleaseTimerRef.current);
         processExitRef.current = false;
         setCollected([]);
@@ -1139,6 +1141,7 @@ function ApproachSection() {
 
   useEffect(() => {
     if (!allCollected) {
+      processWheelActiveRef.current = false;
       setTextReady(false);
       setActiveProcessIndex(0);
       setPressedProcessIndex(0);
@@ -1157,6 +1160,7 @@ function ApproachSection() {
       requestAppScrollTo(targetTop, 'slow');
     }, 220);
     const revealTimer = window.setTimeout(() => {
+      processWheelActiveRef.current = true;
       setTextReady(true);
     }, 620);
 
@@ -1201,6 +1205,7 @@ function ApproachSection() {
     if (!scrollRoot) return undefined;
 
     const handleProcessWheel = (event) => {
+      if (!processWheelActiveRef.current) return;
       const processNode = processRef.current;
       if (!processNode || Math.abs(event.deltaY) < 1) return;
 
@@ -1245,6 +1250,7 @@ function ApproachSection() {
         if (processSnapLockRef.current) return;
         processSnapLockRef.current = true;
         processExitRef.current = true;
+        processWheelActiveRef.current = false;
         window.clearTimeout(processReleaseTimerRef.current);
         processReleaseTimerRef.current = window.setTimeout(() => {
           const root = document.querySelector('.appScroll');
