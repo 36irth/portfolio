@@ -66,6 +66,56 @@
   outline: none;
 }
 
+.characterResetButton {
+  position: fixed;
+  left: calc(50% + 72px);
+  bottom: 28px;
+  z-index: 116;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(1, 136, 251, 0.75);
+  border-radius: 50%;
+  background: rgba(13, 13, 13, 0.72);
+  color: #0188fb;
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px) scale(0.9);
+  transition:
+    opacity 0.24s ease,
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.24s ease,
+    border-color 0.24s ease,
+    color 0.24s ease;
+}
+
+.characterResetButton span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.characterResetButtonVisible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.characterResetButton:hover,
+.characterResetButton:focus-visible {
+  border-color: #ccff93;
+  background: rgba(204, 255, 147, 0.16);
+  color: #ccff93;
+  outline: none;
+}
+
 .sectionNavigationButton {
   width: 44px;
   height: 44px;
@@ -173,23 +223,37 @@
   right: 36px;
   bottom: 30px;
   z-index: 120;
-  width: 58px;
-  height: 58px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
-  font-family: helvetica-lt-pro, Helvetica, Arial, sans-serif;
-  font-size: 16px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 62px;
+  height: 62px;
+  border: 0;
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--blue);
+  font-family: 'Nohemi', helvetica-lt-pro, Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 500;
   line-height: 1;
   opacity: 0;
   pointer-events: none;
-  backdrop-filter: blur(12px);
+  box-shadow: 0 0 24px rgba(1, 136, 251, 0.12);
   transform: translateY(12px);
   transition:
     opacity 0.24s ease,
     transform 0.24s ease,
     background-color 0.24s ease;
+}
+
+.topButton::before {
+  content: '';
+  width: 12px;
+  height: 6px;
+  background: currentColor;
+  clip-path: polygon(50% 0, 100% 100%, 82% 100%, 50% 36%, 18% 100%, 0 100%);
 }
 
 .topButtonVisible {
@@ -200,7 +264,7 @@
 
 .topButton:hover,
 .topButton:focus-visible {
-  background: rgba(1, 136, 251, 0.26);
+  background: #f4fbff;
   outline: none;
 }
 
@@ -413,6 +477,7 @@
   top: 0;
   height: 100vh;
   min-height: 760px;
+  isolation: isolate;
 }
 
 .characterCopy {
@@ -513,14 +578,14 @@
 .characterInteractionHint {
   position: fixed;
   left: 50%;
-  bottom: 88px;
-  z-index: 110;
-  display: inline-flex;
-  align-items: center;
+  bottom: 78px;
+  z-index: 118;
+  width: 720px;
+  height: 220px;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transform: translateX(-50%) translateY(8px);
+  transform: translateX(-50%) translateY(10px);
   transition:
     opacity 0.24s ease,
     transform 0.24s ease,
@@ -533,23 +598,179 @@
   transform: translateX(-50%) translateY(0);
 }
 
-.characterInteractionHint span {
+.cozymarkBubble {
+  position: absolute;
   display: inline-flex;
   align-items: center;
-  min-height: 30px;
-  padding: 8px 15px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 15px;
+  border: 1px solid #ccff93;
   border-radius: 999px;
-  background: rgba(21, 24, 28, 0.74);
-  color: rgba(255, 255, 255, 0.88);
+  background: rgba(204, 255, 147, 0.35);
+  color: #cdff95;
   font-family: 'Suit', helvetica-lt-pro, Helvetica, Arial, sans-serif;
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 600;
-  line-height: 1;
+  line-height: 1.1;
+  white-space: nowrap;
   box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.18),
-    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
-  backdrop-filter: blur(10px);
+    0 0 24px rgba(204, 255, 147, 0.18),
+    0 0 0 1px rgba(204, 255, 147, 0.08) inset;
+  backdrop-filter: blur(8px);
+}
+
+.cozymarkBubbleDrag {
+  left: 54px;
+  top: 70px;
+  animation: cozymarkFloat 2.8s ease-in-out infinite;
+}
+
+.cozymarkBubbleReset {
+  left: 246px;
+  top: 144px;
+  font-weight: 700;
+  animation: cozymarkFloat 2.8s ease-in-out 0.18s infinite;
+}
+
+.cozymarkConnector {
+  position: absolute;
+  display: block;
+  height: 1px;
+  transform-origin: left center;
+  background: linear-gradient(90deg, rgba(204, 255, 147, 0), rgba(204, 255, 147, 0.95));
+  box-shadow: 0 0 12px rgba(204, 255, 147, 0.42);
+  opacity: 0.9;
+}
+
+.cozymarkConnector::after {
+  content: '';
+  position: absolute;
+  right: -3px;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ccff93;
+  box-shadow: 0 0 14px rgba(204, 255, 147, 0.8);
+}
+
+.cozymarkConnectorClick {
+  left: 512px;
+  top: 91px;
+  width: 150px;
+  transform: rotate(-26deg) scaleX(0);
+  animation: cozymarkLineDraw 2.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.cozymarkConnectorReset {
+  left: 520px;
+  top: 183px;
+  width: 92px;
+  transform: rotate(24deg) scaleX(0);
+  animation: cozymarkLineDraw 2.2s cubic-bezier(0.22, 1, 0.36, 1) 0.34s infinite;
+}
+
+.cozymarkClickMark {
+  position: absolute;
+  left: 644px;
+  top: 20px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, rgba(204, 255, 147, 0.95) 0 8px, transparent 9px),
+    radial-gradient(circle at center, rgba(204, 255, 147, 0.38) 0 19px, transparent 20px),
+    radial-gradient(circle at center, rgba(204, 255, 147, 0.22) 0 31px, transparent 32px);
+  box-shadow:
+    0 0 20px rgba(204, 255, 147, 0.58),
+    0 0 0 0 rgba(204, 255, 147, 0.5);
+  animation: cozymarkClickPulse 1.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes cozymarkFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes cozymarkLineDraw {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--line-rotate, 0deg)) scaleX(0);
+  }
+
+  22%,
+  72% {
+    opacity: 0.95;
+    transform: rotate(var(--line-rotate, 0deg)) scaleX(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: rotate(var(--line-rotate, 0deg)) scaleX(1);
+  }
+}
+
+.cozymarkConnectorClick {
+  --line-rotate: -26deg;
+}
+
+.cozymarkConnectorReset {
+  --line-rotate: 24deg;
+}
+
+@keyframes cozymarkClickPulse {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.72;
+    box-shadow:
+      0 0 20px rgba(204, 255, 147, 0.52),
+      0 0 0 0 rgba(204, 255, 147, 0.48);
+  }
+
+  50% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow:
+      0 0 26px rgba(204, 255, 147, 0.72),
+      0 0 0 12px rgba(204, 255, 147, 0.12);
+  }
+
+  100% {
+    transform: scale(0.92);
+    opacity: 0.72;
+    box-shadow:
+      0 0 20px rgba(204, 255, 147, 0.52),
+      0 0 0 0 rgba(204, 255, 147, 0);
+  }
+}
+
+.characterGuideActive .characterCopy {
+  opacity: 0.42;
+  filter: blur(3.5px);
+}
+
+.characterGuideActive .characterPanel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(19px);
+}
+
+.characterGuideActive .glassCard,
+.characterGuideActive .chatBubble,
+.characterGuideActive .awards {
+  z-index: 6;
+  filter: drop-shadow(0 0 33px rgba(1, 136, 251, 0.7));
 }
 
 .awards {
@@ -2546,6 +2767,65 @@
   }
 }
 
+@media (min-width: 1921px) {
+  .characterCopy {
+    left: 150px;
+    top: 100px;
+    transform: scale(var(--character-stage-scale, 1));
+    transform-origin: top left;
+  }
+
+  .awards {
+    left: 150px;
+    bottom: 100px;
+  }
+
+  .designToolsCard {
+    left: 274px;
+    top: 67px;
+  }
+
+  .profileCard {
+    left: 793px;
+    top: 255px;
+  }
+
+  .aiCard {
+    left: 1233px;
+    top: 414px;
+  }
+
+  .certificateCard {
+    left: 1469px;
+    top: 90px;
+  }
+
+  .schoolOne {
+    left: 1122px;
+    top: 134px;
+  }
+
+  .schoolTwo {
+    left: 1032px;
+    top: 234px;
+  }
+
+  .characterFloat {
+    transform: translate3d(var(--drag-x, 0px), calc(42px + var(--drag-y, 0px)), 0)
+      scale(var(--character-stage-enter-scale, 1));
+  }
+
+  .characterFloatVisible {
+    transform: translate3d(var(--drag-x, 0px), var(--drag-y, 0px), 0)
+      scale(var(--character-stage-scale, 1));
+  }
+
+  .characterFloatDismissed {
+    transform: translate3d(var(--drag-x, 0px), calc(var(--drag-y, 0px) - 8px), 0)
+      scale(var(--character-stage-dismiss-scale, 0.82));
+  }
+}
+
 @media (min-width: 1025px) and (max-width: 1500px) {
   .page {
     --desktop-medium-shift: clamp(120px, 10vw, 170px);
@@ -3563,5 +3843,74 @@
 
   .contactActions button {
     height: 64px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .characterCopy {
+    left: 150px;
+    top: 100px;
+    transform: scale(var(--character-stage-scale, 1));
+    transform-origin: top left;
+  }
+
+  .awards {
+    left: 150px;
+    bottom: 100px;
+  }
+
+  .designToolsCard {
+    left: 274px;
+    top: 67px;
+  }
+
+  .profileCard {
+    left: 793px;
+    top: 255px;
+  }
+
+  .aiCard {
+    left: 1233px;
+    right: auto;
+    top: 414px;
+  }
+
+  .certificateCard {
+    left: 1469px;
+    right: auto;
+    top: 90px;
+  }
+
+  .schoolOne {
+    left: 1122px;
+    right: auto;
+    top: 134px;
+  }
+
+  .schoolTwo {
+    left: 1032px;
+    right: auto;
+    top: 234px;
+  }
+
+  .characterFloat,
+  .profileCard.characterFloat {
+    transform: translate3d(var(--drag-x, 0px), calc(42px + var(--drag-y, 0px)), 0)
+      scale(var(--character-stage-enter-scale, 1));
+    transform-origin: top left;
+  }
+
+  .characterFloatVisible,
+  .profileCard.characterFloatVisible {
+    transform: translate3d(var(--drag-x, 0px), var(--drag-y, 0px), 0)
+      scale(var(--character-stage-scale, 1));
+    transform-origin: top left;
+  }
+
+  .characterFloatDismissed,
+  .profileCard.characterFloatDismissed {
+    transform: translate3d(var(--drag-x, 0px), calc(var(--drag-y, 0px) - 8px), 0)
+      scale(var(--character-stage-dismiss-scale, 0.82));
+    transform-origin: top left;
   }
 }

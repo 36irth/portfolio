@@ -521,6 +521,7 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
   const internalSectionRef = useRef(null);
   const resolvedSectionRef = sectionRef ?? internalSectionRef;
   const copyReady = isActive;
+  const [stageScale, setStageScale] = useState(1);
   const initialOffsets = useMemo(
     () => Object.fromEntries(characterWindowIds.map((id) => [id, { x: 0, y: 0 }])),
     [],
@@ -539,6 +540,31 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
   const awardsDismissed = dismissedAwards.size >= cleanAwards.length;
   const allWindowsDismissed = dismissedWindows.size >= characterWindowIds.length - 1 && awardsDismissed;
 
+  useEffect(() => {
+    const syncStageScale = () => {
+      if (window.innerWidth <= 1024) {
+        setStageScale(1);
+        return;
+      }
+
+      const widthScale = window.innerWidth / 1920;
+      const heightScale = window.innerHeight / 1080;
+      setStageScale(Math.max(0.7, Math.min(widthScale, heightScale, 1.5)));
+    };
+
+    syncStageScale();
+    window.addEventListener('resize', syncStageScale);
+    return () => window.removeEventListener('resize', syncStageScale);
+  }, []);
+
+  useEffect(() => {
+    setWindowOffsets(initialOffsets);
+    setAwardOffsets(initialAwardOffsets);
+    setDraggingWindowId('');
+    setDraggingAwardKey('');
+    dragWindowRef.current = null;
+  }, [initialAwardOffsets, initialOffsets, stageScale]);
+
   const clampDragOffset = (dragState, deltaX, deltaY) => {
     const nextX = dragState.baseX + deltaX;
     const nextY = dragState.baseY + deltaY;
@@ -546,10 +572,11 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
       return { x: nextX, y: nextY };
     }
 
-    const minX = dragState.baseX + dragState.bounds.left - dragState.startRect.left;
-    const maxX = dragState.baseX + dragState.bounds.right - dragState.startRect.right;
-    const minY = dragState.baseY + dragState.bounds.top - dragState.startRect.top;
-    const maxY = dragState.baseY + dragState.bounds.bottom - dragState.startRect.bottom;
+    const scale = dragState.scale || 1;
+    const minX = dragState.baseX + (dragState.bounds.left - dragState.startRect.left) / scale;
+    const maxX = dragState.baseX + (dragState.bounds.right - dragState.startRect.right) / scale;
+    const minY = dragState.baseY + (dragState.bounds.top - dragState.startRect.top) / scale;
+    const maxY = dragState.baseY + (dragState.bounds.bottom - dragState.startRect.bottom) / scale;
 
     return {
       x: minX <= maxX ? Math.max(minX, Math.min(maxX, nextX)) : nextX,
@@ -585,9 +612,11 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
       const dragState = dragWindowRef.current;
       if (!dragState) return;
 
-      const deltaX = event.clientX - dragState.startX;
-      const deltaY = event.clientY - dragState.startY;
-      if (Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4) {
+      const pointerDeltaX = event.clientX - dragState.startX;
+      const pointerDeltaY = event.clientY - dragState.startY;
+      const deltaX = pointerDeltaX / (dragState.scale || 1);
+      const deltaY = pointerDeltaY / (dragState.scale || 1);
+      if (Math.abs(pointerDeltaX) > 4 || Math.abs(pointerDeltaY) > 4) {
         dragState.moved = true;
       }
 
@@ -665,6 +694,7 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
       baseX: windowOffsets[id]?.x ?? 0,
       baseY: windowOffsets[id]?.y ?? 0,
       startRect: event.currentTarget.getBoundingClientRect(),
+      scale: stageScale,
       bounds: {
         left: 24,
         top: 24,
@@ -688,6 +718,7 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
       baseX: awardOffsets[awardKey]?.x ?? 0,
       baseY: awardOffsets[awardKey]?.y ?? 0,
       startRect: event.currentTarget.getBoundingClientRect(),
+      scale: stageScale,
       bounds: {
         left: 24,
         top: 24,
@@ -726,7 +757,14 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
       className={styles.characterScrollSection}
       onWheel={handleCharacterWheel}
     >
-      <div className={`${styles.panel} ${styles.characterPanel}`}>
+      <div
+        className={`${styles.panel} ${styles.characterPanel}`}
+        style={{
+          '--character-stage-scale': stageScale,
+          '--character-stage-enter-scale': stageScale * 0.97,
+          '--character-stage-dismiss-scale': stageScale * 0.82,
+        }}
+      >
         <div className={`${styles.characterCopy} ${copyReady ? styles.characterCopyReady : ''}`}>
           <CharacterTitle isActive={isActive} />
           <p>
@@ -1870,7 +1908,6 @@ function InvitationSection() {
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation();
-      requestAppScrollTo(maxScrollTop, 'auto');
     };
 
     scrollRoot.addEventListener('wheel', handleBottomWheel, { passive: false, capture: true });
@@ -2024,7 +2061,7 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
   }, [activeSection, isActive]);
 
   return (
-    <main className={styles.page}>
+    <main className={`${styles.page} ${showCharacterInteractionHint ? styles.characterGuideActive : ''}`}>
       <nav className={styles.sectionNavigation} aria-label="Section navigation">
         <div className={styles.sectionNavigationList}>
           {sectionEntries.map((entry) => (
@@ -2041,18 +2078,6 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
             </button>
           ))}
         </div>
-        <button
-          type="button"
-          className={`${styles.windowResetButton} ${activeSection === 'character' ? styles.windowResetButtonVisible : ''}`}
-          onClick={() => {
-            setCharacterResetSignal((prev) => prev + 1);
-            requestAppScrollTo(window.innerHeight * 3.2 * characterReturnProgress, 'smooth');
-          }}
-          aria-label="창 초기화"
-          title="창 초기화"
-        >
-          ↺
-        </button>
       </nav>
       <div
         className={`${styles.scrollDownHint} ${
@@ -2069,8 +2094,30 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
         }`}
         aria-hidden="true"
       >
-        <span>창은 드래그해서 옮기고, 클릭하면 닫을 수 있어요</span>
+        <span className={`${styles.cozymarkBubble} ${styles.cozymarkBubbleDrag}`}>
+          창을 드래그해서 이동하고 클릭해서 닫을 수 있어요!
+        </span>
+        <span className={styles.cozymarkClickMark} />
+        <span className={`${styles.cozymarkConnector} ${styles.cozymarkConnectorClick}`} />
+        <span className={`${styles.cozymarkBubble} ${styles.cozymarkBubbleReset}`}>
+          리셋 버튼을 누르면 창들이 다시 나타나요.
+        </span>
+        <span className={`${styles.cozymarkConnector} ${styles.cozymarkConnectorReset}`} />
       </div>
+      <button
+        type="button"
+        className={`${styles.characterResetButton} ${
+          activeSection === 'character' ? styles.characterResetButtonVisible : ''
+        }`}
+        onClick={() => {
+          setCharacterResetSignal((prev) => prev + 1);
+          requestAppScrollTo(window.innerHeight * 3.2 * characterReturnProgress, 'smooth');
+        }}
+        aria-label="창 초기화"
+        title="창 초기화"
+      >
+        <span aria-hidden="true">↺</span>
+      </button>
       <button
         type="button"
         className={`${styles.topButton} ${showTopButton ? styles.topButtonVisible : ''}`}
