@@ -13,14 +13,14 @@ const imgHighlightsProject4 = asset('project-5.png');
 const imgHighlightsProject5 = asset('project-6.png');
 const imgHighlightsArrow = asset('highlight-arrow.svg');
 
-const imgApproachObserve = 'https://www.figma.com/api/mcp/asset/1a3b138a-4381-4877-8aec-251314aeb84b';
-const imgApproachOrganize = 'https://www.figma.com/api/mcp/asset/ebc34bbf-f772-49dc-99f6-65425e915f67';
-const imgApproachVisualize = 'https://www.figma.com/api/mcp/asset/b6921018-ba90-43b5-9514-c561ab8323f4';
-const imgApproachFolder = 'https://www.figma.com/api/mcp/asset/4a631a50-94c8-44c8-935a-5d6ca915ff01';
-const imgApproachDrag = 'https://www.figma.com/api/mcp/asset/b9803712-340d-46d5-a156-86f68a82e175';
+const imgApproachObserve = asset('approach-observe.png');
+const imgApproachOrganize = asset('approach-organize.png');
+const imgApproachVisualize = asset('approach-visualize.png');
+const imgApproachFolder = asset('folder.png');
+const imgApproachDrag = asset('drag-icon.svg');
 const imgApproachSummaryTop = asset('approach-image55.png');
-const imgApproachSummaryLeft = 'https://www.figma.com/api/mcp/asset/98bf9130-9092-4e82-8723-ce85f5064582';
-const imgApproachSummaryCenter = 'https://www.figma.com/api/mcp/asset/e1d77281-a5d2-46aa-8dd1-76b70d10006a';
+const imgApproachSummaryLeft = asset('process-ia.png');
+const imgApproachSummaryCenter = asset('process-flow.png');
 const imgApproachFolderBack = asset('folder-back.png');
 const imgApproachFolderFront = asset('folder-front.png');
 const imgProcessIa = asset('process-ia.png');
@@ -32,19 +32,19 @@ const imgProcessIconIa = asset('process-icon-ia.png');
 const imgProcessIconLean = asset('process-icon-lean.png');
 const imgProcessIconFlow = asset('process-icon-flow.png');
 
-const imgAward = 'https://www.figma.com/api/mcp/asset/e2707fcb-a858-4bcc-b38c-1dbf37f21cfb';
-const imgCertificateIcon = 'https://www.figma.com/api/mcp/asset/59f0f208-8f4d-4ace-8131-785b76c7cda8';
-const imgToolHeader = 'https://www.figma.com/api/mcp/asset/111b02b5-bba7-41d3-a04e-5255b7e164b8';
-const imgWindowClose = 'https://www.figma.com/api/mcp/asset/71376b88-e591-4baa-907d-1e3da0e78243';
-const imgToolFigma = asset('figma.png');
-const imgToolCode = 'https://www.figma.com/api/mcp/asset/3ea2786b-a24d-492a-9a29-f20dc9ab8330';
-const imgAiChatGpt = 'https://www.figma.com/api/mcp/asset/7ee665ac-b663-4044-baf1-2ff33cd22134';
-const imgAiClaude = 'https://www.figma.com/api/mcp/asset/16db0de7-8545-4909-98d1-a0e249027932';
-const imgAiPerplexity = 'https://www.figma.com/api/mcp/asset/f1127c29-1ed4-4d9a-8c60-8f28eb0781ef';
-const imgAiCodex = 'https://www.figma.com/api/mcp/asset/d6969e1c-8239-4e48-948c-a347c3cf93b8';
-const imgAiMidjourney = 'https://www.figma.com/api/mcp/asset/e80660e3-1016-4684-a7dd-7d3045b81151';
-const imgProfile = 'https://www.figma.com/api/mcp/asset/e36f4ce6-fa79-464a-8174-376c2e64f588';
-const imgInvitationCardPhoto = 'https://www.figma.com/api/mcp/asset/0c9a2c1a-2d80-4acb-95f0-52b0ca1b63d1';
+const imgAward = asset('award.png');
+const imgCertificateIcon = asset('certificate-icon.svg');
+const imgToolHeader = asset('tool-icon.svg');
+const imgWindowClose = asset('x-icon.svg');
+const imgToolFigma = asset('tool-figma.png');
+const imgToolCode = asset('tool-code.png');
+const imgAiChatGpt = asset('ai-chatgpt.png');
+const imgAiClaude = asset('ai-claude.png');
+const imgAiPerplexity = asset('ai-perplexity.png');
+const imgAiCodex = asset('tool-code.png');
+const imgAiMidjourney = asset('ai-icon.svg');
+const imgProfile = asset('profile.png');
+const imgInvitationCardPhoto = asset('profile.png');
 
 const awards = [
   ['블루어워즈', '시각디자인 분야 입선', '2022.06.14'],
@@ -184,6 +184,21 @@ const scrollToMainTop = () => {
   window.dispatchEvent(new CustomEvent('portfolio:scroll-lock', { detail: { locked: false } }));
   window.dispatchEvent(new CustomEvent('portfolio:character-reset'));
   requestAppScrollTo(window.innerHeight * 3.2 * characterReturnProgress, 'smooth');
+};
+
+const scrollToHighlights = () => {
+  const root = document.querySelector('.appScroll');
+  const target = document.querySelector('[data-section="highlights"]');
+  if (!root || !target) return;
+
+  const rootRect = root.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  const nextTop = root.scrollTop + targetRect.top - rootRect.top;
+
+  window.__portfolioSuppressEssenceSnapUntil = Date.now() + 1400;
+  window.__portfolioSuppressApproachPinUntil = Date.now() + 2600;
+  window.dispatchEvent(new CustomEvent('portfolio:scroll-lock', { detail: { locked: false } }));
+  requestAppScrollTo(nextTop, 'smooth');
 };
 
 const requestAppScrollLock = (locked, top) => {
@@ -1876,6 +1891,11 @@ function InvitationSection() {
     setIsOpen(false);
   };
 
+  const handleViewAgain = () => {
+    setIsOpen(false);
+    scrollToHighlights();
+  };
+
   useEffect(() => {
     if (!isVisible) return undefined;
 
@@ -1943,7 +1963,7 @@ function InvitationSection() {
         </div>
         <img src={asset('profile.png')} alt="김채이 연락처 이미지" />
         <div className={styles.contactActions}>
-          <button type="button" onClick={scrollToMainTop}>View Again</button>
+          <button type="button" onClick={handleViewAgain}>View Again</button>
           <button type="button" onClick={() => window.open('mailto:36irth@gmail.com')}>Accept</button>
         </div>
       </aside>

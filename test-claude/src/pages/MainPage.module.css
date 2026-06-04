@@ -2570,9 +2570,9 @@
   left: 50%;
   top: 126px;
   z-index: 4;
-  width: 612px;
+  width: 420px;
   overflow: hidden;
-  border-radius: 20px;
+  border-radius: 14px;
   background: rgba(255, 255, 255, 0.8);
   color: #1a1a1a;
   box-shadow: 0 4px 10.6px rgba(0, 0, 0, 0.13);
@@ -2601,8 +2601,8 @@
 }
 
 .contactTitle {
-  height: 138px;
-  padding: 33px 20px 23px;
+  height: 96px;
+  padding: 23px 14px 16px;
   border-bottom: 1px solid var(--line);
   text-align: center;
 }
@@ -2610,24 +2610,24 @@
 .contactTitle h3 {
   margin: 0;
   font-family: helvetica-lt-pro, Helvetica, Arial, sans-serif;
-  font-size: 32px;
+  font-size: 22px;
   font-weight: 700;
   line-height: 1.1;
-  letter-spacing: -0.64px;
+  letter-spacing: -0.44px;
 }
 
 .contactTitle p {
-  margin: 10px 0 0;
+  margin: 7px 0 0;
   font-family: 'Suit', sans-serif;
-  font-size: 26px;
+  font-size: 18px;
   line-height: 1.4;
-  letter-spacing: -0.52px;
+  letter-spacing: -0.36px;
 }
 
 .contactCard > img {
   display: block;
-  width: 612px;
-  height: 612px;
+  width: 420px;
+  height: 420px;
   object-fit: cover;
   object-position: center bottom;
 }
@@ -2639,14 +2639,27 @@
 }
 
 .contactActions button {
-  height: 79px;
+  height: 54px;
   border: 0;
   background: rgba(255, 255, 255, 0.8);
   color: var(--blue);
   font-family: helvetica-lt-pro, Helvetica, Arial, sans-serif;
-  font-size: 26px;
+  font-size: 18px;
   line-height: 1.1;
-  letter-spacing: -0.52px;
+  letter-spacing: -0.36px;
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.contactActions button:hover {
+  background: rgba(0, 146, 255, 0.1);
+}
+
+.contactActions button:active {
+  transform: scale(0.97);
 }
 
 .contactActions button:first-child {
@@ -3088,7 +3101,7 @@
   }
 
   .contactCard {
-    width: min(612px, 100%);
+    width: min(420px, 100%);
   }
 
   .contactCard > img {
@@ -3816,23 +3829,23 @@
 
   .contactCard {
     top: 72px;
-    width: calc(100% - 40px);
-    border-radius: 18px;
+    width: min(360px, calc(100% - 40px));
+    border-radius: 14px;
   }
 
   .contactTitle {
     height: auto;
-    padding: 24px 18px 18px;
+    padding: 20px 12px 14px;
   }
 
   .contactTitle h3 {
-    font-size: 26px;
+    font-size: 20px;
   }
 
   .contactTitle p,
   .contactActions button,
   .profileMeta {
-    font-size: 17px;
+    font-size: 16px;
   }
 
   .contactCard > img {
@@ -3842,7 +3855,7 @@
   }
 
   .contactActions button {
-    height: 64px;
+    height: 50px;
   }
 }
 
