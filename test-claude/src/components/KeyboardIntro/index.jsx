@@ -13,7 +13,9 @@ import { detectWebGL } from '../../utils/webgl';
 import styles from './KeyboardIntro.module.css';
 import SplitText from './SplitText';
 
-const bubbleTail = '/assets/portfolio/bubble-tail-large.svg';
+const portfolioAsset = (name) => `${import.meta.env.BASE_URL}assets/portfolio/${name}`;
+const bubbleTail = portfolioAsset('bubble-tail-large.svg');
+const mobileIntroImage = `url("${portfolioAsset('mobile-intro.png')}")`;
 
 let instanceCount = 0;
 
@@ -169,7 +171,7 @@ export function KeyboardIntro({ onComplete }) {
 
   if (webglError) {
     return (
-      <div className={styles.wrapper}>
+      <div className={styles.wrapper} style={{ '--mobile-intro-image': mobileIntroImage }}>
         <div className={styles.fallback}>
           <div className={styles.fallbackTitle}>chaei</div>
           <p className={styles.fallbackText}>This browser could not start the 3D intro.</p>
@@ -186,7 +188,7 @@ export function KeyboardIntro({ onComplete }) {
   };
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} style={{ '--mobile-intro-image': mobileIntroImage }}>
       <canvas ref={canvasRef} className={styles.canvas} />
 
       <div className={styles.layout}>

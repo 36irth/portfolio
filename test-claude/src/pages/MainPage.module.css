@@ -68,14 +68,14 @@
 
 .characterResetButton {
   position: fixed;
-  left: calc(50% + 72px);
+  left: calc(50% + 110px);
   bottom: 28px;
   z-index: 116;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 50px;
+  height: 50px;
   border: 1px solid rgba(1, 136, 251, 0.75);
   border-radius: 50%;
   background: rgba(13, 13, 13, 0.72);
@@ -98,7 +98,7 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-  font-size: 18px;
+  font-size: 22px;
   line-height: 1;
 }
 
@@ -154,12 +154,16 @@
 .scrollDownHint {
   position: fixed;
   left: 50%;
+  right: auto;
   bottom: 28px;
   z-index: 110;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
+  min-height: 50px;
   padding: 10px 16px;
+  box-sizing: border-box;
   border: 1px solid rgba(1, 136, 251, 0.45);
   border-radius: 999px;
   background: rgba(13, 13, 13, 0.5);
@@ -228,14 +232,14 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
-  width: 62px;
-  height: 62px;
+  width: 74px;
+  height: 74px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #ffffff;
   color: var(--blue);
   font-family: 'Nohemi', helvetica-lt-pro, Helvetica, Arial, sans-serif;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 500;
   line-height: 1;
   opacity: 0;
@@ -250,8 +254,8 @@
 
 .topButton::before {
   content: '';
-  width: 12px;
-  height: 6px;
+  width: 14px;
+  height: 7px;
   background: currentColor;
   clip-path: polygon(50% 0, 100% 100%, 82% 100%, 50% 36%, 18% 100%, 0 100%);
 }
@@ -575,204 +579,6 @@
   transform: translate3d(0, 0, 0);
 }
 
-.characterInteractionHint {
-  position: fixed;
-  left: 50%;
-  bottom: 78px;
-  z-index: 118;
-  width: 720px;
-  height: 220px;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transform: translateX(-50%) translateY(10px);
-  transition:
-    opacity 0.24s ease,
-    transform 0.24s ease,
-    visibility 0.24s ease;
-}
-
-.characterInteractionHintVisible {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0);
-}
-
-.cozymarkBubble {
-  position: absolute;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 42px;
-  padding: 10px 15px;
-  border: 1px solid #ccff93;
-  border-radius: 999px;
-  background: rgba(204, 255, 147, 0.35);
-  color: #cdff95;
-  font-family: 'Suit', helvetica-lt-pro, Helvetica, Arial, sans-serif;
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 1.1;
-  white-space: nowrap;
-  box-shadow:
-    0 0 24px rgba(204, 255, 147, 0.18),
-    0 0 0 1px rgba(204, 255, 147, 0.08) inset;
-  backdrop-filter: blur(8px);
-}
-
-.cozymarkBubbleDrag {
-  left: 54px;
-  top: 70px;
-  animation: cozymarkFloat 2.8s ease-in-out infinite;
-}
-
-.cozymarkBubbleReset {
-  left: 246px;
-  top: 144px;
-  font-weight: 700;
-  animation: cozymarkFloat 2.8s ease-in-out 0.18s infinite;
-}
-
-.cozymarkConnector {
-  position: absolute;
-  display: block;
-  height: 1px;
-  transform-origin: left center;
-  background: linear-gradient(90deg, rgba(204, 255, 147, 0), rgba(204, 255, 147, 0.95));
-  box-shadow: 0 0 12px rgba(204, 255, 147, 0.42);
-  opacity: 0.9;
-}
-
-.cozymarkConnector::after {
-  content: '';
-  position: absolute;
-  right: -3px;
-  top: -3px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #ccff93;
-  box-shadow: 0 0 14px rgba(204, 255, 147, 0.8);
-}
-
-.cozymarkConnectorClick {
-  left: 512px;
-  top: 91px;
-  width: 150px;
-  transform: rotate(-26deg) scaleX(0);
-  animation: cozymarkLineDraw 2.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
-}
-
-.cozymarkConnectorReset {
-  left: 520px;
-  top: 183px;
-  width: 92px;
-  transform: rotate(24deg) scaleX(0);
-  animation: cozymarkLineDraw 2.2s cubic-bezier(0.22, 1, 0.36, 1) 0.34s infinite;
-}
-
-.cozymarkClickMark {
-  position: absolute;
-  left: 644px;
-  top: 20px;
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at center, rgba(204, 255, 147, 0.95) 0 8px, transparent 9px),
-    radial-gradient(circle at center, rgba(204, 255, 147, 0.38) 0 19px, transparent 20px),
-    radial-gradient(circle at center, rgba(204, 255, 147, 0.22) 0 31px, transparent 32px);
-  box-shadow:
-    0 0 20px rgba(204, 255, 147, 0.58),
-    0 0 0 0 rgba(204, 255, 147, 0.5);
-  animation: cozymarkClickPulse 1.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
-}
-
-@keyframes cozymarkFloat {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-@keyframes cozymarkLineDraw {
-  0% {
-    opacity: 0;
-    transform: rotate(var(--line-rotate, 0deg)) scaleX(0);
-  }
-
-  22%,
-  72% {
-    opacity: 0.95;
-    transform: rotate(var(--line-rotate, 0deg)) scaleX(1);
-  }
-
-  100% {
-    opacity: 0;
-    transform: rotate(var(--line-rotate, 0deg)) scaleX(1);
-  }
-}
-
-.cozymarkConnectorClick {
-  --line-rotate: -26deg;
-}
-
-.cozymarkConnectorReset {
-  --line-rotate: 24deg;
-}
-
-@keyframes cozymarkClickPulse {
-  0% {
-    transform: scale(0.92);
-    opacity: 0.72;
-    box-shadow:
-      0 0 20px rgba(204, 255, 147, 0.52),
-      0 0 0 0 rgba(204, 255, 147, 0.48);
-  }
-
-  50% {
-    transform: scale(1);
-    opacity: 1;
-    box-shadow:
-      0 0 26px rgba(204, 255, 147, 0.72),
-      0 0 0 12px rgba(204, 255, 147, 0.12);
-  }
-
-  100% {
-    transform: scale(0.92);
-    opacity: 0.72;
-    box-shadow:
-      0 0 20px rgba(204, 255, 147, 0.52),
-      0 0 0 0 rgba(204, 255, 147, 0);
-  }
-}
-
-.characterGuideActive .characterCopy {
-  opacity: 0.42;
-  filter: blur(3.5px);
-}
-
-.characterGuideActive .characterPanel::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  pointer-events: none;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(19px);
-}
-
-.characterGuideActive .glassCard,
-.characterGuideActive .chatBubble,
-.characterGuideActive .awards {
-  z-index: 6;
-  filter: drop-shadow(0 0 33px rgba(1, 136, 251, 0.7));
-}
-
 .awards {
   position: absolute;
   left: 150px;
@@ -956,12 +762,20 @@
   gap: 20px;
 }
 
-.toolLeft img {
+.toolIcon {
   flex: 0 0 auto;
   width: 50px;
   height: 50px;
   border-radius: 10px;
   object-fit: cover;
+}
+
+.toolIconFigma {
+  transform: none;
+}
+
+.toolIconGemini {
+  transform: none;
 }
 
 .toolLeft div {
@@ -1328,13 +1142,13 @@
 
 .highlightSmallBlur {
   left: -1px;
-  bottom: -1px;
+  top: -1px;
   width: 411px;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.35);
+  height: 153px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.08) 0%, rgba(0, 0, 0, 0.24) 52%, rgba(0, 0, 0, 0.42) 100%);
   backdrop-filter: blur(11px);
-  -webkit-mask-image: linear-gradient(to top, #000 0%, #000 72%, transparent 100%);
-  mask-image: linear-gradient(to top, #000 0%, #000 72%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.28) 28%, #000 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.28) 28%, #000 100%);
 }
 
 .highlightProjectImageA {
@@ -2679,13 +2493,22 @@
 
   .topButton {
     right: 24px;
-    width: 52px;
-    height: 52px;
+    width: 62px;
+    height: 62px;
+    font-size: 18px;
   }
 
   .scrollDownHint {
     bottom: 20px;
+    min-height: 48px;
     font-size: 14px;
+  }
+
+  .characterResetButton {
+    left: calc(50% + 104px);
+    bottom: 20px;
+    width: 48px;
+    height: 48px;
   }
 
   .panel {
@@ -2715,10 +2538,6 @@
     left: 80px;
     top: 72px;
     width: 980px;
-  }
-
-  .characterInteractionHint {
-    bottom: 74px;
   }
 
   .awards {
@@ -2781,61 +2600,66 @@
 }
 
 @media (min-width: 1921px) {
+  .characterPanel {
+    --character-stage-x: calc((100vw - 1920px) / 2);
+    --character-stage-y: max(0px, calc((100vh - 1080px) / 2));
+  }
+
   .characterCopy {
-    left: 150px;
-    top: 100px;
-    transform: scale(var(--character-stage-scale, 1));
+    left: calc(var(--character-stage-x) + 150px);
+    top: calc(var(--character-stage-y) + 100px);
+    transform: scale(1);
     transform-origin: top left;
   }
 
   .awards {
-    left: 150px;
-    bottom: 100px;
+    left: calc(var(--character-stage-x) + 150px);
+    bottom: calc(var(--character-stage-y) + 100px);
   }
 
   .designToolsCard {
-    left: 274px;
-    top: 67px;
+    left: calc(var(--character-stage-x) + 274px);
+    top: calc(var(--character-stage-y) + 67px);
   }
 
   .profileCard {
-    left: 793px;
-    top: 255px;
+    left: calc(var(--character-stage-x) + 793px);
+    top: calc(var(--character-stage-y) + 255px);
   }
 
   .aiCard {
-    left: 1233px;
-    top: 414px;
+    left: calc(var(--character-stage-x) + 1233px);
+    top: calc(var(--character-stage-y) + 414px);
   }
 
   .certificateCard {
-    left: 1469px;
-    top: 90px;
+    left: calc(var(--character-stage-x) + 1469px);
+    top: calc(var(--character-stage-y) + 90px);
   }
 
   .schoolOne {
-    left: 1122px;
-    top: 134px;
+    left: calc(var(--character-stage-x) + 1122px);
+    top: calc(var(--character-stage-y) + 134px);
   }
 
   .schoolTwo {
-    left: 1032px;
-    top: 234px;
+    left: calc(var(--character-stage-x) + 1032px);
+    top: calc(var(--character-stage-y) + 234px);
   }
 
   .characterFloat {
     transform: translate3d(var(--drag-x, 0px), calc(42px + var(--drag-y, 0px)), 0)
-      scale(var(--character-stage-enter-scale, 1));
+      scale(0.97);
   }
 
   .characterFloatVisible {
     transform: translate3d(var(--drag-x, 0px), var(--drag-y, 0px), 0)
-      scale(var(--character-stage-scale, 1));
+      scale(1);
   }
 
   .characterFloatDismissed {
     transform: translate3d(var(--drag-x, 0px), calc(var(--drag-y, 0px) - 8px), 0)
-      scale(var(--character-stage-dismiss-scale, 0.82));
+      scale(0.82);
   }
 }
 
@@ -2892,15 +2716,23 @@
 
   .scrollDownHint {
     gap: 10px;
+    min-height: 44px;
     padding: 8px 13px;
   }
 
   .topButton {
     right: 16px;
     bottom: 20px;
-    width: 46px;
-    height: 46px;
-    font-size: 14px;
+    width: 56px;
+    height: 56px;
+    font-size: 16px;
+  }
+
+  .characterResetButton {
+    left: calc(50% + 96px);
+    bottom: 20px;
+    width: 44px;
+    height: 44px;
   }
 
   .characterScrollSection {
@@ -2940,10 +2772,6 @@
 
   .characterFloatVisible {
     transform: translate3d(0, 0, 0) scale(0.7);
-  }
-
-  .characterInteractionHint {
-    bottom: 72px;
   }
 
   .awards {
@@ -2999,7 +2827,7 @@
 
   .highlightSmallBlur {
     width: calc(100% + 2px);
-    height: 100%;
+    height: calc(100% + 2px);
   }
 
   .highlightsRightList,
@@ -3173,20 +3001,6 @@
     width: calc(100% - 40px);
   }
 
-  .characterInteractionHint {
-    bottom: 68px;
-    justify-content: center;
-    width: min(420px, calc(100% - 32px));
-  }
-
-  .characterInteractionHint span {
-    min-height: 28px;
-    padding: 7px 12px;
-    font-size: 13px;
-    line-height: 1.35;
-    text-align: center;
-  }
-
   .characterTitle {
     align-items: flex-start;
   }
@@ -3266,7 +3080,7 @@
     gap: 12px;
   }
 
-  .toolLeft img {
+  .toolIcon {
     width: 36px;
     height: 36px;
   }
@@ -3457,6 +3271,10 @@
 
   .highlightLargeBlur {
     height: 70px;
+  }
+
+  .highlightSmallBlur {
+    height: calc(100% + 2px);
   }
 
   .highlightEyebrow {
@@ -3859,7 +3677,7 @@
   }
 }
 
-@media (min-width: 1025px) {
+@media (min-width: 1501px) and (max-width: 1920px) {
   .characterCopy {
     left: 150px;
     top: 100px;

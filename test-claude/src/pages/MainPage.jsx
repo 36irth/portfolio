@@ -3,7 +3,7 @@ import SplitText from '../components/KeyboardIntro/SplitText';
 import CharacterKeyDisplay from './CharacterKeyDisplay';
 import styles from './MainPage.module.css';
 
-const asset = (name) => `/assets/portfolio/${name}`;
+const asset = (name) => `${import.meta.env.BASE_URL}assets/portfolio/${name}`;
 
 const imgHighlightsProject = asset('project-1.png');
 const imgHighlightsProject1 = asset('project-2.png');
@@ -36,13 +36,13 @@ const imgAward = asset('award.png');
 const imgCertificateIcon = asset('certificate-icon.svg');
 const imgToolHeader = asset('tool-icon.svg');
 const imgWindowClose = asset('x-icon.svg');
-const imgToolFigma = asset('tool-figma.png');
-const imgToolCode = asset('tool-code.png');
-const imgAiChatGpt = asset('ai-chatgpt.png');
-const imgAiClaude = asset('ai-claude.png');
-const imgAiPerplexity = asset('ai-perplexity.png');
-const imgAiCodex = asset('tool-code.png');
-const imgAiMidjourney = asset('ai-icon.svg');
+const imgToolFigma = asset('figma.png');
+const imgToolCode = asset('tool-code-source.png');
+const imgAiChatGpt = asset('ai-chatgpt-source.png');
+const imgAiClaude = asset('ai-claude-source.png');
+const imgAiPerplexity = asset('ai-perplexity-source.png');
+const imgAiCodex = asset('ai-codex-source.png');
+const imgAiMidjourney = asset('ai-midjourney-source.png');
 const imgProfile = asset('profile.png');
 const imgInvitationCardPhoto = asset('profile.png');
 
@@ -76,6 +76,12 @@ const aiTools = [
   ['Midjourney', 'Create images and videos', imgAiMidjourney],
   ['Gemini', 'Writing / Product management', asset('gemini.png')],
 ];
+
+const getToolIconClass = (name) => {
+  if (name === 'Figma') return `${styles.toolIcon} ${styles.toolIconFigma}`;
+  if (name === 'Gemini') return `${styles.toolIcon} ${styles.toolIconGemini}`;
+  return styles.toolIcon;
+};
 
 const highlightLargeProjects = [
   {
@@ -140,7 +146,13 @@ const getHighlightHref = (group, projectIndex, label) => {
     return 'https://www.figma.com/proto/Q4RWt5mGXgO47PjRUCVS3Y/%EA%B9%80%EC%B1%84%EC%9D%B4?node-id=579-1763&t=rsfcqL7jkvfqttzP-1';
   }
   if (group === 'large' && projectIndex === 2 && ['pdf', 'slide'].includes(normalized)) {
-    return 'https://www.figma.com/deck/KbN24gyULgtsJZ3NgeslmB';
+    return 'https://www.figma.com/deck/PKn6ENNRHI93tn5J9sB6WJ';
+  }
+  if (group === 'small' && projectIndex === 0 && normalized === 'pdf') {
+    return asset('homecoming-basketball.pdf');
+  }
+  if (group === 'small' && projectIndex === 1 && normalized === 'pdf') {
+    return asset('cafe-yuil.pdf');
   }
   return '';
 };
@@ -562,9 +574,14 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
         return;
       }
 
+      if (window.innerWidth >= 1920) {
+        setStageScale(1);
+        return;
+      }
+
       const widthScale = window.innerWidth / 1920;
       const heightScale = window.innerHeight / 1080;
-      setStageScale(Math.max(0.7, Math.min(widthScale, heightScale, 1.5)));
+      setStageScale(Math.max(0.7, Math.min(widthScale, heightScale, 1)));
     };
 
     syncStageScale();
@@ -698,8 +715,17 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
     }`;
   };
 
+  const awardGroupClass = () => {
+    const visible = getFloatState(isActive, scrollProgress, 6);
+    const dismissed = visible && awardsDismissed;
+    return `${styles.characterFloat} ${visible && !dismissed ? styles.characterFloatVisible : ''} ${
+      dismissed ? styles.characterFloatDismissed : ''
+    }`;
+  };
+
   const handleWindowPointerDown = (id, index) => (event) => {
     if (!getFloatState(isActive, scrollProgress, index)) return;
+    event.currentTarget.setPointerCapture?.(event.pointerId);
     dragWindowRef.current = {
       type: 'window',
       id,
@@ -725,6 +751,7 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
     if (dismissedAwards.has(awardKey)) return;
     event.preventDefault();
     event.stopPropagation();
+    event.currentTarget.setPointerCapture?.(event.pointerId);
     dragWindowRef.current = {
       type: 'award',
       id: awardKey,
@@ -791,9 +818,8 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
         </div>
 
         <div
-          className={`${styles.awards} ${characterWindowClass('awards', 6)}`}
-          style={getWindowStyle('awards', 6)}
-          onPointerDown={handleWindowPointerDown('awards', 6)}
+          className={`${styles.awards} ${awardGroupClass()}`}
+          style={floatStyle(6)}
         >
           {cleanAwards.map(([line1, line2, date]) => {
             const awardKey = `${line1}-${line2}-${date}`;
@@ -829,7 +855,7 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
             {designTools.map(([name, desc, level, image]) => (
               <div className={styles.toolRow} key={name}>
                 <div className={styles.toolLeft}>
-                  <img src={image} alt="" />
+                  <img src={image} alt="" className={getToolIconClass(name)} />
                   <div>
                     <strong>{name}</strong>
                     <span>{desc}</span>
@@ -865,7 +891,7 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
             {aiTools.map(([name, desc, image]) => (
               <div className={styles.toolRow} key={name}>
                 <div className={styles.toolLeft}>
-                  <img src={image} alt="" />
+                  <img src={image} alt="" className={getToolIconClass(name)} />
                   <div>
                     <strong>{name}</strong>
                     <span>{desc}</span>
@@ -976,12 +1002,24 @@ function HighlightsSection() {
                     <p className={styles.highlightTitle}>{project.title}</p>
                   </div>
                   <div className={styles.highlightButtonRow}>
-                    {project.buttons.map((label) => (
-                      <button key={label} type="button" className={styles.highlightAction}>
-                        <span>{label}</span>
-                        <img src={imgHighlightsArrow} alt="" />
-                      </button>
-                    ))}
+                    {project.buttons.map((label) => {
+                      const href = getHighlightHref('small', index, label);
+                      const content = (
+                        <>
+                          <span>{label}</span>
+                          <img src={imgHighlightsArrow} alt="" />
+                        </>
+                      );
+                      return href ? (
+                        <a key={label} href={href} target="_blank" rel="noreferrer" className={styles.highlightAction}>
+                          {content}
+                        </a>
+                      ) : (
+                        <button key={label} type="button" className={styles.highlightAction}>
+                          {content}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </article>
@@ -1981,9 +2019,6 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
   const [showTopButton, setShowTopButton] = useState(false);
   const [characterResetSignal, setCharacterResetSignal] = useState(0);
   const [approachAllCollected, setApproachAllCollected] = useState(false);
-  const showCharacterInteractionHint =
-    activeSection === 'character' &&
-    characterWindowIds.some((_, index) => getFloatState(isActive, scrollProgress, index));
 
   const scrollToSection = (sectionId) => {
     const target = document.querySelector(`[data-section="${sectionId}"]`);
@@ -2081,7 +2116,7 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
   }, [activeSection, isActive]);
 
   return (
-    <main className={`${styles.page} ${showCharacterInteractionHint ? styles.characterGuideActive : ''}`}>
+    <main className={styles.page}>
       <nav className={styles.sectionNavigation} aria-label="Section navigation">
         <div className={styles.sectionNavigationList}>
           {sectionEntries.map((entry) => (
@@ -2107,22 +2142,6 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
       >
         <span className={styles.scrollDownMouse} />
         <span>Scroll down</span>
-      </div>
-      <div
-        className={`${styles.characterInteractionHint} ${
-          showCharacterInteractionHint ? styles.characterInteractionHintVisible : ''
-        }`}
-        aria-hidden="true"
-      >
-        <span className={`${styles.cozymarkBubble} ${styles.cozymarkBubbleDrag}`}>
-          창을 드래그해서 이동하고 클릭해서 닫을 수 있어요!
-        </span>
-        <span className={styles.cozymarkClickMark} />
-        <span className={`${styles.cozymarkConnector} ${styles.cozymarkConnectorClick}`} />
-        <span className={`${styles.cozymarkBubble} ${styles.cozymarkBubbleReset}`}>
-          리셋 버튼을 누르면 창들이 다시 나타나요.
-        </span>
-        <span className={`${styles.cozymarkConnector} ${styles.cozymarkConnectorReset}`} />
       </div>
       <button
         type="button"
