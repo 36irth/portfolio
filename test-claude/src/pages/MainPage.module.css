@@ -1052,10 +1052,11 @@
 
 .highlightLargeCard {
   display: flex;
+  flex: 1 1 0;
   flex-direction: column;
   justify-content: flex-end;
   gap: 20px;
-  width: 360px;
+  min-width: 0;
   height: 529px;
   padding: 30px;
   border-radius: 35px;
@@ -1120,8 +1121,8 @@
 
 .highlightLargeBlur {
   left: -1px;
+  right: -1px;
   bottom: -1px;
-  width: 360px;
   height: 176px;
   backdrop-filter: blur(25px);
   -webkit-mask-image: linear-gradient(to top, #000 0%, #000 72%, transparent 100%);
@@ -1152,17 +1153,18 @@
 }
 
 .highlightProjectImageA {
-  top: -1.98%;
-  left: -47.09%;
-  width: 199.8%;
-  height: 101.98%;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .highlightProjectImageB {
   top: 0;
-  left: -40.88%;
-  width: 195.93%;
+  left: -7.45%;
+  width: 123.85%;
   height: 100%;
+  object-fit: cover;
 }
 
 .highlightProjectImageC {

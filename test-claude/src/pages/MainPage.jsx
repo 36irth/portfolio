@@ -5,9 +5,9 @@ import styles from './MainPage.module.css';
 
 const asset = (name) => `${import.meta.env.BASE_URL}assets/portfolio/${name}`;
 
-const imgHighlightsProject = asset('project-1.png');
-const imgHighlightsProject1 = asset('project-2.png');
-const imgHighlightsProject2 = asset('project-3.png');
+const imgHighlightsProject = asset('project-gunit.png');
+const imgHighlightsProject1 = asset('project-mingle.png');
+const imgHighlightsProject2 = asset('project-2.png');
 const imgHighlightsProject3 = asset('project-4.png');
 const imgHighlightsProject4 = asset('project-5.png');
 const imgHighlightsProject5 = asset('project-6.png');
@@ -94,17 +94,17 @@ const highlightLargeProjects = [
   },
   {
     image: imgHighlightsProject1,
-    eyebrow: '콘서트 특화 일정 공유 앱',
-    title: 'STAG',
+    eyebrow: '회의 시간 조율 앱',
+    title: 'mingle',
     buttons: ['Prototype'],
     imageClass: styles.highlightProjectImageB,
     overlayClass: styles.highlightOverlayB,
   },
   {
     image: imgHighlightsProject2,
-    eyebrow: 'K-Brand 글로벌 웹사이트 리뉴얼',
-    title: '롬앤',
-    buttons: ['Web', 'Slide'],
+    eyebrow: '콘서트 특화 일정 공유 앱',
+    title: 'STAG',
+    buttons: ['Prototype'],
     imageClass: styles.highlightProjectImageC,
     overlayClass: styles.highlightOverlayC,
   },
@@ -129,7 +129,7 @@ const highlightSmallProjects = [
     image: imgHighlightsProject5,
     eyebrow: '웹디자인 졸업전시',
     title: '알렉산더맥퀸',
-    buttons: ['Prototype'],
+    buttons: ['pdf'],
     imageClass: styles.highlightProjectImageF,
   },
 ];
@@ -143,16 +143,19 @@ const getHighlightHref = (group, projectIndex, label) => {
     return 'https://www.figma.com/deck/DOYuW7zigrKfKCXuutEt1d';
   }
   if (group === 'large' && projectIndex === 1 && ['site', 'prototype'].includes(normalized)) {
-    return 'https://www.figma.com/proto/Q4RWt5mGXgO47PjRUCVS3Y/%EA%B9%80%EC%B1%84%EC%9D%B4?node-id=579-1763&t=rsfcqL7jkvfqttzP-1';
+    return 'https://www.figma.com/proto/UALyVcFwWbFz1uGaSeCbkH/mingle?node-id=178-1892&t=rtN7gaALVZSpTAV6-1';
   }
-  if (group === 'large' && projectIndex === 2 && ['pdf', 'slide'].includes(normalized)) {
-    return 'https://www.figma.com/deck/PKn6ENNRHI93tn5J9sB6WJ';
+  if (group === 'large' && projectIndex === 2 && normalized === 'prototype') {
+    return 'https://www.figma.com/proto/Q4RWt5mGXgO47PjRUCVS3Y/%EA%B9%80%EC%B1%84%EC%9D%B4?node-id=579-1763&t=rsfcqL7jkvfqttzP-1';
   }
   if (group === 'small' && projectIndex === 0 && normalized === 'pdf') {
     return asset('homecoming-basketball.pdf');
   }
   if (group === 'small' && projectIndex === 1 && normalized === 'pdf') {
     return asset('cafe-yuil.pdf');
+  }
+  if (group === 'small' && projectIndex === 2 && normalized === 'pdf') {
+    return asset('alexander-mcqueen-graduation-exhibition.pdf');
   }
   return '';
 };
@@ -878,7 +881,7 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
           </div>
           <img src={asset('profile.png')} alt="김채이 프로필" className={styles.profileImage} draggable={false} />
           <p className={styles.profileMeta}>2001.03.06</p>
-          <p className={styles.profileMeta}>36irth@gmail.com</p>
+          <p className={styles.profileMeta}>36irth!@gmail.com</p>
         </aside>
 
         <aside
@@ -2002,7 +2005,7 @@ function InvitationSection() {
         <img src={asset('profile.png')} alt="김채이 연락처 이미지" />
         <div className={styles.contactActions}>
           <button type="button" onClick={handleViewAgain}>View Again</button>
-          <button type="button" onClick={() => window.open('mailto:36irth@gmail.com')}>Accept</button>
+          <button type="button" onClick={() => window.open('mailto:36irth!@gmail.com')}>Accept</button>
         </div>
       </aside>
     </section>
