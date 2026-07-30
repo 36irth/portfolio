@@ -810,6 +810,21 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
           '--character-stage-dismiss-scale': stageScale * 0.82,
         }}
       >
+        <p
+          className={`${styles.characterInteractionHint} ${
+            isActive && !allWindowsDismissed && (
+              characterWindowIds.some((id, index) => {
+                const dismissed = id === 'awards' ? awardsDismissed : dismissedWindows.has(id);
+                return getFloatState(isActive, scrollProgress, index) && !dismissed;
+              }) || (getFloatState(isActive, scrollProgress, 6) && !awardsDismissed)
+            )
+              ? styles.characterInteractionHintVisible
+              : ''
+          }`}
+        >
+          창을 클릭하면 닫히고 드래그하면 움직여요
+        </p>
+
         <div className={`${styles.characterCopy} ${copyReady ? styles.characterCopyReady : ''}`}>
           <CharacterTitle isActive={isActive} />
           <p>
@@ -881,7 +896,7 @@ function CharacterSection({ isActive, scrollProgress, sectionRef, resetSignal })
           </div>
           <img src={asset('profile.png')} alt="김채이 프로필" className={styles.profileImage} draggable={false} />
           <p className={styles.profileMeta}>2001.03.06</p>
-          <p className={styles.profileMeta}>36irth!@gmail.com</p>
+          <p className={styles.profileMeta}>63irth@gmail.com</p>
         </aside>
 
         <aside
@@ -1045,6 +1060,7 @@ function ApproachSection({ onAllCollected }) {
   const processSnapLockRef = useRef(false);
   const processExitRef = useRef(false);
   const processWheelActiveRef = useRef(false);
+  const processReverseExitRef = useRef(false);
   const approachPinTimerRef = useRef(0);
   const processReleaseTimerRef = useRef(0);
   const [collected, setCollected] = useState([]);
@@ -1244,6 +1260,7 @@ function ApproachSection({ onAllCollected }) {
       setActiveProcessIndex(0);
       setPressedProcessIndex(0);
       processExitRef.current = false;
+      processReverseExitRef.current = false;
       return undefined;
     }
     pinnedRef.current = false;
@@ -1319,23 +1336,33 @@ function ApproachSection({ onAllCollected }) {
       if (!isProcessFocused) return;
 
       const direction = event.deltaY > 0 ? 1 : -1;
-      const nextIndex = activeProcessIndex + direction;
       const targetTop = getProcessPinnedTop();
 
-      if (nextIndex < 0) {
+      if (direction < 0 && activeProcessIndex <= 0) {
         event.preventDefault();
         event.stopPropagation();
         event.stopImmediatePropagation();
+        if (!processReverseExitRef.current) {
+          processReverseExitRef.current = true;
+          if (targetTop != null) requestAppScrollLock(true, targetTop);
+          settleProcessSnapSoon(360);
+          return;
+        }
         processSnapLockRef.current = false;
         processExitRef.current = false;
+        processReverseExitRef.current = false;
         window.clearTimeout(processReleaseTimerRef.current);
         requestAppScrollLock(false);
+        setTextReady(false);
         const sectionTop = getApproachTop();
         if (sectionTop != null) {
           requestAppScrollTo(Math.max(0, sectionTop), 'slow');
         }
         return;
       }
+
+      const nextIndex = activeProcessIndex + direction;
+      processReverseExitRef.current = false;
 
       if (nextIndex >= processCards.length) {
         event.preventDefault();
@@ -2005,7 +2032,7 @@ function InvitationSection() {
         <img src={asset('profile.png')} alt="김채이 연락처 이미지" />
         <div className={styles.contactActions}>
           <button type="button" onClick={handleViewAgain}>View Again</button>
-          <button type="button" onClick={() => window.open('mailto:36irth!@gmail.com')}>Accept</button>
+          <button type="button" onClick={() => window.open('mailto:63irth@gmail.com')}>Accept</button>
         </div>
       </aside>
     </section>

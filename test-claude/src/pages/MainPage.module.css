@@ -68,7 +68,7 @@
 
 .characterResetButton {
   position: fixed;
-  left: calc(50% + 110px);
+  left: calc(50% + 88px);
   bottom: 28px;
   z-index: 116;
   display: inline-flex;
@@ -100,6 +100,7 @@
   height: 100%;
   font-size: 22px;
   line-height: 1;
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .characterResetButtonVisible {
@@ -110,10 +111,20 @@
 
 .characterResetButton:hover,
 .characterResetButton:focus-visible {
-  border-color: #ccff93;
-  background: rgba(204, 255, 147, 0.16);
-  color: #ccff93;
+  border-color: rgba(1, 136, 251, 0.75);
+  background: rgba(13, 13, 13, 0.72);
+  color: #0188fb;
   outline: none;
+  transform: translateY(-1px) scale(1.03);
+  box-shadow: 0 0 18px rgba(1, 136, 251, 0.18);
+}
+
+.characterResetButton:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.characterResetButton:active span {
+  transform: rotate(-82deg);
 }
 
 .sectionNavigationButton {
@@ -688,6 +699,51 @@
   cursor: grabbing;
   z-index: 30;
   transition: none;
+}
+
+.characterInteractionHint {
+  position: absolute;
+  left: 50%;
+  bottom: 86px;
+  z-index: 14;
+  margin: 0;
+  color: rgba(178, 226, 255, 0.84);
+  font-family: 'Suit', sans-serif;
+  font-size: clamp(13px, 0.78vw, 15px);
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-50%) translateY(8px);
+  transition:
+    opacity 0.42s ease,
+    transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.characterInteractionHintVisible {
+  opacity: 0.98;
+  transform: translateX(-50%) translateY(0);
+  animation: characterHintGlow 2.6s ease-in-out infinite;
+}
+
+@keyframes characterHintGlow {
+  0%,
+  100% {
+    color: rgba(178, 226, 255, 0.74);
+    text-shadow:
+      0 0 5px rgba(136, 207, 255, 0.24),
+      0 0 0 rgba(1, 136, 251, 0);
+  }
+
+  48%,
+  58% {
+    color: rgba(226, 247, 255, 1);
+    text-shadow:
+      0 0 8px rgba(178, 226, 255, 0.86),
+      0 0 22px rgba(1, 136, 251, 0.64),
+      0 0 38px rgba(1, 136, 251, 0.38);
+  }
 }
 
 .glassCard {
@@ -3745,5 +3801,94 @@
     transform: translate3d(var(--drag-x, 0px), calc(var(--drag-y, 0px) - 8px), 0)
       scale(var(--character-stage-dismiss-scale, 0.82));
     transform-origin: top left;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1920px) {
+  .characterCopy {
+    left: 7.8125vw;
+    top: 9.26vh;
+    width: 980px;
+    transform: scale(var(--character-stage-scale, 1));
+    transform-origin: top left;
+  }
+
+  .awards {
+    left: 7.8125vw;
+    bottom: 9.26vh;
+    transform: scale(var(--character-stage-scale, 1));
+    transform-origin: bottom left;
+  }
+
+  .designToolsCard {
+    left: 14.27vw;
+    top: 6.2vh;
+    width: 532px;
+  }
+
+  .profileCard {
+    left: 41.3vw;
+    top: 23.61vh;
+    width: 335px;
+  }
+
+  .aiCard {
+    left: 64.22vw;
+    right: auto;
+    top: 38.33vh;
+    width: 433px;
+  }
+
+  .certificateCard {
+    left: 76.51vw;
+    right: auto;
+    top: 8.33vh;
+    width: 394px;
+  }
+
+  .schoolOne {
+    left: 58.44vw;
+    right: auto;
+    top: 12.41vh;
+    width: 317px;
+  }
+
+  .schoolTwo {
+    left: 53.75vw;
+    right: auto;
+    top: 21.67vh;
+    width: 352px;
+  }
+
+  .characterFloat,
+  .profileCard.characterFloat {
+    transform: translate3d(var(--drag-x, 0px), calc(42px + var(--drag-y, 0px)), 0)
+      scale(var(--character-stage-enter-scale, 0.97));
+    transform-origin: top left;
+  }
+
+  .characterFloatVisible,
+  .profileCard.characterFloatVisible {
+    transform: translate3d(var(--drag-x, 0px), var(--drag-y, 0px), 0)
+      scale(var(--character-stage-scale, 1));
+    transform-origin: top left;
+  }
+
+  .characterFloatDismissed,
+  .profileCard.characterFloatDismissed {
+    transform: translate3d(var(--drag-x, 0px), calc(var(--drag-y, 0px) - 8px), 0)
+      scale(var(--character-stage-dismiss-scale, 0.82));
+    transform-origin: top left;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1500px) {
+  .characterResetButton {
+    left: calc(50% + 84px);
+  }
+
+  .characterInteractionHint {
+    bottom: 78px;
+    font-size: clamp(12px, 1vw, 14px);
   }
 }
