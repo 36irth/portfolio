@@ -146,7 +146,7 @@ const getHighlightHref = (group, projectIndex, label) => {
     return 'https://www.figma.com/proto/UALyVcFwWbFz1uGaSeCbkH/mingle?node-id=178-1892&t=rtN7gaALVZSpTAV6-1';
   }
   if (group === 'large' && projectIndex === 2 && normalized === 'prototype') {
-    return 'https://www.figma.com/proto/Q4RWt5mGXgO47PjRUCVS3Y/%EA%B9%80%EC%B1%84%EC%9D%B4?node-id=579-1763&t=rsfcqL7jkvfqttzP-1';
+    return 'https://www.figma.com/proto/QeO5PEeg80Q19N3CzTHFcM/STAG?node-id=0-1&t=qkbS69EpESylNhGy-1';
   }
   if (group === 'small' && projectIndex === 0 && normalized === 'pdf') {
     return asset('homecoming-basketball.pdf');
@@ -1061,6 +1061,7 @@ function ApproachSection({ onAllCollected }) {
   const processExitRef = useRef(false);
   const processWheelActiveRef = useRef(false);
   const processReverseExitRef = useRef(false);
+  const processReturnModeRef = useRef(false);
   const approachPinTimerRef = useRef(0);
   const processReleaseTimerRef = useRef(0);
   const [collected, setCollected] = useState([]);
@@ -1184,6 +1185,7 @@ function ApproachSection({ onAllCollected }) {
         previousScrollTop = currentScrollTop;
 
         if (!isScrollingUp) return;
+        if (processReturnModeRef.current) return;
         if (!sectionRef.current) return;
 
         const rect = sectionRef.current.getBoundingClientRect();
@@ -1210,6 +1212,50 @@ function ApproachSection({ onAllCollected }) {
       if (frame) window.cancelAnimationFrame(frame);
     };
   }, [isCompact]);
+
+  useEffect(() => {
+    if (!allCollected || isCompact) return undefined;
+    const scrollRoot = document.querySelector('.appScroll');
+    if (!scrollRoot) return undefined;
+
+    let frame = 0;
+    let previousScrollTop = scrollRoot.scrollTop;
+    const activateProcessReturnMode = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        const currentScrollTop = scrollRoot.scrollTop;
+        const isScrollingUp = currentScrollTop < previousScrollTop;
+        previousScrollTop = currentScrollTop;
+        if (!isScrollingUp || !processReturnModeRef.current) return;
+
+        const processNode = processRef.current;
+        const targetTop = getProcessPinnedTop();
+        if (!processNode || targetTop == null) return;
+
+        const rect = processNode.getBoundingClientRect();
+        const rootRect = scrollRoot.getBoundingClientRect();
+        const isProcessBottomPinned = Math.abs(rect.bottom - rootRect.bottom) < 72;
+        const isApproachVisible = rect.top < rootRect.bottom && rect.bottom > rootRect.top;
+        if (!isProcessBottomPinned || !isApproachVisible) return;
+
+        processWheelActiveRef.current = true;
+        processSnapLockRef.current = false;
+        processExitRef.current = false;
+        processReverseExitRef.current = false;
+        setTextReady(true);
+        setActiveProcessIndex(processCards.length - 1);
+        setPressedProcessIndex(processCards.length - 1);
+        requestAppScrollLock(true, targetTop);
+      });
+    };
+
+    scrollRoot.addEventListener('scroll', activateProcessReturnMode, { passive: true });
+    return () => {
+      scrollRoot.removeEventListener('scroll', activateProcessReturnMode);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, [allCollected, isCompact]);
 
   useEffect(() => {
     if (!draggingCard) return undefined;
@@ -1261,6 +1307,7 @@ function ApproachSection({ onAllCollected }) {
       setPressedProcessIndex(0);
       processExitRef.current = false;
       processReverseExitRef.current = false;
+      processReturnModeRef.current = false;
       return undefined;
     }
     pinnedRef.current = false;
@@ -1338,16 +1385,39 @@ function ApproachSection({ onAllCollected }) {
       const direction = event.deltaY > 0 ? 1 : -1;
       const targetTop = getProcessPinnedTop();
 
+      if (direction < 0 && processReturnModeRef.current) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        if (targetTop != null) requestAppScrollLock(true, targetTop);
+        if (processSnapLockRef.current) return;
+
+        const nextReturnIndex = activeProcessIndex - 1;
+        if (nextReturnIndex >= 0) {
+          processSnapLockRef.current = true;
+          selectProcessCard(nextReturnIndex);
+          settleProcessSnapSoon(620);
+          return;
+        }
+
+        processSnapLockRef.current = false;
+        processExitRef.current = false;
+        processReverseExitRef.current = false;
+        processReturnModeRef.current = false;
+        window.clearTimeout(processReleaseTimerRef.current);
+        requestAppScrollLock(false);
+        setTextReady(false);
+        const sectionTop = getApproachTop();
+        if (sectionTop != null) {
+          requestAppScrollTo(Math.max(0, sectionTop), 'slow');
+        }
+        return;
+      }
+
       if (direction < 0 && activeProcessIndex <= 0) {
         event.preventDefault();
         event.stopPropagation();
         event.stopImmediatePropagation();
-        if (!processReverseExitRef.current) {
-          processReverseExitRef.current = true;
-          if (targetTop != null) requestAppScrollLock(true, targetTop);
-          settleProcessSnapSoon(360);
-          return;
-        }
         processSnapLockRef.current = false;
         processExitRef.current = false;
         processReverseExitRef.current = false;
@@ -1375,6 +1445,7 @@ function ApproachSection({ onAllCollected }) {
         if (processSnapLockRef.current) return;
         processSnapLockRef.current = true;
         processExitRef.current = true;
+        processReturnModeRef.current = true;
         processWheelActiveRef.current = false;
         window.clearTimeout(processReleaseTimerRef.current);
         processReleaseTimerRef.current = window.setTimeout(() => {

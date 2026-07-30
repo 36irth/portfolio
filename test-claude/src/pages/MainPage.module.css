@@ -704,7 +704,7 @@
 .characterInteractionHint {
   position: absolute;
   left: 50%;
-  bottom: 86px;
+  bottom: 98px;
   z-index: 14;
   margin: 0;
   color: rgba(178, 226, 255, 0.84);
@@ -1224,10 +1224,11 @@
 }
 
 .highlightProjectImageC {
-  top: -0.07%;
-  left: 0;
+  inset: 0;
   width: 100%;
-  height: 130.36%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
 }
 
 .highlightProjectImageD {
@@ -3369,6 +3370,8 @@
   }
 
   .approachList {
+    display: flex;
+    align-items: center;
     gap: 17px;
     justify-items: center;
   }
@@ -3888,7 +3891,409 @@
   }
 
   .characterInteractionHint {
-    bottom: 78px;
+    bottom: 90px;
     font-size: clamp(12px, 1vw, 14px);
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1919px) {
+  .highlightsPanel,
+  .approachPanel,
+  .essencePanel,
+  .invitationPanel {
+    --responsive-scale: clamp(0.625, 5.2083vw, 1);
+  }
+
+  .highlightsPanel,
+  .invitationPanel {
+    min-height: max(100vh, clamp(675px, 56.25vw, 1080px));
+    padding: clamp(62px, 5.208vw, 100px) clamp(94px, 7.8125vw, 150px);
+  }
+
+  .highlightsPanel {
+    justify-content: space-between;
+  }
+
+  .highlightsTitle,
+  .approachTitle,
+  .invitationTitle,
+  .essenceTitle {
+    gap: clamp(16px, 1.302vw, 25px);
+  }
+
+  .highlightsTitle h2,
+  .approachTitle h2,
+  .invitationTitle h2,
+  .essenceTitle h2,
+  .sectionTitle h2 {
+    font-size: clamp(50px, 4.1667vw, 80px);
+  }
+
+  .highlightsPanel .keyActive,
+  .highlightsPanel .keyInactive,
+  .approachPanel .keyActive,
+  .approachPanel .keyInactive,
+  .essencePanel .keyActive,
+  .essencePanel .keyInactive,
+  .invitationPanel .keyActive,
+  .invitationPanel .keyInactive {
+    width: clamp(25px, 2.083vw, 40px);
+    height: clamp(25px, 2.083vw, 40px);
+    border-radius: clamp(3px, 0.26vw, 5px);
+    font-size: clamp(16px, 1.302vw, 25px);
+  }
+
+  .highlightsContent {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: clamp(22px, 1.823vw, 35px);
+    width: min(calc(100vw - clamp(120px, 15.625vw, 300px)), 1596px);
+  }
+
+  .highlightsLargeList {
+    display: flex;
+    align-items: flex-start;
+    flex: 1 1 auto;
+    gap: clamp(22px, 1.823vw, 35px);
+    width: auto;
+    min-width: 0;
+  }
+
+  .highlightsRightList {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 clamp(257px, 21.406vw, 411px);
+    gap: clamp(22px, 1.823vw, 35px);
+    width: clamp(257px, 21.406vw, 411px);
+    height: clamp(331px, 27.552vw, 529px);
+  }
+
+  .highlightLargeCard {
+    height: clamp(331px, 27.552vw, 529px);
+    gap: clamp(13px, 1.042vw, 20px);
+    padding: clamp(19px, 1.5625vw, 30px);
+    border-radius: clamp(22px, 1.823vw, 35px);
+  }
+
+  .highlightSmallCard {
+    min-height: clamp(96px, 7.969vw, 153px);
+    padding: clamp(13px, 1.042vw, 20px);
+    border-radius: clamp(13px, 1.042vw, 20px);
+  }
+
+  .highlightLargeBlur {
+    height: clamp(110px, 9.167vw, 176px);
+  }
+
+  .highlightSmallBlur {
+    width: 100%;
+    height: 100%;
+  }
+
+  .highlightCardContent {
+    gap: clamp(13px, 1.042vw, 20px);
+  }
+
+  .highlightSmallContent {
+    gap: clamp(8px, 0.625vw, 12px);
+  }
+
+  .highlightEyebrow {
+    font-size: clamp(12px, 0.9375vw, 18px);
+  }
+
+  .highlightTitle {
+    font-size: clamp(15px, 1.25vw, 24px);
+  }
+
+  .highlightButtonRow {
+    gap: clamp(6px, 0.52vw, 10px);
+  }
+
+  .highlightAction {
+    min-width: clamp(63px, 5.208vw, 100px);
+    gap: clamp(6px, 0.52vw, 10px);
+    padding: clamp(3px, 0.26vw, 5px) clamp(9px, 0.781vw, 15px);
+  }
+
+  .highlightAction span {
+    font-size: clamp(13px, 1.042vw, 20px);
+  }
+
+  .approachPanel {
+    min-height: max(100vh, clamp(675px, 56.25vw, 1080px));
+    margin-top: clamp(100px, 8.333vw, 160px);
+    gap: clamp(44px, 3.646vw, 70px);
+    padding: clamp(62px, 5.208vw, 100px) clamp(94px, 7.8125vw, 150px);
+  }
+
+  .approachPanelExpanded {
+    min-height: calc(clamp(675px, 56.25vw, 1080px) + max(clamp(675px, 56.25vw, 1080px), 100vh));
+  }
+
+  .approachList {
+    display: flex;
+    align-items: center;
+    gap: clamp(19px, 1.5625vw, 30px);
+  }
+
+  .approachCard {
+    width: clamp(161px, 13.385vw, 257px);
+    min-height: clamp(174px, 14.531vw, 279px);
+    gap: clamp(16px, 1.302vw, 25px);
+    padding: clamp(16px, 1.302vw, 25px) clamp(19px, 1.5625vw, 30px);
+    border-radius: clamp(13px, 1.042vw, 20px);
+  }
+
+  .approachFigureWrap {
+    width: clamp(52px, 4.323vw, 83px);
+    height: clamp(68px, 5.625vw, 108px);
+  }
+
+  .approachCardText {
+    gap: clamp(8px, 0.625vw, 12px);
+  }
+
+  .approachCard h3 {
+    gap: clamp(5px, 0.417vw, 8px);
+    font-size: clamp(15px, 1.25vw, 24px);
+  }
+
+  .approachCard h3 span {
+    width: clamp(18px, 1.458vw, 28px);
+    height: clamp(18px, 1.458vw, 28px);
+    font-size: clamp(13px, 1.042vw, 20px);
+  }
+
+  .approachCard p,
+  .folderDrop p {
+    font-size: clamp(13px, 1.042vw, 20px);
+  }
+
+  .folderDrop {
+    gap: clamp(31px, 2.604vw, 50px);
+  }
+
+  .folderStage {
+    width: clamp(201px, 16.771vw, 322px);
+    height: clamp(178px, 14.792vw, 284px);
+  }
+
+  .folderDrop p {
+    gap: clamp(6px, 0.52vw, 10px);
+    padding: clamp(3px, 0.26vw, 5px) clamp(13px, 1.042vw, 20px);
+  }
+
+  .folderDrop p img {
+    width: clamp(15px, 1.25vw, 24px);
+    height: clamp(15px, 1.25vw, 24px);
+  }
+
+  .approachSummary {
+    top: clamp(675px, 56.25vw, 1080px);
+    height: max(clamp(675px, 56.25vw, 1080px), 100vh);
+  }
+
+  .approachText {
+    bottom: clamp(471px, 39.27vw, 754px);
+    width: min(clamp(648px, 53.958vw, 1036px), calc(100vw - 160px));
+    font-size: clamp(15px, 1.25vw, 24px);
+  }
+
+  .processFrame {
+    gap: clamp(28px, 2.344vw, 45px);
+    width: clamp(574px, 47.865vw, 919px);
+    height: clamp(409px, 34.063vw, 654px);
+    padding: clamp(31px, 2.604vw, 50px) clamp(31px, 2.604vw, 50px) clamp(13px, 1.042vw, 20px);
+    border-radius: clamp(44px, 3.646vw, 70px) clamp(44px, 3.646vw, 70px) 0 0;
+  }
+
+  .processHeaderLeft {
+    gap: clamp(28px, 2.344vw, 45px);
+  }
+
+  .processIcon {
+    width: clamp(66px, 5.521vw, 106px);
+    height: clamp(66px, 5.521vw, 106px);
+    border-radius: clamp(19px, 1.5625vw, 30px);
+  }
+
+  .processIcon img {
+    width: clamp(51px, 4.271vw, 82px);
+    height: clamp(51px, 4.271vw, 82px);
+  }
+
+  .processHeaderText {
+    gap: clamp(16px, 1.302vw, 25px);
+    min-height: clamp(66px, 5.469vw, 105px);
+  }
+
+  .processHeaderText strong {
+    font-size: clamp(15px, 1.25vw, 24px);
+  }
+
+  .processOption {
+    padding: clamp(9px, 0.781vw, 15px) clamp(13px, 1.042vw, 20px);
+  }
+
+  .processOption span {
+    font-size: clamp(14px, 1.146vw, 22px);
+  }
+
+  .processOption img {
+    width: clamp(15px, 1.25vw, 24px);
+    height: clamp(15px, 1.25vw, 24px);
+  }
+
+  .processCloseButton {
+    width: clamp(46px, 3.854vw, 74px);
+    height: clamp(46px, 3.854vw, 74px);
+  }
+
+  .processCloseButton span {
+    width: clamp(18px, 1.458vw, 28px);
+  }
+
+  .processViewport {
+    width: clamp(512px, 42.656vw, 819px);
+    height: clamp(271px, 22.552vw, 433px);
+  }
+
+  .processTrack {
+    --process-card-width: clamp(215px, 17.917vw, 344px);
+    --process-gap: clamp(13px, 1.042vw, 20px);
+    height: clamp(271px, 22.552vw, 433px);
+    transform: translateX(calc((clamp(512px, 42.656vw, 819px) - var(--process-card-width)) / 2 - var(--process-index) * (var(--process-card-width) + var(--process-gap))));
+  }
+
+  .processCard {
+    flex-basis: var(--process-card-width);
+    width: var(--process-card-width);
+    height: clamp(271px, 22.552vw, 433px);
+    padding: clamp(13px, 1.042vw, 20px);
+    border-radius: clamp(25px, 2.083vw, 40px);
+  }
+
+  .processCheckMark {
+    width: clamp(28px, 2.292vw, 44px);
+    height: clamp(28px, 2.292vw, 44px);
+    border-width: clamp(2px, 0.156vw, 3px);
+  }
+
+  .processCheckMark img {
+    width: clamp(15px, 1.25vw, 24px);
+    height: clamp(15px, 1.25vw, 24px);
+  }
+
+  .essencePanel {
+    grid-template-columns: minmax(386px, clamp(386px, 32.135vw, 617px)) minmax(0, clamp(540px, 45.052vw, 865px));
+    gap: clamp(54px, 7.188vw, 138px);
+    min-height: clamp(1406px, 117.188vw, 2250px);
+    padding: clamp(249px, 20.729vw, 398px) clamp(94px, 7.8125vw, 150px) clamp(62px, 5.208vw, 100px);
+  }
+
+  .essenceIntro {
+    top: clamp(200px, 16.667vw, 320px);
+    width: clamp(386px, 32.135vw, 617px);
+  }
+
+  .essenceIntro > p {
+    margin-top: clamp(22px, 1.823vw, 35px);
+    font-size: clamp(16px, 1.354vw, 26px);
+  }
+
+  .questionList {
+    gap: clamp(63px, 5.208vw, 100px);
+  }
+
+  .questionBubble {
+    gap: clamp(11px, 0.938vw, 18px);
+    max-width: clamp(536px, 44.635vw, 857px);
+    min-height: clamp(59px, 4.948vw, 95px);
+    padding: clamp(16px, 1.302vw, 25px) clamp(22px, 1.823vw, 35px);
+    border-radius: clamp(31px, 2.604vw, 50px);
+    font-size: clamp(20px, 1.667vw, 32px);
+  }
+
+  .questionBubbleLarge {
+    width: clamp(408px, 34.01vw, 653px);
+    min-height: clamp(88px, 7.292vw, 140px);
+  }
+
+  .questionBubbleLarge strong {
+    width: clamp(26px, 2.188vw, 42px);
+  }
+
+  .questionBubbleLarge span {
+    width: clamp(327px, 27.24vw, 523px);
+  }
+
+  .delivered,
+  .sender {
+    font-size: clamp(20px, 1.667vw, 32px);
+  }
+
+  .delivered {
+    margin: 0 clamp(16px, 1.302vw, 25px) clamp(13px, 1.042vw, 20px) 0;
+  }
+
+  .answerBubble {
+    max-width: clamp(463px, 38.542vw, 740px);
+    padding: clamp(16px, 1.302vw, 25px) clamp(22px, 1.823vw, 35px);
+    border-radius: clamp(25px, 2.083vw, 40px);
+    font-size: clamp(18px, 1.458vw, 28px);
+  }
+
+  .sender {
+    margin-left: clamp(22px, 1.823vw, 35px);
+  }
+
+  .invitationPanel {
+    min-height: max(100vh, clamp(675px, 56.25vw, 1080px));
+    padding-top: clamp(62px, 5.208vw, 100px);
+  }
+
+  .invitationTitle {
+    gap: clamp(22px, 1.823vw, 35px);
+    padding-top: clamp(81px, 6.771vw, 130px);
+  }
+
+  .invitationSub p,
+  .invitationSub strong {
+    font-size: clamp(16px, 1.354vw, 26px);
+  }
+
+  .invitationKeyButton {
+    bottom: clamp(44px, 3.646vw, 70px);
+    width: clamp(250px, 20.833vw, 400px);
+    height: clamp(338px, 28.125vw, 540px);
+  }
+
+  .contactCard {
+    width: clamp(263px, 21.875vw, 420px);
+    border-radius: clamp(13px, 1.042vw, 20px);
+  }
+
+  .contactTitle {
+    height: clamp(72px, 6.042vw, 116px);
+  }
+
+  .contactTitle h3 {
+    font-size: clamp(20px, 1.667vw, 32px);
+  }
+
+  .contactTitle p,
+  .contactActions button {
+    font-size: clamp(13px, 1.146vw, 22px);
+  }
+
+  .contactCard > img {
+    width: clamp(263px, 21.875vw, 420px);
+    height: clamp(263px, 21.875vw, 420px);
+  }
+
+  .contactActions button {
+    height: clamp(44px, 3.646vw, 70px);
   }
 }
