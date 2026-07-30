@@ -102,7 +102,7 @@ const highlightLargeProjects = [
   },
   {
     image: imgHighlightsProject2,
-    eyebrow: '콘서트 특화 일정 공유 앱',
+    eyebrow: '콘서트 특화 일정 관리 & 공유 앱',
     title: 'STAG',
     buttons: ['Prototype'],
     imageClass: styles.highlightProjectImageC,
