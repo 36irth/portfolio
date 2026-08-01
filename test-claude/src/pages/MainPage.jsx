@@ -140,7 +140,7 @@ const getHighlightHref = (group, projectIndex, label) => {
     return 'https://airsoft-nine.vercel.app/';
   }
   if (group === 'large' && projectIndex === 0 && normalized === 'slide') {
-    return 'https://www.figma.com/deck/DOYuW7zigrKfKCXuutEt1d';
+    return 'https://www.figma.com/deck/p8DGNWmECGIl7D1cLU9viU/%EC%B5%9C%EC%A2%85_-%ED%8C%80%ED%94%8C2-3%EC%A1%B0--%EA%B2%B0%EA%B3%BC%EB%B3%B4%EA%B3%A0%EC%84%9C_GUNIT-%EA%B1%B4%EC%9E%87-?node-id=2011-542&t=JNIoNz3SIMMG4AH7-1';
   }
   if (group === 'large' && projectIndex === 1 && ['site', 'prototype'].includes(normalized)) {
     return 'https://www.figma.com/proto/UALyVcFwWbFz1uGaSeCbkH/mingle?node-id=178-1892&t=rtN7gaALVZSpTAV6-1';
