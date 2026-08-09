@@ -1139,9 +1139,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 0;
+  width: 74px;
   height: 34px;
-  padding: 0 2em;
+  padding: 0 16px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.34);
   border-radius: 999px;
@@ -1171,9 +1171,9 @@
 .highlightSmallCard .highlightProjectTag {
   top: 20px;
   right: 20px;
-  min-width: 0;
+  width: 74px;
   height: 30px;
-  padding: 0 2em;
+  padding: 0 16px;
   font-size: 13px;
 }
 
@@ -4073,18 +4073,18 @@
   .highlightProjectTag {
     top: clamp(16px, 1.458vw, 28px);
     right: clamp(16px, 1.458vw, 28px);
-    min-width: 0;
+    width: clamp(56px, 3.854vw, 74px);
     height: clamp(24px, 1.771vw, 34px);
-    padding: 0 2em;
+    padding: 0 clamp(11px, 0.833vw, 16px);
     font-size: clamp(11px, 0.729vw, 14px);
   }
 
   .highlightSmallCard .highlightProjectTag {
     top: clamp(12px, 1.042vw, 20px);
     right: clamp(12px, 1.042vw, 20px);
-    min-width: 0;
+    width: clamp(56px, 3.854vw, 74px);
     height: clamp(22px, 1.562vw, 30px);
-    padding: 0 2em;
+    padding: 0 clamp(11px, 0.833vw, 16px);
     font-size: clamp(10px, 0.677vw, 13px);
   }
 
