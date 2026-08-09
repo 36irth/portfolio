@@ -8,9 +8,9 @@ const asset = (name) => `${import.meta.env.BASE_URL}assets/portfolio/${name}`;
 const imgHighlightsProject = asset('project-gunit.png');
 const imgHighlightsProject1 = asset('project-mingle.png');
 const imgHighlightsProject2 = asset('project-2.png');
-const imgHighlightsProject3 = asset('project-4.png');
-const imgHighlightsProject4 = asset('project-5.png');
-const imgHighlightsProject5 = asset('project-6.png');
+const imgHighlightsProject3 = asset('project-small-basketball-wide.png');
+const imgHighlightsProject4 = asset('project-small-cafe-yuil.png');
+const imgHighlightsProject5 = asset('project-small-mcqueen-wide.png');
 const imgHighlightsArrow = asset('highlight-arrow.svg');
 
 const imgApproachObserve = asset('approach-observe.png');
@@ -88,6 +88,9 @@ const highlightLargeProjects = [
     image: imgHighlightsProject,
     eyebrow: '에어소프트건 팬덤 커뮤니티 앱',
     title: 'GUNIT',
+    contribution: '\uAE30\uD68D 20% / \uB514\uC790\uC778 100%',
+    tag: '팀',
+    tagTone: 'team',
     buttons: ['App', 'Slide'],
     imageClass: styles.highlightProjectImageA,
     overlayClass: styles.highlightOverlayA,
@@ -96,6 +99,9 @@ const highlightLargeProjects = [
     image: imgHighlightsProject1,
     eyebrow: '회의 시간 조율 앱',
     title: 'mingle',
+    contribution: '\uAE30\uC5EC\uB3C4 100%',
+    tag: '개인',
+    tagTone: 'personal',
     buttons: ['Prototype'],
     imageClass: styles.highlightProjectImageB,
     overlayClass: styles.highlightOverlayB,
@@ -104,6 +110,9 @@ const highlightLargeProjects = [
     image: imgHighlightsProject2,
     eyebrow: '콘서트 특화 일정 관리 & 공유 앱',
     title: 'STAG',
+    contribution: '\uAE30\uC5EC\uB3C4 100%',
+    tag: '개인',
+    tagTone: 'personal',
     buttons: ['Prototype'],
     imageClass: styles.highlightProjectImageC,
     overlayClass: styles.highlightOverlayC,
@@ -115,6 +124,9 @@ const highlightSmallProjects = [
     image: imgHighlightsProject3,
     eyebrow: 'RE 프로젝트',
     title: '대학농구 홈커밍',
+    contribution: '\uAE30\uC5EC\uB3C4 100%',
+    tag: '개인',
+    tagTone: 'personal',
     buttons: ['pdf'],
     imageClass: styles.highlightProjectImageD,
   },
@@ -122,6 +134,9 @@ const highlightSmallProjects = [
     image: imgHighlightsProject4,
     eyebrow: '로컬 브랜드 로고 리디자인',
     title: '카페유일',
+    contribution: '\uAE30\uC5EC\uB3C4 100%',
+    tag: '개인',
+    tagTone: 'personal',
     buttons: ['pdf'],
     imageClass: styles.highlightProjectImageE,
   },
@@ -129,6 +144,9 @@ const highlightSmallProjects = [
     image: imgHighlightsProject5,
     eyebrow: '웹디자인 졸업전시',
     title: '알렉산더맥퀸',
+    contribution: '\uAE30\uC5EC\uB3C4 100%',
+    tag: '개인',
+    tagTone: 'personal',
     buttons: ['pdf'],
     imageClass: styles.highlightProjectImageF,
   },
@@ -192,6 +210,7 @@ const questions = [
 const formatQuestion = (number, question) => question;
 const characterReturnProgress = 0.38;
 const isCompactViewport = () => window.matchMedia?.('(max-width: 680px)').matches ?? window.innerWidth <= 680;
+
 
 const scrollToMainTop = () => {
   window.__portfolioSuppressEssenceSnapUntil = Date.now() + 1400;
@@ -975,12 +994,14 @@ function HighlightsSection() {
           {highlightLargeProjects.map((project, index) => (
             <AnimatedContent key={project.title} delay={0.03 + index * 0.06} distance={28} blur={10} scale={0.975}>
               <article className={styles.highlightLargeCard}>
+                <span className={`${styles.highlightProjectTag} ${project.tagTone === 'team' ? styles.highlightProjectTagTeam : ''}`}>{project.tag}</span>
                 <img src={project.image} alt="" className={`${project.imageClass} ${styles.highlightCardImage}`} />
                 <div className={`${styles.highlightLargeBlur} ${project.overlayClass}`} />
                 <div className={styles.highlightCardContent}>
                   <div className={styles.highlightTextBlock}>
                     <p className={styles.highlightEyebrow}>{project.eyebrow}</p>
                     <p className={styles.highlightTitle}>{project.title}</p>
+                    <p className={styles.highlightContribution}>{project.contribution}</p>
                   </div>
                   <div className={styles.highlightButtonRow}>
                     {project.buttons.map((label) => {
@@ -1012,12 +1033,14 @@ function HighlightsSection() {
           {highlightSmallProjects.map((project, index) => (
             <AnimatedContent key={project.title} delay={0.18 + index * 0.06} distance={22} blur={8} scale={0.98}>
               <article className={styles.highlightSmallCard}>
+                <span className={`${styles.highlightProjectTag} ${project.tagTone === 'team' ? styles.highlightProjectTagTeam : ''}`}>{project.tag}</span>
                 <img src={project.image} alt="" className={`${project.imageClass} ${styles.highlightCardImage}`} />
                 <div className={styles.highlightSmallBlur} />
                 <div className={styles.highlightSmallContent}>
                   <div className={styles.highlightTextBlock}>
                     <p className={styles.highlightEyebrow}>{project.eyebrow}</p>
                     <p className={styles.highlightTitle}>{project.title}</p>
+                    <p className={styles.highlightContribution}>{project.contribution}</p>
                   </div>
                   <div className={styles.highlightButtonRow}>
                     {project.buttons.map((label) => {
@@ -2110,6 +2133,7 @@ function InvitationSection() {
   );
 }
 
+
 const MemoHighlightsSection = memo(HighlightsSection);
 const MemoApproachSection = memo(ApproachSection);
 const MemoEssenceSection = memo(EssenceSection);
@@ -2120,6 +2144,27 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
   const [showTopButton, setShowTopButton] = useState(false);
   const [characterResetSignal, setCharacterResetSignal] = useState(0);
   const [approachAllCollected, setApproachAllCollected] = useState(false);
+
+  const getSectionNavBounds = (sectionId, target) => {
+    const selectorsBySection = {
+      highlights: [styles.highlightsTitle, styles.highlightsContent],
+      approach: [styles.approachTitle, styles.approachList, styles.folderDrop],
+      essence: [styles.essenceIntro],
+      invitation: [styles.invitationTitle, styles.invitationKeyButton],
+    };
+    const selectors = selectorsBySection[sectionId];
+    if (!selectors) return null;
+
+    const rects = selectors
+      .map((className) => target.querySelector(`.${className}`)?.getBoundingClientRect())
+      .filter(Boolean);
+    if (!rects.length) return null;
+
+    return {
+      top: Math.min(...rects.map((rect) => rect.top)),
+      bottom: Math.max(...rects.map((rect) => rect.bottom)),
+    };
+  };
 
   const scrollToSection = (sectionId) => {
     const target = document.querySelector(`[data-section="${sectionId}"]`);
@@ -2135,10 +2180,14 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
 
     const rect = target.getBoundingClientRect();
     const rootRect = root.getBoundingClientRect();
+    const sectionTop = root.scrollTop + rect.top - rootRect.top;
+    const bounds = getSectionNavBounds(sectionId, target);
     const top =
       sectionId === 'character'
-        ? root.scrollTop + rect.top - rootRect.top + window.innerHeight * 3.2 * characterReturnProgress
-        : root.scrollTop + rect.top - rootRect.top;
+        ? sectionTop + window.innerHeight * 3.2 * characterReturnProgress
+        : bounds
+          ? root.scrollTop + bounds.top - rootRect.top - Math.max(0, (rootRect.height - (bounds.bottom - bounds.top)) / 2)
+          : sectionTop;
     requestAppScrollTo(top, 'smooth');
     setActiveSection(sectionId);
   };
