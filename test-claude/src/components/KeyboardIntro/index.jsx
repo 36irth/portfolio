@@ -31,6 +31,7 @@ export function KeyboardIntro({ onComplete }) {
   const [progress, setProgress] = useState(0);
   const [webglError, setWebglError] = useState(false);
   const [isSkipping, setIsSkipping] = useState(false);
+  const [isSkipPressed, setIsSkipPressed] = useState(false);
   const [isTitleDone, setIsTitleDone] = useState(false);
 
   const typedValue = SEQUENCE.slice(0, progress).join('').toUpperCase();
@@ -184,6 +185,9 @@ export function KeyboardIntro({ onComplete }) {
   }
 
   const handleSkip = () => {
+    if (isSkipping) return;
+    setIsSkipPressed(true);
+    window.setTimeout(() => setIsSkipPressed(false), 360);
     skipSequenceRef.current?.();
   };
 
@@ -220,11 +224,14 @@ export function KeyboardIntro({ onComplete }) {
             </p>
           </div>
 
-          {!isSkipping && (
-            <button className={styles.skipButton} onClick={handleSkip}>
-              <span className={styles.skipLabel}>s k i p</span>
-            </button>
-          )}
+          <button
+            className={`${styles.skipButton} ${isSkipping ? styles.skipButtonDisabled : ''} ${isSkipPressed ? styles.skipButtonPressed : ''}`}
+            onClick={handleSkip}
+            disabled={isSkipping}
+            aria-disabled={isSkipping}
+          >
+            <span className={styles.skipLabel}>s k i p</span>
+          </button>
         </div>
 
         <div className={`${styles.bottomRow} ${isTitleDone ? styles.bottomRowReady : ''}`}>
