@@ -482,8 +482,8 @@
 
 .characterScrollSection {
   position: relative;
-  height: 420vh;
-  min-height: 4200px;
+  height: 380vh;
+  min-height: 3800px;
   background: var(--bg);
 }
 
@@ -2883,8 +2883,8 @@
   }
 
   .characterScrollSection {
-    height: 420vh;
-    min-height: 4200px;
+    height: 380vh;
+    min-height: 3800px;
   }
 
   .panel {

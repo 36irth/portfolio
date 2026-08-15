@@ -217,7 +217,7 @@ const scrollToMainTop = () => {
   window.__portfolioSuppressApproachPinUntil = Date.now() + 2600;
   window.dispatchEvent(new CustomEvent('portfolio:scroll-lock', { detail: { locked: false } }));
   window.dispatchEvent(new CustomEvent('portfolio:character-reset'));
-  requestAppScrollTo(window.innerHeight * 3.2 * characterReturnProgress, 'smooth');
+  requestAppScrollTo(window.innerHeight * 2.8 * characterReturnProgress, 'smooth');
 };
 
 const scrollToHighlights = () => {
@@ -2184,7 +2184,7 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
     const bounds = getSectionNavBounds(sectionId, target);
     const top =
       sectionId === 'character'
-        ? sectionTop + window.innerHeight * 3.2 * characterReturnProgress
+        ? sectionTop + window.innerHeight * 2.8 * characterReturnProgress
         : bounds
           ? root.scrollTop + bounds.top - rootRect.top - Math.max(0, (rootRect.height - (bounds.bottom - bounds.top)) / 2)
           : sectionTop;
@@ -2300,7 +2300,7 @@ export function MainPage({ isActive = false, scrollProgress = 0 }) {
         }`}
         onClick={() => {
           setCharacterResetSignal((prev) => prev + 1);
-          requestAppScrollTo(window.innerHeight * 3.2 * characterReturnProgress, 'smooth');
+          requestAppScrollTo(window.innerHeight * 2.8 * characterReturnProgress, 'smooth');
         }}
         aria-label="창 초기화"
         title="창 초기화"

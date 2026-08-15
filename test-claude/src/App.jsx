@@ -216,7 +216,7 @@ function App() {
   };
 
   const characterProgress = useMemo(() => {
-    const span = viewportHeight * 3.2;
+    const span = viewportHeight * 2.8;
     return Math.max(0, Math.min(1, scrollTop / span));
   }, [scrollTop, viewportHeight]);
 

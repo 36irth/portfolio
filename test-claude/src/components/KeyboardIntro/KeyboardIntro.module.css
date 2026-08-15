@@ -152,34 +152,63 @@
 }
 
 .skipButton {
+  position: relative;
   pointer-events: auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 18px;
-  border: 1px solid #989898;
+  padding: clamp(10px, 0.729vw, 14px) clamp(24px, 1.875vw, 36px);
+  overflow: hidden;
+  border: clamp(1.5px, 0.104vw, 2px) solid rgba(190, 232, 255, 0.72);
   border-radius: 555px;
-  background: transparent;
-  color: #989898;
+  background: rgba(1, 136, 251, 0.18);
+  color: rgba(237, 248, 255, 0.94);
   cursor: pointer;
+  box-shadow: none;
+  animation: skipButtonFloat 4.2s ease-in-out infinite;
   transition:
-    border-color 0.2s ease,
-    color 0.2s ease,
-    background-color 0.2s ease;
+    border-color 0.24s ease,
+    color 0.24s ease,
+    background-color 0.24s ease,
+    box-shadow 0.24s ease,
+    transform 0.24s ease;
 }
+
 
 .skipButton:hover,
 .skipButton:focus-visible {
-  border-color: #c3c3c3;
-  color: #d9d9d9;
-  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(232, 248, 255, 0.95);
+  color: #ffffff;
+  background: rgba(1, 136, 251, 0.32);
+  box-shadow: none;
+  transform: translateY(-8px);
   outline: none;
 }
 
+.skipButton:active {
+  transform: translateY(0) scale(0.98);
+}
+
+
+
+@keyframes skipButtonFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skipButton {
+    animation: none;
+  }
+}
 .skipLabel {
   display: block;
   font-family: 'Nohemi', 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: 28px;
+  font-size: clamp(28px, 1.875vw, 36px);
   font-weight: 300;
   line-height: 1.1;
   letter-spacing: 0;
@@ -383,7 +412,7 @@
   }
 
   .skipLabel {
-    font-size: 24px;
+    font-size: clamp(24px, 2.571vw, 36px);
   }
 
   .introStage {
@@ -452,11 +481,11 @@
 
   .skipButton {
     align-self: center;
-    padding: 6px 14px;
+    padding: clamp(10px, 1.4vw, 13px) clamp(24px, 3.2vw, 32px);
   }
 
   .skipLabel {
-    font-size: 22px;
+    font-size: clamp(24px, 3.1vw, 30px);
   }
 
   .introStage {
@@ -544,11 +573,11 @@
 
   .skipButton {
     align-self: center;
-    padding: 8px 18px;
+    padding: 10px 24px;
   }
 
   .skipLabel {
-    font-size: 18px;
+    font-size: 22px;
     letter-spacing: 2.7px;
     word-spacing: 0;
   }
