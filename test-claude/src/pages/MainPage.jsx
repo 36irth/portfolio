@@ -102,7 +102,7 @@ const highlightLargeProjects = [
     contribution: '\uAE30\uC5EC\uB3C4 100%',
     tag: '개인',
     tagTone: 'personal',
-    buttons: ['Prototype'],
+    buttons: ['Prototype', 'Landing'],
     imageClass: styles.highlightProjectImageB,
     overlayClass: styles.highlightOverlayB,
   },
@@ -113,7 +113,7 @@ const highlightLargeProjects = [
     contribution: '\uAE30\uC5EC\uB3C4 100%',
     tag: '개인',
     tagTone: 'personal',
-    buttons: ['Prototype'],
+    buttons: ['Prototype', 'Landing'],
     imageClass: styles.highlightProjectImageC,
     overlayClass: styles.highlightOverlayC,
   },
@@ -163,8 +163,14 @@ const getHighlightHref = (group, projectIndex, label) => {
   if (group === 'large' && projectIndex === 1 && ['site', 'prototype'].includes(normalized)) {
     return 'https://www.figma.com/proto/UALyVcFwWbFz1uGaSeCbkH/mingle?node-id=178-1892&t=rtN7gaALVZSpTAV6-1';
   }
+  if (group === 'large' && projectIndex === 1 && normalized === 'landing') {
+    return 'https://mingle-rho.vercel.app/';
+  }
   if (group === 'large' && projectIndex === 2 && normalized === 'prototype') {
     return 'https://www.figma.com/proto/QeO5PEeg80Q19N3CzTHFcM/STAG?node-id=0-1&t=qkbS69EpESylNhGy-1';
+  }
+  if (group === 'large' && projectIndex === 2 && normalized === 'landing') {
+    return 'file:///C:/Users/user/Desktop/landing_stag/index.html';
   }
   if (group === 'small' && projectIndex === 0 && normalized === 'pdf') {
     return asset('homecoming-basketball.pdf');
